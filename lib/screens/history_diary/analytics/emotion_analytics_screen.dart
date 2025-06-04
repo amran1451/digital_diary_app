@@ -125,7 +125,18 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
               ),
             ),
             leftTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: true, interval: 1),
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: 1,
+                reservedSize: 28,
+                getTitlesWidget: (value, meta) => Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: Text(
+                    value.toInt().toString(),
+                    style: const TextStyle(fontSize: 10),
+                  ),
+                ),
+              ),
             ),
             topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
             rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
