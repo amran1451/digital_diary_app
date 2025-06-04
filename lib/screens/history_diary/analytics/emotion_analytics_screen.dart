@@ -129,13 +129,16 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
                 showTitles: true,
                 interval: 1,
                 reservedSize: 28,
-                getTitlesWidget: (value, meta) => Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: Text(
-                    value.toInt().toString(),
-                    style: const TextStyle(fontSize: 10),
-                  ),
-                ),
+                getTitlesWidget: (value, meta) {
+                  if (value >= meta.max) return const SizedBox();
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: Text(
+                      value.toInt().toString(),
+                      style: const TextStyle(fontSize: 10),
+                    ),
+                  );
+                },
               ),
             ),
             topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
