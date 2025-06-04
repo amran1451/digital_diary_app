@@ -1,5 +1,5 @@
 // lib/screens/sleep_tracker_screen.dart
-
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../models/entry_data.dart';
@@ -16,8 +16,11 @@ class SleepTrackerScreen extends StatefulWidget {
   State<SleepTrackerScreen> createState() => _SleepTrackerScreenState();
 }
 
-class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
-  static const double _dayWidth = 32;
+class _SleepTrackerScreenState extends State<SleepTrackerScreen>
+    with SingleTickerProviderStateMixin {
+  static const double _dayWidth = 40;
+  late TabController _tabController;
+  DateTime _focusedDay = DateTime.now();
 
   List<EntryData> _allEntries = [];
   List<EntryData> _entries = [];
@@ -26,7 +29,14 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     _loadEntries();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadEntries() async {
@@ -89,28 +99,72 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
     return '$hч $mм';
   }
 
+  int? _parseMinutes(String s) {
+    final p = s.split(':');
+    if (p.length != 2) return null;
+    final h = int.tryParse(p[0]);
+    final m = int.tryParse(p[1]);
+    if (h == null || m == null) return null;
+    return h * 60 + m;
+  }
+
+  String _fmtTime(int mins) {
+    final h = (mins ~/ 60) % 24;
+    final m = mins % 60;
+    return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}';
+  }
+
+  Duration get _avgSleepDuration {
+    final list = _entries
+        .map((e) {
+      final bed = _toDateTime(e, e.bedTime);
+      final wake = _toDateTime(e, e.wakeTime);
+      if (bed == null || wake == null || wake.isBefore(bed)) return null;
+      return wake.difference(bed);
+    })
+        .whereType<Duration>()
+        .toList();
+    if (list.isEmpty) return Duration.zero;
+    final total = list.fold<int>(0, (p, d) => p + d.inMinutes);
+    return Duration(minutes: (total / list.length).round());
+  }
+
+  int get _avgWakeMinutes {
+    final list = _entries
+        .map((e) => _parseMinutes(e.wakeTime))
+        .whereType<int>()
+        .toList();
+    if (list.isEmpty) return 0;
+    final sum = list.reduce((a, b) => a + b);
+    return (sum / list.length).round();
+  }
+
+  int get _avgBedMinutes {
+    final vals = _entries
+        .map((e) => _parseMinutes(e.bedTime))
+        .whereType<int>()
+        .toList();
+    if (vals.isEmpty) return 0;
+    double sinSum = 0, cosSum = 0;
+    for (final v in vals) {
+      final ang = v / 1440 * 2 * pi;
+      sinSum += sin(ang);
+      cosSum += cos(ang);
+    }
+    final ang = atan2(sinSum / vals.length, cosSum / vals.length);
+    final res = ang >= 0 ? ang : ang + 2 * pi;
+    return (res * 1440 / (2 * pi)).round();
+  }
+
   void _showDetails(EntryData e) {
     final bed = _toDateTime(e, e.bedTime);
     final wake = _toDateTime(e, e.wakeTime);
     if (bed == null || wake == null) return;
     final dur = wake.difference(bed);
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(DateFormat('dd.MM.yyyy').format(_entryDate(e))),
-        content: Text(
-          'Длительность: ${_formatDuration(dur)}\n'
-              'Засыпание: ${e.bedTime}\n'
-              'Пробуждение: ${e.wakeTime}\n'
-              'Энергия: ${e.energy}',
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK')),
-        ],
-      ),
-    );
+    final msg =
+        '${DateFormat('dd.MM').format(_entryDate(e))} — ${_formatDuration(dur)}';
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg)));
   }
 
   Widget _buildAxis(double width, double hourWidth) {
@@ -149,7 +203,9 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
     if (bed == null || wake == null || wake.isBefore(bed)) {
       return Row(
         children: [
-          SizedBox(width: _dayWidth, child: Text(day)),
+          SizedBox(
+              width: _dayWidth,
+              child: Text(day, softWrap: false, textAlign: TextAlign.center)),
           SizedBox(
             width: width,
             height: 24,
@@ -177,7 +233,9 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
 
     return Row(
       children: [
-        SizedBox(width: _dayWidth, child: Text(day)),
+        SizedBox(
+            width: _dayWidth,
+            child: Text(day, softWrap: false, textAlign: TextAlign.center)),
         GestureDetector(
           onTap: () => _showDetails(e),
           child: SizedBox(
@@ -220,6 +278,103 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
     );
   }
 
+  Widget _buildTrackerTab(double width, double hourWidth) {
+    return Column(
+      children: [
+        _buildAxis(width, hourWidth),
+        const SizedBox(height: 4),
+        Expanded(
+          child: _entries.isEmpty
+              ? const Center(child: Text('Нет данных'))
+              : Scrollbar(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final e in _entries) _buildRow(e, width, hourWidth),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatsTab() {
+    if (_entries.isEmpty) {
+      return const Center(child: Text('Нет данных'));
+    }
+    final dur = _avgSleepDuration;
+    final wake = _fmtTime(_avgWakeMinutes);
+    final bed = _fmtTime(_avgBedMinutes);
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Средняя длительность сна: ${_formatDuration(dur)}'),
+          const SizedBox(height: 12),
+          Text('Среднее время подъёма: $wake'),
+          const SizedBox(height: 12),
+          Text('Среднее время отбоя: $bed'),
+        ],
+      ),
+    );
+  }
+
+  // eventsMap: date -> sleep duration in minutes
+  Widget _buildCalendarTab(Map<DateTime, int> eventsMap) {
+    if (_entries.isEmpty) {
+      return const Center(child: Text('Нет данных'));
+    }
+    final dates = eventsMap.keys.toList()..sort();
+    final first = dates.first;
+    final last = dates.last;
+    return TableCalendar<int>(
+      firstDay: first,
+      lastDay: last,
+      focusedDay: _focusedDay,
+      onPageChanged: (d) => setState(() => _focusedDay = d),
+      startingDayOfWeek: StartingDayOfWeek.monday,
+      eventLoader: (day) {
+        final key = DateTime(day.year, day.month, day.day);
+        return eventsMap[key] != null ? [eventsMap[key]!] : [];
+      },
+      calendarBuilders: CalendarBuilders(
+        markerBuilder: (ctx, day, events) {
+          if (events.isEmpty) return const SizedBox();
+          final v = events.first as int; // minutes
+          final hours = v / 60;
+          Color bg;
+          if (hours <= 3) bg = Colors.red.shade200;
+          else if (hours <= 6) bg = Colors.orange.shade300;
+          else if (hours <= 8) bg = Colors.lightGreen.shade400;
+          else bg = Colors.green.shade600;
+          return Positioned.fill(
+            child: Container(
+              margin: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: bg,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              alignment: Alignment.center,
+              child: Text('${hours.toStringAsFixed(1)}',
+                  style: const TextStyle(fontSize: 12, color: Colors.black)),
+            ),
+          );
+        },
+      ),
+      onDaySelected: (day, events) {
+        if (events.isEmpty) return;
+        final v = events.first as int; // minutes
+        final msg = '${DateFormat('dd.MM').format(day)} '
+            '— ${_formatDuration(Duration(minutes: v))}';
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(msg)));
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final app = MyApp.of(context);
@@ -231,6 +386,14 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
       appBar: AppBar(
         title: const Text('Трекер сна'),
         centerTitle: true,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Трекер'),
+            Tab(text: 'Статистика'),
+            Tab(text: 'Календарь'),
+          ],
+        ),
         actions: [
           IconButton(
             icon: Icon(app.isDark ? Icons.sunny : Icons.nightlight_round),
@@ -274,22 +437,27 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            _buildAxis(width, hourWidth),
-            const SizedBox(height: 4),
-            Expanded(
-              child: _entries.isEmpty
-                  ? const Center(child: Text('Нет данных'))
-                  : Scrollbar(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (final e in _entries) _buildRow(e, width, hourWidth),
-                    ],
-                  ),
-                ),
-                    ),
-
+        child: TabBarView(
+          controller: _tabController,
+          physics: _period == _Period.week
+              ? const NeverScrollableScrollPhysics()
+              : const BouncingScrollPhysics(),
+          children: [
+            _buildTrackerTab(width, hourWidth),
+            _buildStatsTab(),
+            _buildCalendarTab({
+              for (final e in _entries)
+                _entryDate(e):
+                _toDateTime(e, e.wakeTime) == null ||
+                    _toDateTime(e, e.bedTime) == null
+                    ? 0
+                    : (_toDateTime(e, e.wakeTime)!
+                    .difference(_toDateTime(e, e.bedTime)!)
+                    .inMinutes)
+                    .clamp(0, 24 * 60)
+            }),
+          ],
+        ),
             ),
           ],
         ),
