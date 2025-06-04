@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 import '../../../models/entry_data.dart';
 import '../../../services/local_db.dart';
 import '../../../main.dart';
@@ -437,27 +438,28 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
               ],
             ),
             const SizedBox(height: 16),
-        child: TabBarView(
-          controller: _tabController,
-          physics: _period == _Period.week
-              ? const NeverScrollableScrollPhysics()
-              : const BouncingScrollPhysics(),
-          children: [
-            _buildTrackerTab(width, hourWidth),
-            _buildStatsTab(),
-            _buildCalendarTab({
-              for (final e in _entries)
-                _entryDate(e):
-                _toDateTime(e, e.wakeTime) == null ||
-                    _toDateTime(e, e.bedTime) == null
-                    ? 0
-                    : (_toDateTime(e, e.wakeTime)!
-                    .difference(_toDateTime(e, e.bedTime)!)
-                    .inMinutes)
-                    .clamp(0, 24 * 60)
-            }),
-          ],
-        ),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                physics: _period == _Period.week
+                    ? const NeverScrollableScrollPhysics()
+                    : const BouncingScrollPhysics(),
+                children: [
+                  _buildTrackerTab(width, hourWidth),
+                  _buildStatsTab(),
+                  _buildCalendarTab({
+                    for (final e in _entries)
+                      _entryDate(e):
+                      _toDateTime(e, e.wakeTime) == null ||
+                          _toDateTime(e, e.bedTime) == null
+                          ? 0
+                          : (_toDateTime(e, e.wakeTime)!
+                          .difference(_toDateTime(e, e.bedTime)!)
+                          .inMinutes)
+                          .clamp(0, 24 * 60)
+                  }),
+                ],
+              ),
             ),
           ],
         ),
