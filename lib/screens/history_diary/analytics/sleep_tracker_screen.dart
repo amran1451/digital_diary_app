@@ -365,10 +365,11 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
           );
         },
       ),
-      onDaySelected: (day, events) {
-        if (events.isEmpty) return;
-        final v = events.first as int; // minutes
-        final msg = '${DateFormat('dd.MM').format(day)} '
+      onDaySelected: (selectedDay, focusedDay) {
+        final key = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
+        final v = eventsMap[key];
+        if (v == null) return;
+        final msg = '${DateFormat('dd.MM').format(selectedDay)} '
             '— ${_formatDuration(Duration(minutes: v))}';
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(msg)));
