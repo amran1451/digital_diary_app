@@ -1,0 +1,300 @@
+// JavaScript Document
+
+(function($){
+	// if(ExternalLogin) {
+	// 	$(function(){
+	// 		centering();
+	// 		$(window).on('resize', function(){
+	// 			centering();
+	// 		});
+	// 	});
+	// }
+
+	function centering() {
+		// var height = $('#auth_form_wrap').height();
+		// var winHeight = $(window).height();
+		// if (winHeight > (height + 200)) {
+		// 	var marginTop = -Math.round(height/2);
+		// 	$('#auth_form_wrap').css({'margin-top': marginTop + 'px', 'margin-bottom': 'auto', 'top': '50%', 'padding-top': '0', 'padding-bottom': '0'});
+		// } else {
+		// 	$('#auth_form_wrap').css({'padding-top': '100px', 'padding-bottom': '100px', 'top': 'auto', 'margin-top': 'auto', 'margin-bottom': 'auto'});
+		// }
+	}
+
+	$(function(){
+		if(ExternalLogin) {
+			var popup_id = 'auth_form_wrap';
+		} else {
+			var popup_id = 'popup';
+		}
+		// $(document).on('keyup', '#'+popup_id+' input', function() {
+		// 	$(this).removeClass('error');
+		// 	$(this).siblings().hide();
+		// 	$(this).addClass('active');
+		// 	$(this).css('background', '#fff');
+		// });
+
+		// $(document).on('focusout', '#'+popup_id+' input', function() {
+		// 	$(this).removeClass('active');
+		// 	if ($(this).val() != '') {
+		// 		$(this).css('background', '#fff');
+		// 	} else {
+		// 		$(this).css('background', '#fbfbfb');
+		// 	}
+		// });
+
+		// $(document).on('focusin', '#'+popup_id+' input', function() {
+		// 	$(this).css('background', '#fff');
+		// 	$(this).addClass('active');
+		// });
+	});
+
+	$(function(){
+		// $(document).on('click', '#auth_form_content button', function(e) {
+		// 	e.preventDefault();
+		// 	if (($('#form_login_email').val() != '')&&($('#form_login_password').val() != '')) {
+		// 		startLogin();
+		// 	}
+		// });
+
+		// $(document).on('click', '.input_wrap i.fa-times', function() {
+		// 	$(this).hide();
+		// 	$(this).siblings('span, i').hide();
+		// 	$(this).siblings('input').removeClass('error').css('background', '#fbfbfb').val('');
+		// });
+
+		$(document).on('click', '#auth_form_content .modal-footer .js-sign-up-account', function(e) {
+			e.preventDefault();
+			$('#auth_form_content').hide();
+			$('#req_form_content').show();
+			if(ExternalLogin) {
+				centering();
+			}
+		});
+		
+		// $(document).on('click', '#req_form_content button', function(e) {
+		// 	e.preventDefault();
+		// 	if (($('#form_reg_full_name').val() != '')&&($('#form_reg_email').val() != '')&&($('#form_reg_password_first').val() != '')&&($('#form_reg_password_second').val() != '')) {
+		// 		startRegister();
+		// 	}
+		// });
+
+		$(document).on('click', '#req_form_content .js-sign-in-account', function(e) {
+			e.preventDefault();
+			$('#auth_form_content').show();
+			$('#req_form_content').hide();
+			if(ExternalLogin) {
+				centering();
+			}
+		});
+
+		$(document).on('click', '#auth_form_content .js-forgot-password-account', function(e) {
+			e.preventDefault();
+			$('#auth_form_content').hide();
+			$('#recover_account').show();
+			if(ExternalLogin) {
+				centering();
+			}
+			$('#recover_account .input_wrap').find('i, span').hide();
+			$('#recover_account .input_wrap').find('input').removeClass('error').val('');
+			$('#recover_account button').find('span').show();
+			$('#recover_account button').find('i').hide();
+		});
+
+		// $(document).on('click', '#recover_account button', function(e) {
+		// 	e.preventDefault();
+		// 	if ($('#recover_account input').val() != '') {
+		// 		startRestore('recover');
+		// 	}
+		// });
+
+		$(document).on('click', '#recover_account a', function(e) {
+			e.preventDefault();
+			$('#recover_account').hide();
+			$('#auth_form_content').show();
+			if(ExternalLogin) {
+				centering();
+			}
+		});
+
+		$(document).on('click', '#recover_account_sent a', function(e) {
+			e.preventDefault();
+			$('#recover_account_sent').hide();
+			$('#auth_form_content').show();
+			if(ExternalLogin) {
+				centering();
+			}
+		});
+
+		$(document).on('click', '#auth_form_content .js-account-access', function(e) {
+			e.preventDefault();
+			$('#auth_form_content').hide();
+			$('#account_access').show();
+			if(ExternalLogin) {
+				centering();
+			}
+			$('#account_access .input_wrap').find('i, span').hide();
+			$('#account_access .input_wrap').find('input').val('');
+			$('#account_access button').find('span').show();
+			$('#account_access button').find('i').hide();
+			
+		});
+
+		$(document).on('click', '#req_form_content .js-account-access', function(e) {
+			e.preventDefault();
+			$('#req_form_content').hide();
+			$('#account_access').show();
+			if(ExternalLogin) {
+				centering();
+			}
+			$('#account_access .input_wrap').find('i, span').hide();
+			$('#account_access .input_wrap').find('input').removeClass('error').val('');
+			$('#account_access button').find('span').show();
+			$('#account_access button').find('i').hide();
+			
+		});
+
+		// $(document).on('click', '#account_access button', function(e) {
+		// 	e.preventDefault();
+		// 	if ($('#account_access input').val() != '') {
+		// 		startRestore('access');
+		// 	}
+		// });
+
+		$(document).on('click', '#account_access a', function(e) {
+			e.preventDefault();
+			$('#account_access').hide();
+			$('#auth_form_content').show();
+			if(ExternalLogin) {
+				centering();
+			}
+		});
+
+		$(document).on('click', '#account_access_sent a', function(e) {
+			e.preventDefault();
+			$('#account_access_sent').hide();
+			$('#auth_form_content').show();
+			if(ExternalLogin) {
+				centering();
+			}
+		});
+		
+		$(document).on('click', '#registration_need_confirmation a', function(e) {
+			e.preventDefault();
+			$('#registration_need_confirmation').hide();
+			$('#auth_form_content').show();
+			if(ExternalLogin) {
+				centering();
+			}
+		});
+	});
+	
+})(jQuery)
+
+function CloseLoginForm() {
+	if(ExternalLogin) {
+		$('#auth_form_content').hide();
+	} else {
+		$('#auth_form_wrap').togglePopup();
+	}
+}
+
+function ShowSpinButton(button_id) {
+	// $('#'+button_id).find('span').hide();
+	// $('#'+button_id).find('i').css('display', 'inline-block');
+	// $('#'+button_id).css('background', '#c2c2c2');
+}
+
+function CloseSpinButton(button_id) {
+	// $('#'+button_id).find('span').show();
+	// $('#'+button_id).find('i').hide();
+	// $('#'+button_id).css('background', '#4ca9e4');
+}
+
+function ShowLoginFormError(input_id, error_id) {
+	console.log(input_id, error_id);
+
+	let error_tooltip = $('#'+error_id);
+
+	if(error_tooltip.parents('form').find('.warning-message').length) {
+		error_tooltip.parents('form').find('.warning-message').removeClass('visible')
+	}
+	
+	if(error_id == 'ERR_CAPTCHA') {
+		let text = error_tooltip.text();
+		if(error_tooltip.parents('form').find('.warning-message').length) {
+			error_tooltip.parents('form').find('.warning-message').text(text).addClass('visible')
+			error_tooltip.parents('form').find('[type="password"]').val('').focus();
+		} else {
+			console.log('нету warning-message');
+		}
+	} else {
+		let elemPadding = $('#'+input_id).css('padding');
+
+		$('#'+input_id).addClass('error hide_text');
+		$('#'+error_id).addClass('visible').css('padding', elemPadding);
+	}
+}
+
+function CloseAllErrors() {
+	$('input').removeClass('error');
+}
+
+function startRegister() {
+	// CloseAllErrors();
+	// ShowSpinButton('req_form_content_button');
+	
+	// var fullname = $('#form_reg_full_name').val();
+	// var email = $('#form_reg_email').val();
+	// var password = $('#form_reg_password_first').val();
+	// var password_rep = $('#form_reg_password_second').val();
+	// xajax_userRegister(fullname, email, password, password_rep);
+}
+
+function startLogin() {
+	// CloseAllErrors();
+	// ShowSpinButton('auth_form_content_button');
+	
+	// var emailaddress = $('#form_login_email').val();
+	// var password = $('#form_login_password').val();
+
+	// xajax_userLogin(emailaddress, password);
+}
+
+/**
+ * Восстановление пароля
+ */
+function startRestore(recover_type){
+	// CloseAllErrors();
+	// ShowSpinButton(recover_type+'_account_button');
+	
+	// var emailaddress = $('#form_'+recover_type+'_email').val();
+	// xajax_userRestorePass(emailaddress, recover_type);
+}
+
+/**
+ * Вывод ошибок авторизации
+ */
+function AuthorizationError( msg ) {
+    ShowError(msg);
+	$('#button_log_spin').hide();
+	$('#button_log').show();
+}
+
+function validateEmail(email) { 
+    // var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    // return re.test(email);
+}
+
+function PasswordSent(recover_type) {
+	if(recover_type=='recover') {
+		$('#recover_account').hide();
+		$('#recover_account_sent').show();
+	} else {
+		$('#account_access').hide();
+		$('#account_access_sent').show();
+	}
+	if(ExternalLogin) {
+		centering();
+	}
+}

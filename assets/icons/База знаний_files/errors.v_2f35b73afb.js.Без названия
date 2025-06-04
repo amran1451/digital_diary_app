@@ -1,0 +1,39 @@
+$(document).ready(function(){
+	$('input,select,textarea').each(function() {
+		error_string = '';
+		for(var i=0; i<10 ;i++) {
+			if($(this).attr('error_'+i)) {
+				error_string = error_string+'<span id="warning_'+ $(this).attr('errorid_'+i)+ '" class="errorTip">';
+				//error_string = error_string+'<span id="warninfo_'+ $(this).attr('errorid_'+i)+ '" class="error_text">'+ $(this).attr('error_'+i)+ '</span>';
+				error_string = error_string+$(this).attr('error_'+i);
+				error_string = error_string+'<span class="icon icon-sort-down"></span>';
+				error_string = error_string+'<span class="closeError icon-remove"></span>';
+				error_string = error_string+'</span>';
+				$(this).removeAttr('error_'+i);
+				$(this).removeAttr('errorid_'+i);
+			} else {
+				break;
+			}
+		}
+		$(this).after(error_string);
+	});
+	
+	$('.show-error-on-load').each(function() {
+		var errorid = $(this).attr('id');
+		$('#warning_'+errorid).show();
+		$('#warninfo_'+errorid).show();
+	});
+	
+	$('.closeError').click(function() {
+	   $(this).parent().hide();
+	   $(this).parent().siblings('.error').removeClass('error');
+   });
+});
+
+function ShowError(errorid) {
+	$('#warning_'+errorid).show();
+}
+/*
+<span class="errorTip">не менее 5 символов <span class="icon icon-sort-down"></span><span class="closeError icon-remove"></span></span>
+<span class="errorTip">не менее 5 символов <span class="icon icon-sort-down"></span><span class="closeError icon-remove"></span></span>
+*/

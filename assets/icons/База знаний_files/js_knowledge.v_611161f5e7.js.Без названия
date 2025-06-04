@@ -1,0 +1,71 @@
+var search_timeout;
+var search_string;
+
+$(document).ready(function(){
+    // Если на странице есть поиск, то запустим его.
+    if( $('#search_field').length > 0 ){
+        $(".search form").keypress(function (e) {if (e.keyCode == 13) {e.preventDefault();}})
+
+        $('#search_field').change(function() {
+            checkSearch();
+        });
+        $('#search_field').keyup(function() {
+            checkSearch();
+        });
+    }
+    $('.knowContent img').on('load',function ()
+    {
+//        console.log(this,this.naturalWidth,this.width);
+        if(this.width >= this.naturalWidth && this.width <= 670)
+        {
+            $(this).removeAttr('data-action');
+        }
+    });
+});
+
+function checkSearch() {
+	var tmp_search_string = $('#search_field').val();
+	if(tmp_search_string == '') {
+        $('#search_spin').hide();
+		$("#searchResults").hide();
+		$("#block_knowledge").show();
+	}
+    else if(tmp_search_string != search_string) {
+		search_string = tmp_search_string;
+		clearTimeout(search_timeout);
+        $('#search_spin').show();
+		search_timeout = setTimeout("GetSearch()",1500);
+	}
+}
+
+function GetSearch() {
+	var search_string = $('#search_field').val();
+    var page_type = $('input[name=page_type]').val();
+    if(page_type == 'category_main')
+    {
+        page_type = 'category';
+    }
+    var category_id = 0;
+
+    if( page_type === 'category' ){
+        category_id = $('input[name=category_id]').val();
+    }
+    
+	xajax_doSearch(page_type, category_id, search_string);
+}
+
+function CheckFavorites( element_id, on_off, is_user_authorized ) {
+    if(is_user_authorized) {
+        xajax_SetFavorites(element_id, on_off);
+    }
+    else{
+        ShowLoginForm();
+    }
+
+    return false;
+}
+
+function showMoreKnowledge(data_id, page) {
+    var offset = $('#offset_knowledge').val();
+	xajax_ShowMoreKnowledge(data_id, page, offset);
+}

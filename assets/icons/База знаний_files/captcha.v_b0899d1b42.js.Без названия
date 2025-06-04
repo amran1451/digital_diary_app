@@ -1,0 +1,25 @@
+$(document).ready(function(){
+	$(document).on('click','.captcha span',function(){
+		$('.captcha span').removeClass('active');
+		$(this).addClass('active');
+		$(this).closest('.captchaBlock').find('.captcha_response').val($(this).attr('rel'));
+
+
+        if( $(this).closest('form').find('textarea').length){
+            if( $(this).closest('form').find('textarea').val().length > 0){
+                $(this).closest('.captchaBlock').find('.disable').removeClass('disable');
+            }
+        }
+        // $(this).closest('.captchaBlock').find('.captcha_error').hide();
+	});
+
+    // by nathaira: Добавила сюда, т.к. проверка включает наличие капчи
+    $(document).on('keyup', 'textarea[name="comment_content"]', function(){
+        if( $(this).val().length > 0 && $(this).parents('form').find('input.captcha_response').val() !== '' ){
+            $(this).closest('form').find('[type="submit"]').removeClass('disable');
+        }
+        else{
+            $(this).closest('form').find('[type="submit"]').addClass('disable');
+        }
+    });
+});

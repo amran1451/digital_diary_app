@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Это строковый ресурс, которым по‑умолчанию метится ваше приложение -->
+    <string name="app_name">Дневник</string>
+</resources>
