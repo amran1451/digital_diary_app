@@ -17,7 +17,6 @@ class SleepTrackerScreen extends StatefulWidget {
 }
 
 class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
-  static const double _hourWidth = 40;
   static const double _dayWidth = 32;
 
   List<EntryData> _allEntries = [];
@@ -114,7 +113,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
     );
   }
 
-  Widget _buildAxis(double width) {
+  Widget _buildAxis(double width, double hourWidth) {
     final labels = [
       for (int h = 18; h <= 22; h += 2) '$h',
       '0',
@@ -130,7 +129,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
             children: [
               for (int i = 0; i < labels.length; i++)
                 SizedBox(
-                  width: _hourWidth * 2,
+                  width: hourWidth * 2,
                   child: Center(
                       child: Text(labels[i],
                           style: const TextStyle(fontSize: 10))),
@@ -142,10 +141,10 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
     );
   }
 
-  Widget _buildRow(EntryData e, double width) {
+  Widget _buildRow(EntryData e, double width, double hourWidth) {
     final bed = _toDateTime(e, e.bedTime);
     final wake = _toDateTime(e, e.wakeTime);
-    final day = _entryDate(e).day.toString().padLeft(2, '0');
+    final day = DateFormat('dd.MM').format(_entryDate(e));
 
     if (bed == null || wake == null || wake.isBefore(bed)) {
       return Row(
@@ -154,9 +153,8 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
           SizedBox(
             width: width,
             height: 24,
-            child: const Align(
-                alignment: Alignment.centerLeft,
-                child: Text('не спал(а) ☹️')),
+            child:
+            const Center(child: Text('не спал ☹️')),
           ),
         ],
       );
@@ -170,8 +168,8 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
     );
     final startMin = bed.difference(base).inMinutes.toDouble();
     final endMin = wake.difference(base).inMinutes.toDouble();
-    final left = startMin / 60 * _hourWidth;
-    final right = endMin / 60 * _hourWidth;
+    final left = startMin / 60 * hourWidth;
+    final right = endMin / 60 * hourWidth;
     final dur = wake.difference(bed);
 
     final leftClamped = left.clamp(0.0, width);
@@ -189,7 +187,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
               children: [
                 for (int i = 0; i <= 22; i++)
                   Positioned(
-                    left: i * _hourWidth - 0.5,
+                    left: i * hourWidth - 0.5,
                     top: 0,
                     bottom: 0,
                     child: Container(
@@ -225,7 +223,9 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
   @override
   Widget build(BuildContext context) {
     final app = MyApp.of(context);
-    final width = _hourWidth * 22;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final width = screenWidth - 32 - _dayWidth;
+    final hourWidth = width / 22;
 
     return Scaffold(
       appBar: AppBar(
@@ -274,24 +274,22 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
               ],
             ),
             const SizedBox(height: 16),
+            _buildAxis(width, hourWidth),
+            const SizedBox(height: 4),
             Expanded(
               child: _entries.isEmpty
                   ? const Center(child: Text('Нет данных'))
                   : Scrollbar(
                 child: SingleChildScrollView(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildAxis(width),
-                        const SizedBox(height: 4),
-                        for (final e in _entries) _buildRow(e, width),
-                      ],
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final e in _entries) _buildRow(e, width, hourWidth),
+                    ],
                   ),
                 ),
-              ),
+                    ),
+
             ),
           ],
         ),
