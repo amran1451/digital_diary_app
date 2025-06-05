@@ -22,7 +22,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
   // Width of the left column with dates. Enough to fit "12.05" without
   // wasting extra space.
   static const double _dayWidth = 36;
-  static const double _leftSpacing = 8;
+  static const double _leftSpacing = 4;
   late TabController _tabController;
   DateTime _focusedDay = DateTime.now();
 
@@ -189,20 +189,19 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
               children: [
               // first label
               Positioned(
-              left: 0,
+              left: -hourWidth,
               top: 0,
               bottom: 0,
               child: SizedBox(
                 width: hourWidth * 2,
-                child: Align(
-                  alignment: Alignment.centerLeft,
+                child: Center(
                   child: Text(
                     labels.first,
                     style: const TextStyle(fontSize: 10),
-                  ),
                     ),
                   ),
                 ),
+              ),
             // middle labels
             Positioned.fill(
               left: hourWidth,
@@ -225,19 +224,20 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
                 ),
             // last label
             Positioned(
-              right: 0,
+              right: -hourWidth,
               top: 0,
               bottom: 0,
               child: SizedBox(
                 width: hourWidth * 2,
-                child: Align(
-                  alignment: Alignment.centerRight,
+                child: Center(
                   child: Text(
                     labels.last,
                     style: const TextStyle(fontSize: 10),
                   ),
-                    ),
+                ),
                   ),
+            ),
+          ),
                 ),
               ],
             ),
