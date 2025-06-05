@@ -19,7 +19,9 @@ class SleepTrackerScreen extends StatefulWidget {
 
 class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     with SingleTickerProviderStateMixin {
-  static const double _dayWidth = 40;
+  // Width of the left column with dates. Enough to fit "12.05" without
+  // wasting extra space.
+  static const double _dayWidth = 36;
   static const double _leftSpacing = 8;
   late TabController _tabController;
   DateTime _focusedDay = DateTime.now();
@@ -176,69 +178,72 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
       for (int h = 2; h <= 16; h += 2) '$h',
     ];
     return Padding(
-        padding: const EdgeInsets.only(left: _leftSpacing),
-        child: Row(
-          children: [
-            const SizedBox(width: _dayWidth),
-              SizedBox(
-                width: width,
-                height: 20,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
+      padding: const EdgeInsets.only(left: _leftSpacing),
+      child: Row(
+        children: [
+          const SizedBox(width: _dayWidth),
+          SizedBox(
+            width: width,
+            height: 20,
+            child: Stack(
+              children: [
               // first label
               Positioned(
-                left: -hourWidth + 4,
-                top: 0,
-                bottom: 0,
-                child: SizedBox(
-                  width: hourWidth * 2,
-                  child: Center(
-                    child: Text(
-                      labels.first,
-                      style: const TextStyle(fontSize: 10),
+              left: 0,
+              top: 0,
+              bottom: 0,
+              child: SizedBox(
+                width: hourWidth * 2,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    labels.first,
+                    style: const TextStyle(fontSize: 10),
+                  ),
                     ),
                   ),
                 ),
-              ),
-              // middle labels
-              Positioned.fill(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+            // middle labels
+            Positioned.fill(
+              left: hourWidth,
+              right: hourWidth,
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    for (int i = 1; i < labels.length - 1; i++)
-                      SizedBox(
-                        width: hourWidth * 2,
-                        child: Center(
-                          child: Text(
-                            labels[i],
-                            style: const TextStyle(fontSize: 10),
+              for (int i = 1; i < labels.length - 1; i++)
+              SizedBox(
+              width: hourWidth * 2,
+              child: Center(
+                child: Text(
+                  labels[i],
+                  style: const TextStyle(fontSize: 10),
+                ),
                           ),
                         ),
-                      ),
                   ],
-                ),
               ),
-              // last label
-              Positioned(
-                right: -hourWidth + 4,
-                top: 0,
-                bottom: 0,
-                child: SizedBox(
-                  width: hourWidth * 2,
-                  child: Center(
-                    child: Text(
-                      labels.last,
-                      style: const TextStyle(fontSize: 10),
+                ),
+            // last label
+            Positioned(
+              right: 0,
+              top: 0,
+              bottom: 0,
+              child: SizedBox(
+                width: hourWidth * 2,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    labels.last,
+                    style: const TextStyle(fontSize: 10),
+                  ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
-        ),
+        ],
+      ),
     );
   }
 
@@ -253,9 +258,13 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
         child: Row(
           children: [
             SizedBox(
-                width: _dayWidth,
-                child:
-                Text(day, softWrap: false, textAlign: TextAlign.center)),
+              width: _dayWidth,
+              height: 24,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(day, softWrap: false),
+              ),
+            ),
             SizedBox(
               width: width,
               height: 24,
@@ -286,9 +295,13 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     child: Row(
     children: [
     SizedBox(
-    width: _dayWidth,
-    child:
-    Text(day, softWrap: false, textAlign: TextAlign.center)),
+      width: _dayWidth,
+      height: 24,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(day, softWrap: false),
+      ),
+    ),
     GestureDetector(
     onTap: () => _showDetails(e),
     child: SizedBox(
