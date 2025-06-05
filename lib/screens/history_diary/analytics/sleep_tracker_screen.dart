@@ -180,15 +180,34 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
         SizedBox(
           width: width,
           height: 20,
-          child: Row(
+          child: Stack(
             children: [
-              for (int i = 0; i < labels.length; i++)
-                SizedBox(
+          Row(
+          children: [
+          for (int i = 0; i < labels.length - 1; i++)
+          SizedBox(
+          width: hourWidth * 2,
+          child: Center(
+            child: Text(
+              labels[i],
+              style: const TextStyle(fontSize: 10),
+            ),
+          ),
+        ),
+      ],
+    ),
+    Positioned(
+    right: 0,
+    child: SizedBox(
                   width: hourWidth * 2,
                   child: Center(
-                      child: Text(labels[i],
-                          style: const TextStyle(fontSize: 10))),
+    child: Text(
+    labels.last,
+    style: const TextStyle(fontSize: 10),
+    ),
+    ),
                 ),
+    ),
             ],
           ),
         ),
