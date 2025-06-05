@@ -182,32 +182,50 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
           height: 20,
           child: Stack(
             children: [
-          Row(
-          children: [
-          for (int i = 0; i < labels.length - 1; i++)
-          SizedBox(
-          width: hourWidth * 2,
-          child: Center(
-            child: Text(
-              labels[i],
-              style: const TextStyle(fontSize: 10),
-            ),
-          ),
-        ),
-      ],
-    ),
-    Positioned(
-    right: 0,
-    child: SizedBox(
+              // first label
+              Positioned(
+                left: 0,
+                child: SizedBox(
                   width: hourWidth * 2,
                   child: Center(
-    child: Text(
-    labels.last,
-    style: const TextStyle(fontSize: 10),
-    ),
-    ),
+                    child: Text(
+                      labels.first,
+                      style: const TextStyle(fontSize: 10),
+                    ),
+                  ),
                 ),
-    ),
+              ),
+              // middle labels
+              Positioned.fill(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (int i = 1; i < labels.length - 1; i++)
+                      SizedBox(
+                        width: hourWidth * 2,
+                        child: Center(
+                          child: Text(
+                            labels[i],
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              // last label
+              Positioned(
+                right: 0,
+                child: SizedBox(
+                  width: hourWidth * 2,
+                  child: Center(
+                    child: Text(
+                      labels.last,
+                      style: const TextStyle(fontSize: 10),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
