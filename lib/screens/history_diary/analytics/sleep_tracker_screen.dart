@@ -181,10 +181,13 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
           width: width,
           height: 20,
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
               // first label
               Positioned(
-                left: 0,
+                left: -hourWidth + 4,
+                top: 0,
+                bottom: 0,
                 child: SizedBox(
                   width: hourWidth * 2,
                   child: Center(
@@ -215,7 +218,9 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
               ),
               // last label
               Positioned(
-                right: 0,
+                right: -hourWidth + 4,
+                top: 0,
+                bottom: 0,
                 child: SizedBox(
                   width: hourWidth * 2,
                   child: Center(
