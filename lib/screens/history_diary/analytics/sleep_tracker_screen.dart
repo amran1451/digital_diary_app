@@ -23,6 +23,10 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
   // wasting extra space.
   static const double _dayWidth = 36;
   static const double _leftSpacing = 4;
+  // Spacing between the column with dates and the chart area
+  static const double _betweenSpacing = 8;
+  // Right padding so the last hour label is fully visible
+  static const double _rightSpacing = 8;
   late TabController _tabController;
   DateTime _focusedDay = DateTime.now();
 
@@ -178,11 +182,15 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
       for (int h = 2; h <= 16; h += 2) '$h',
     ];
     return Padding(
-      padding: const EdgeInsets.only(left: _leftSpacing),
+      padding: const EdgeInsets.only(
+        left: _leftSpacing,
+        right: _rightSpacing,
+      ),
       child: Row(
         children: [
           const SizedBox(width: _dayWidth),
-          SizedBox(
+          const SizedBox(width: _betweenSpacing),
+      SizedBox(
             width: width,
             height: 20,
             child: Stack(
@@ -254,7 +262,10 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
 
     if (bed == null || wake == null || wake.isBefore(bed)) {
       return Padding(
-        padding: const EdgeInsets.only(left: _leftSpacing),
+        padding: const EdgeInsets.only(
+          left: _leftSpacing,
+          right: _rightSpacing,
+        ),
         child: Row(
           children: [
             SizedBox(
@@ -265,6 +276,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
                 child: Text(day, softWrap: false),
               ),
             ),
+            const SizedBox(width: _betweenSpacing),
             SizedBox(
               width: width,
               height: 24,
@@ -291,20 +303,24 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     final barWidth = (right.clamp(0.0, width) - leftClamped).clamp(0.0, width);
 
     return Padding(
-        padding: const EdgeInsets.only(left: _leftSpacing),
-    child: Row(
-    children: [
-    SizedBox(
-      width: _dayWidth,
-      height: 24,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(day, softWrap: false),
+      padding: const EdgeInsets.only(
+        left: _leftSpacing,
+        right: _rightSpacing,
       ),
-    ),
-    GestureDetector(
-    onTap: () => _showDetails(e),
-    child: SizedBox(
+      child: Row(
+        children: [
+          SizedBox(
+            width: _dayWidth,
+            height: 24,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(day, softWrap: false),
+            ),
+          ),
+          const SizedBox(width: _betweenSpacing),
+          GestureDetector(
+            onTap: () => _showDetails(e),
+            child: SizedBox(
     width: width,
     height: 24,
     child: Stack(
@@ -524,7 +540,8 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
   Widget build(BuildContext context) {
     final app = MyApp.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
-    final width = screenWidth - 32 - _dayWidth - _leftSpacing;
+    final width = screenWidth - 32 - _dayWidth -
+        _leftSpacing - _betweenSpacing - _rightSpacing;
     final hourWidth = width / 22;
 
     return Scaffold(
