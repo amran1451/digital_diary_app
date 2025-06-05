@@ -5,6 +5,7 @@ import 'rating_analytics_screen.dart';
 import 'energy_analytics_screen.dart';
 import 'emotion_analytics_screen.dart';
 import 'sleep_tracker_screen.dart';
+import 'steps_analytics_screen.dart';
 
 class AnalyticsMenuScreen extends StatelessWidget {
   static const routeName = '/analytics';
@@ -42,6 +43,12 @@ class AnalyticsMenuScreen extends StatelessWidget {
               label: 'Сон',
               color: Colors.blueAccent,
               onTap: () => Navigator.pushNamed(ctx, SleepTrackerScreen.routeName),
+            ),
+            _Tile(
+              icon: Icons.directions_walk,
+              label: 'Шаги',
+              color: Colors.deepOrange,
+              onTap: () => Navigator.pushNamed(ctx, StepsAnalyticsScreen.routeName),
             ),
             _Tile(
               icon: Icons.emoji_emotions,
