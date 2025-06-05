@@ -24,7 +24,7 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _load();
   }
 
@@ -116,8 +116,8 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
         ]),
       );
     }
-    final maxY = (maxVal * 1.1).clamp(10, double.infinity).toDouble();
-    final labelStep = _entries.length >= 30 ? (_entries.length / 10).ceil() : 1;
+    final maxY = (maxVal * 1.2).ceil().clamp(10, double.infinity).toDouble();
+    final labelStep = max(1, (_entries.length / 10).ceil());
     final angle = _entries.length >= 30 ? -1.1 : -0.5;
     return BarChart(
       BarChartData(
@@ -128,7 +128,7 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
             sideTitles: SideTitles(
               showTitles: true,
               interval: labelStep.toDouble(),
-              reservedSize: 32,
+              reservedSize: 36,
               getTitlesWidget: (v, _) {
                 final i = v.toInt();
                 if (i < 0 || i >= labels.length || i % labelStep != 0) {
@@ -145,7 +145,7 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
             sideTitles: SideTitles(
               showTitles: true,
               interval: maxY / 5,
-              reservedSize: 36,
+              reservedSize: 42,
               getTitlesWidget: (v, _) => Padding(
                 padding: const EdgeInsets.only(right: 6),
                 child: Text(v.toInt().toString(),
@@ -257,7 +257,11 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
         title: const Text('Аналитика шагов'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [Tab(text: 'График'), Tab(text: 'Активности')],
+          tabs: const [
+            Tab(text: 'График'),
+            Tab(text: 'Активности'),
+            Tab(text: 'Таблица'),
+          ],
         ),
         actions: [
           IconButton(
@@ -329,11 +333,10 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
                 children: [
                   _buildStepsChart(context),
                   _buildActivityPie(context),
+                  _buildTable(),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            Expanded(child: _buildTable()),
           ],
         ),
       ),
