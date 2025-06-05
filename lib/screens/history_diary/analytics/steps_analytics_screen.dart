@@ -24,7 +24,7 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     _load();
   }
 
@@ -78,21 +78,7 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
       : _entries.reduce((a, b) =>
   (int.tryParse(a.steps) ?? 0) < (int.tryParse(b.steps) ?? 0) ? a : b);
 
-  Map<String, int> get _activityCounts {
-    final map = <String, int>{};
-    for (final e in _entries) {
-      final raw = e.activity.trim();
-      if (raw.isEmpty) continue;
-      final parts = raw
-          .split(RegExp(r'[;,\n]+'))
-          .map((s) => s.trim().toLowerCase())
-          .where((s) => s.isNotEmpty);
-      for (final p in parts) {
-        map[p] = (map[p] ?? 0) + 1;
-      }
-    }
-    return map;
-  }
+
 
   Widget _buildStepsChart(BuildContext context) {
     if (_entries.isEmpty) return const Center(child: Text('Нет данных'));
@@ -183,48 +169,7 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
     );
   }
 
-  Widget _buildActivityPie(BuildContext context) {
-    final counts = _activityCounts;
-    if (counts.isEmpty) return const Center(child: Text('Нет данных'));
-    final total = counts.values.reduce((a, b) => a + b);
-    final entries = counts.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    final sections = <PieChartSectionData>[];
-    for (var i = 0; i < entries.length; i++) {
-      final e = entries[i];
-      sections.add(
-        PieChartSectionData(
-          value: e.value.toDouble(),
-          color: Colors.primaries[i % Colors.primaries.length],
-          title: '${(e.value * 100 / total).toStringAsFixed(1)}%',
-          radius: 40,
-        ),
-      );
-    }
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          SizedBox(height: 200, child: PieChart(PieChartData(sections: sections))),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: [
-              for (var i = 0; i < entries.length; i++)
-                Row(mainAxisSize: MainAxisSize.min, children: [
-                  Container(
-                      width: 12,
-                      height: 12,
-                      color: Colors.primaries[i % Colors.primaries.length]),
-                  const SizedBox(width: 4),
-                  Text(entries[i].key, style: const TextStyle(fontSize: 12)),
-                ])
-            ],
-          )
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildTable() {
     if (_entries.isEmpty) return const Center(child: Text('Нет данных'));
@@ -259,7 +204,6 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
           controller: _tabController,
           tabs: const [
             Tab(text: 'График'),
-            Tab(text: 'Активности'),
             Tab(text: 'Таблица'),
           ],
         ),
@@ -332,7 +276,6 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
                 controller: _tabController,
                 children: [
                   _buildStepsChart(context),
-                  _buildActivityPie(context),
                   _buildTable(),
                 ],
               ),
