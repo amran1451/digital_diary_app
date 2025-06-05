@@ -484,8 +484,9 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
               children: [
                 ChoiceChip(
                   label: const Text('7 дней'),
@@ -495,7 +496,6 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
                     _applyPeriod();
                   },
                 ),
-                const SizedBox(width: 8),
                 ChoiceChip(
                   label: const Text('30 дней'),
                   selected: _period == _Period.month,
@@ -504,7 +504,6 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
                     _applyPeriod();
                   },
                 ),
-                const SizedBox(width: 8),
                 ChoiceChip(
                   label: const Text('Весь период'),
                   selected: _period == _Period.all,
