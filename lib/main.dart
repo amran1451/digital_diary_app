@@ -19,7 +19,6 @@ import 'screens/history_diary/analytics/analytics_menu_screen.dart';
 import 'screens/history_diary/analytics/emotion_analytics_screen.dart';
 import 'screens/history_diary/analytics/energy_analytics_screen.dart';
 import 'screens/history_diary/analytics/rating_analytics_screen.dart';
-import 'screens/history_diary/analytics/sleep_analytics_screen.dart';
 import 'screens/history_diary/analytics/sleep_tracker_screen.dart';
 
 // history_diary - entries
@@ -118,7 +117,6 @@ class _MyAppState extends State<MyApp> {
         ImportScreen.routeName:        (_) => const ImportScreen(),
         ImportPreviewScreen.routeName: (_) => const ImportPreviewScreen(),
         RatingAnalyticsScreen.routeName: (_) => const RatingAnalyticsScreen(),
-        SleepAnalyticsScreen.routeName: (_) => const SleepAnalyticsScreen(),
         SleepTrackerScreen.routeName: (_) => const SleepTrackerScreen(),
         AnalyticsMenuScreen.routeName: (_) => const AnalyticsMenuScreen(),
         EnergyAnalyticsScreen.routeName: (_) => const EnergyAnalyticsScreen(),

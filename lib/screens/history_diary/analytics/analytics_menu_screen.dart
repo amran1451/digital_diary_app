@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'rating_analytics_screen.dart';
-import 'sleep_analytics_screen.dart';
 import 'energy_analytics_screen.dart';
 import 'emotion_analytics_screen.dart';
 import 'sleep_tracker_screen.dart';
@@ -41,12 +40,6 @@ class AnalyticsMenuScreen extends StatelessWidget {
             _Tile(
               icon: Icons.hotel,
               label: 'Сон',
-              color: Colors.teal,
-              onTap: () => Navigator.pushNamed(ctx, SleepAnalyticsScreen.routeName),
-            ),
-            _Tile(
-              icon: Icons.schedule,
-              label: 'Трекер сна',
               color: Colors.blueAccent,
               onTap: () => Navigator.pushNamed(ctx, SleepTrackerScreen.routeName),
             ),

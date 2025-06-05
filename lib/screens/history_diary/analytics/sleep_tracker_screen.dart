@@ -309,6 +309,65 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     final dur = _avgSleepDuration;
     final wake = _fmtTime(_avgWakeMinutes);
     final bed = _fmtTime(_avgBedMinutes);
+    int? earliestBed;
+    DateTime? earliestBedDate;
+    int? latestBed;
+    DateTime? latestBedDate;
+    int? earliestWake;
+    DateTime? earliestWakeDate;
+    int? latestWake;
+    DateTime? latestWakeDate;
+    Duration? shortest;
+    DateTime? shortestDate;
+    Duration? longest;
+    DateTime? longestDate;
+
+    for (final e in _entries) {
+      final bedMin = _parseMinutes(e.bedTime);
+      final wakeMin = _parseMinutes(e.wakeTime);
+      final durEntry = _toDateTime(e, e.bedTime) != null &&
+          _toDateTime(e, e.wakeTime) != null
+          ? _toDateTime(e, e.wakeTime)!
+          .difference(_toDateTime(e, e.bedTime)!)
+          : null;
+
+      if (bedMin != null) {
+        if (earliestBed == null || bedMin < earliestBed!) {
+          earliestBed = bedMin;
+          earliestBedDate = _entryDate(e);
+        }
+        if (latestBed == null || bedMin > latestBed!) {
+          latestBed = bedMin;
+          latestBedDate = _entryDate(e);
+        }
+      }
+
+      if (wakeMin != null) {
+        if (earliestWake == null || wakeMin < earliestWake!) {
+          earliestWake = wakeMin;
+          earliestWakeDate = _entryDate(e);
+        }
+        if (latestWake == null || wakeMin > latestWake!) {
+          latestWake = wakeMin;
+          latestWakeDate = _entryDate(e);
+        }
+      }
+
+      if (durEntry != null) {
+        if (shortest == null || durEntry < shortest!) {
+          shortest = durEntry;
+          shortestDate = _entryDate(e);
+        }
+        if (longest == null || durEntry > longest!) {
+          longest = durEntry;
+          longestDate = _entryDate(e);
+        }
+      }
+    }
+
+    String dateFmt(DateTime? d) =>
+        d == null ? '' : DateFormat('dd.MM').format(d);
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -318,6 +377,24 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
           Text('Среднее время подъёма: $wake'),
           const SizedBox(height: 12),
           Text('Среднее время отбоя: $bed'),
+          const SizedBox(height: 12),
+          Text('Самое раннее время отбоя: '
+              '${earliestBed != null ? _fmtTime(earliestBed!) + ' — ' + dateFmt(earliestBedDate) : '-'}'),
+          const SizedBox(height: 12),
+          Text('Самое позднее время отбоя: '
+              '${latestBed != null ? _fmtTime(latestBed!) + ' — ' + dateFmt(latestBedDate) : '-'}'),
+          const SizedBox(height: 12),
+          Text('Самое раннее время подъёма: '
+              '${earliestWake != null ? _fmtTime(earliestWake!) + ' — ' + dateFmt(earliestWakeDate) : '-'}'),
+          const SizedBox(height: 12),
+          Text('Самое позднее время подъёма: '
+              '${latestWake != null ? _fmtTime(latestWake!) + ' — ' + dateFmt(latestWakeDate) : '-'}'),
+          const SizedBox(height: 12),
+          Text('Самый короткий сон: '
+              '${shortest != null ? _formatDuration(shortest!) + ' — ' + dateFmt(shortestDate) : '-'}'),
+          const SizedBox(height: 12),
+          Text('Самый длинный сон: '
+              '${longest != null ? _formatDuration(longest!) + ' — ' + dateFmt(longestDate) : '-'}'),
         ],
       ),
     );
