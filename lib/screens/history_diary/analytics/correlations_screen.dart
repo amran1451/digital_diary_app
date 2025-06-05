@@ -102,10 +102,10 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
       stepsRaw.add((int.tryParse(e.steps) ?? 0).toDouble());
     }
 
-    final maxRating = ratingRaw.isEmpty ? 0 : ratingRaw.reduce(max);
-    final maxEnergy = energyRaw.isEmpty ? 0 : energyRaw.reduce(max);
-    final maxSleep = sleepRaw.isEmpty ? 0 : sleepRaw.reduce(max);
-    final maxSteps = stepsRaw.isEmpty ? 0 : stepsRaw.reduce(max);
+    final maxRating = ratingRaw.isEmpty ? 0.0 : ratingRaw.reduce(max);
+    final maxEnergy = energyRaw.isEmpty ? 0.0 : energyRaw.reduce(max);
+    final maxSleep = sleepRaw.isEmpty ? 0.0 : sleepRaw.reduce(max);
+    final maxSteps = stepsRaw.isEmpty ? 0.0 : stepsRaw.reduce(max);
 
     double scale(double v, double maxVal) => maxVal == 0 ? 0 : v * 10 / maxVal;
 
@@ -218,7 +218,8 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
             lineTouchData: LineTouchData(
               handleBuiltInTouches: true,
               touchTooltipData: LineTouchTooltipData(
-                tooltipBgColor: Theme.of(context).colorScheme.surfaceVariant,
+                getTooltipColor: (spot) =>
+                Theme.of(context).colorScheme.surfaceVariant,
                 getTooltipItems: (spots) {
                   if (spots.isEmpty) return [];
                   final idx = spots.first.x.toInt();
