@@ -20,6 +20,7 @@ class SleepTrackerScreen extends StatefulWidget {
 class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     with SingleTickerProviderStateMixin {
   static const double _dayWidth = 40;
+  static const double _leftSpacing = 8;
   late TabController _tabController;
   DateTime _focusedDay = DateTime.now();
 
@@ -174,14 +175,16 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
       '0',
       for (int h = 2; h <= 16; h += 2) '$h',
     ];
-    return Row(
-      children: [
-        const SizedBox(width: _dayWidth),
-        SizedBox(
-          width: width,
-          height: 20,
-          child: Stack(
-            clipBehavior: Clip.none,
+    return Padding(
+        padding: const EdgeInsets.only(left: _leftSpacing),
+    child: Row(
+    children: [
+    const SizedBox(width: _dayWidth),
+    SizedBox(
+    width: width,
+    height: 20,
+    child: Stack(
+    clipBehavior: Clip.none,
             children: [
               // first label
               Positioned(
@@ -244,18 +247,21 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     final day = DateFormat('dd.MM').format(_entryDate(e));
 
     if (bed == null || wake == null || wake.isBefore(bed)) {
-      return Row(
-        children: [
-          SizedBox(
-              width: _dayWidth,
-              child: Text(day, softWrap: false, textAlign: TextAlign.center)),
-          SizedBox(
-            width: width,
-            height: 24,
-            child:
-            const Center(child: Text('не спал ☹️')),
-          ),
-        ],
+      return Padding(
+        padding: const EdgeInsets.only(left: _leftSpacing),
+        child: Row(
+          children: [
+            SizedBox(
+                width: _dayWidth,
+                child:
+                Text(day, softWrap: false, textAlign: TextAlign.center)),
+            SizedBox(
+              width: width,
+              height: 24,
+              child: const Center(child: Text('не спал ☹️')),
+            ),
+          ],
+        ),
       );
     }
 
@@ -274,50 +280,54 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     final leftClamped = left.clamp(0.0, width);
     final barWidth = (right.clamp(0.0, width) - leftClamped).clamp(0.0, width);
 
-    return Row(
-      children: [
-        SizedBox(
-            width: _dayWidth,
-            child: Text(day, softWrap: false, textAlign: TextAlign.center)),
-        GestureDetector(
-          onTap: () => _showDetails(e),
-          child: SizedBox(
-            width: width,
-            height: 24,
-            child: Stack(
-              children: [
-                for (int i = 0; i <= 22; i++)
+    return Padding(
+        padding: const EdgeInsets.only(left: _leftSpacing),
+    child: Row(
+    children: [
+    SizedBox(
+    width: _dayWidth,
+    child:
+    Text(day, softWrap: false, textAlign: TextAlign.center)),
+    GestureDetector(
+    onTap: () => _showDetails(e),
+    child: SizedBox(
+    width: width,
+    height: 24,
+    child: Stack(
+    children: [
+    for (int i = 0; i <= 22; i++)
+    Positioned(
+    left: i * hourWidth - 0.5,
+    top: 0,
+    bottom: 0,
+    child: Container(
+    width: 1,
+    color: Colors.grey.withOpacity(0.3)),
+    ),
                   Positioned(
-                    left: i * hourWidth - 0.5,
-                    top: 0,
-                    bottom: 0,
+    left: leftClamped,
+    top: 2,
+    width: barWidth,
+    bottom: 2,
                     child: Container(
-                        width: 1,
-                        color: Colors.grey.withOpacity(0.3)),
-                  ),
-                Positioned(
-                  left: leftClamped,
-                  top: 2,
-                  width: barWidth,
-                  bottom: 2,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.lightBlueAccent,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      _formatDuration(dur),
-                      style:
-                      const TextStyle(color: Colors.white, fontSize: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.lightBlueAccent,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        _formatDuration(dur),
+                        style:
+                        const TextStyle(color: Colors.white, fontSize: 10),
+                      ),
                     ),
                   ),
-                ),
-              ],
+    ],
+    ),
             ),
           ),
-        ),
-      ],
+    ],
+    ),
     );
   }
 
@@ -500,7 +510,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
   Widget build(BuildContext context) {
     final app = MyApp.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
-    final width = screenWidth - 32 - _dayWidth;
+    final width = screenWidth - 32 - _dayWidth - _leftSpacing;
     final hourWidth = width / 22;
 
     return Scaffold(
