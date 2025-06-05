@@ -195,6 +195,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
             width: width,
             height: 20,
             child: Stack(
+              clipBehavior: Clip.none,
               children: [
               // first label
               Positioned(
