@@ -177,15 +177,15 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     ];
     return Padding(
         padding: const EdgeInsets.only(left: _leftSpacing),
-    child: Row(
-    children: [
-    const SizedBox(width: _dayWidth),
-    SizedBox(
-    width: width,
-    height: 20,
-    child: Stack(
-    clipBehavior: Clip.none,
-            children: [
+        child: Row(
+          children: [
+            const SizedBox(width: _dayWidth),
+              SizedBox(
+                width: width,
+                height: 20,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
               // first label
               Positioned(
                 left: -hourWidth + 4,
@@ -238,6 +238,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
           ),
         ),
       ],
+        ),
     );
   }
 
