@@ -6,6 +6,7 @@ import 'energy_analytics_screen.dart';
 import 'emotion_analytics_screen.dart';
 import 'sleep_tracker_screen.dart';
 import 'steps_analytics_screen.dart';
+import 'correlations_screen.dart';
 
 class AnalyticsMenuScreen extends StatelessWidget {
   static const routeName = '/analytics';
@@ -55,6 +56,12 @@ class AnalyticsMenuScreen extends StatelessWidget {
               label: 'Эмоции',
               color: Colors.teal,
               onTap: () => Navigator.pushNamed(ctx, EmotionAnalyticsScreen.routeName),
+            ),
+            _Tile(
+              icon: Icons.multiline_chart,
+              label: 'Корреляции',
+              color: Colors.purple,
+              onTap: () => Navigator.pushNamed(ctx, CorrelationsScreen.routeName),
             ),
           ],
         ),
