@@ -117,6 +117,8 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
       );
     }
     final maxY = (maxVal * 1.1).clamp(10, double.infinity).toDouble();
+    final labelStep = _entries.length >= 30 ? (_entries.length / 10).ceil() : 1;
+    final angle = _entries.length >= 30 ? -1.1 : -0.5;
     return BarChart(
       BarChartData(
         maxY: maxY,
@@ -125,15 +127,16 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: 1,
+              interval: labelStep.toDouble(),
               reservedSize: 32,
               getTitlesWidget: (v, _) {
                 final i = v.toInt();
-                if (i < 0 || i >= labels.length) return const SizedBox();
+                if (i < 0 || i >= labels.length || i % labelStep != 0) {
+                  return const SizedBox();
+                }
                 return Transform.rotate(
-                  angle: -0.5,
-                  child:
-                  Text(labels[i], style: const TextStyle(fontSize: 10)),
+                  angle: angle,
+                  child: Text(labels[i], style: const TextStyle(fontSize: 10)),
                 );
               },
             ),
@@ -198,45 +201,50 @@ class _StepsAnalyticsScreenState extends State<StepsAnalyticsScreen>
         ),
       );
     }
-    return Column(
-      children: [
-        SizedBox(height: 200, child: PieChart(PieChartData(sections: sections))),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 4,
-          children: [
-            for (var i = 0; i < entries.length; i++)
-              Row(mainAxisSize: MainAxisSize.min, children: [
-                Container(
-                    width: 12,
-                    height: 12,
-                    color: Colors.primaries[i % Colors.primaries.length]),
-                const SizedBox(width: 4),
-                Text(entries[i].key, style: const TextStyle(fontSize: 12)),
-              ])
-          ],
-        )
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(height: 200, child: PieChart(PieChartData(sections: sections))),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              for (var i = 0; i < entries.length; i++)
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  Container(
+                      width: 12,
+                      height: 12,
+                      color: Colors.primaries[i % Colors.primaries.length]),
+                  const SizedBox(width: 4),
+                  Text(entries[i].key, style: const TextStyle(fontSize: 12)),
+                ])
+            ],
+          )
+        ],
+      ),
     );
   }
 
   Widget _buildTable() {
     if (_entries.isEmpty) return const Center(child: Text('Нет данных'));
     return SingleChildScrollView(
-      child: DataTable(
-        columns: const [
-          DataColumn(label: Text('Дата')),
-          DataColumn(label: Text('Шаги')),
-          DataColumn(label: Text('Активность')),
-        ],
-        rows: _entries.map((e) {
-          return DataRow(cells: [
-            DataCell(Text(e.date.replaceAll('-', '.'))),
-            DataCell(Text(e.steps)),
-            DataCell(Text(e.activity)),
-          ]);
-        }).toList(),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          columns: const [
+            DataColumn(label: Text('Дата')),
+            DataColumn(label: Text('Шаги')),
+            DataColumn(label: Text('Активность')),
+          ],
+          rows: _entries.map((e) {
+            return DataRow(cells: [
+              DataCell(Text(e.date.replaceAll('-', '.'))),
+              DataCell(Text(e.steps)),
+              DataCell(Text(e.activity)),
+            ]);
+          }).toList(),
+        ),
       ),
     );
   }
