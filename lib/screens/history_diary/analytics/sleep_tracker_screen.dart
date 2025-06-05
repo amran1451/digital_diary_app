@@ -181,6 +181,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
       '0',
       for (int h = 2; h <= 16; h += 2) '$h',
     ];
+
     return Padding(
       padding: const EdgeInsets.only(
         left: _leftSpacing,
@@ -190,7 +191,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
         children: [
           const SizedBox(width: _dayWidth),
           const SizedBox(width: _betweenSpacing),
-      SizedBox(
+          SizedBox(
             width: width,
             height: 20,
             child: Stack(
@@ -206,29 +207,29 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
                   child: Text(
                     labels.first,
                     style: const TextStyle(fontSize: 10),
+                      ),
                     ),
                   ),
                 ),
-              ),
             // middle labels
             Positioned.fill(
               left: hourWidth,
               right: hourWidth,
               child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-              for (int i = 1; i < labels.length - 1; i++)
-              SizedBox(
-              width: hourWidth * 2,
-              child: Center(
-                child: Text(
-                  labels[i],
-                  style: const TextStyle(fontSize: 10),
-                ),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  for (int i = 1; i < labels.length - 1; i++)
+                    SizedBox(
+                      width: hourWidth * 2,
+                      child: Center(
+                        child: Text(
+                          labels[i],
+                          style: const TextStyle(fontSize: 10),
+                        ),
                           ),
                         ),
-                  ],
-              ),
+                ],
+                  ),
                 ),
             // last label
             Positioned(
@@ -244,8 +245,6 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
                   ),
                 ),
                   ),
-            ),
-          ),
                 ),
               ],
             ),
@@ -321,24 +320,25 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
           GestureDetector(
             onTap: () => _showDetails(e),
             child: SizedBox(
-    width: width,
-    height: 24,
-    child: Stack(
-    children: [
-    for (int i = 0; i <= 22; i++)
-    Positioned(
-    left: i * hourWidth - 0.5,
-    top: 0,
-    bottom: 0,
-    child: Container(
-    width: 1,
-    color: Colors.grey.withOpacity(0.3)),
-    ),
+              width: width,
+              height: 24,
+              child: Stack(
+                children: [
+                  for (int i = 0; i <= 22; i++)
+                    Positioned(
+                      left: i * hourWidth - 0.5,
+                      top: 0,
+                      bottom: 0,
+                      child: Container(
+                        width: 1,
+                        color: Colors.grey.withOpacity(0.3),
+                      ),
+                    ),
                   Positioned(
-    left: leftClamped,
-    top: 2,
-    width: barWidth,
-    bottom: 2,
+                    left: leftClamped,
+                    top: 2,
+                    width: barWidth,
+                    bottom: 2,
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.lightBlueAccent,
@@ -348,16 +348,16 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
                       child: Text(
                         _formatDuration(dur),
                         style:
-                        const TextStyle(color: Colors.white, fontSize: 10),
+                          const TextStyle(color: Colors.white, fontSize: 10),
                       ),
                     ),
                   ),
-    ],
-    ),
+                ],
+              ),
             ),
           ),
-    ],
-    ),
+        ],
+      ),
     );
   }
 
