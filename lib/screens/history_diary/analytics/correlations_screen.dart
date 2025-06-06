@@ -201,10 +201,13 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
                   showTitles: true,
                   interval: 1,
                   reservedSize: 24,
-                  getTitlesWidget: (v, _) => Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: Text(v.toInt().toString(), style: const TextStyle(fontSize: 8)),
-                  ),
+                  getTitlesWidget: (v, _) {
+                    if (v > 10) return const SizedBox();
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Text(v.toInt().toString(), style: const TextStyle(fontSize: 8)),
+                    );
+                  },
                 ),
               ),
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
