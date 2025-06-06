@@ -19,7 +19,7 @@ class DateTimeScreen extends StatefulWidget {
 }
 
 class _DateTimeScreenState extends State<DateTimeScreen> {
-  late EntryData entry;
+  EntryData? entry;
   late TextEditingController reasonCtrl;
   int _rating = 5;
   late String _ratingDesc;
@@ -119,11 +119,11 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     }
 
     // Подготовка UI
-    _rating = int.tryParse(entry.rating) ?? 5;
+    _rating = int.tryParse(entry!.rating) ?? 5;
     _ratingDesc = _ratingLabels[_rating]!;
-    reasonCtrl.text = entry.ratingReason;
+    reasonCtrl.text = entry!.ratingReason;
 
-    DraftService.currentDraft = entry;
+    DraftService.currentDraft = entry!;
     await DraftService.saveDraft();
 
     setState(() {});
@@ -170,7 +170,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   }
 
   Future<void> _pickDate() async {
-    final parts = entry.date.split('-');
+    final parts = entry!.date.split('-');
     final initial = DateTime(
       int.parse(parts[2]),
       int.parse(parts[1]),
@@ -184,9 +184,9 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     );
     if (picked != null) {
       String two(int v) => v.toString().padLeft(2, '0');
-      entry.date =
+      entry!.date =
           '${two(picked.day)}-${two(picked.month)}-${picked.year}';
-      DraftService.currentDraft = entry;
+      DraftService.currentDraft = entry!;
       await DraftService.saveDraft();
       setState(() {});
     }
@@ -197,7 +197,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     final appState = MyApp.of(context);
 
     // Пока entry не инициализирован, показываем индикатор
-    if (DraftService.currentDraft == null) {
+    if (entry == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
@@ -254,13 +254,13 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                 child: InkWell(
                   onTap: _pickDate,
                   child: Text(
-                    'Дата: ${entry.date}',
+                    'Дата: ${entry!.date}',
                     style: const TextStyle(
                         decoration: TextDecoration.underline),
                   ),
                 ),
               ),
-              Text('Время: ${entry.time}'),
+              Text('Время: ${entry!.time}'),
             ]),
             const SizedBox(height: 24),
             Text(
@@ -275,9 +275,9 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               label: '$_rating',
               onChanged: (v) async {
                 _rating = v.toInt();
-                entry.rating = '$_rating';
+                entry!.rating = '$_rating';
                 _ratingDesc = _ratingLabels[_rating]!;
-                DraftService.currentDraft = entry;
+                DraftService.currentDraft = entry!;
                 await DraftService.saveDraft();
                 setState(() {});
               },
@@ -294,8 +294,8 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (v) async {
-                entry.ratingReason = v;
-                DraftService.currentDraft = entry;
+                entry!.ratingReason = v;
+                DraftService.currentDraft = entry!;
                 await DraftService.saveDraft();
               },
             ),
@@ -304,12 +304,12 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
-                  DraftService.currentDraft = entry;
+                  DraftService.currentDraft = entry!;
                   await DraftService.saveDraft();
                   Navigator.pushNamed(
                     context,
                     StateScreen.routeName,
-                    arguments: entry,
+                    arguments: entry!,
                   );
                 },
                 child: const Text('→ Далее: Состояние'),
