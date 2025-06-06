@@ -41,48 +41,46 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBdKmwYEP_zmoHY2_yFS3-2uKRxx5NgaWs',
-    appId: '1:628560871626:web:9e90b67276271a4dfa7433',
-    messagingSenderId: '628560871626',
-    projectId: 'diarycloud-5257a',
-    authDomain: 'diarycloud-5257a.firebaseapp.com',
-    storageBucket: 'diarycloud-5257a.firebasestorage.app',
-    measurementId: 'G-0FNCXTJ0EF',
+    apiKey: 'AIzaSyB8RLDnBKR7y_GHzlWAGtIwtKajx8UBKrA',
+    appId: '1:700671083968:web:46c8fb48f87fa9c6eaf425',
+    messagingSenderId: '700671083968',
+    projectId: 'app1-50114',
+    authDomain: 'app1-50114.firebaseapp.com',
+    storageBucket: 'app1-50114.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAKDulJC8k5jW4t1F2Bex8K0sEvJSNLKEo',
-    appId: '1:628560871626:android:079b5cecdce51e4afa7433',
-    messagingSenderId: '628560871626',
-    projectId: 'diarycloud-5257a',
-    storageBucket: 'diarycloud-5257a.firebasestorage.app',
+    apiKey: 'AIzaSyCVS7rq-bI9LzsoUel3m7rJPdl1cCuuN3I',
+    appId: '1:700671083968:android:4e89f7bfb4962f06eaf425',
+    messagingSenderId: '700671083968',
+    projectId: 'app1-50114',
+    storageBucket: 'app1-50114.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA7em3lm_PlTWTlsNF-mwU2Y_BFOJ-_wAE',
-    appId: '1:628560871626:ios:bff27bbc29ad4b72fa7433',
-    messagingSenderId: '628560871626',
-    projectId: 'diarycloud-5257a',
-    storageBucket: 'diarycloud-5257a.firebasestorage.app',
-    iosBundleId: 'com.example.digitalDiaryApp',
+    apiKey: 'AIzaSyCiuGIDN7uFqM4GGEapCHYj0uNAXcLr9cE',
+    appId: '1:700671083968:ios:39d57b88d1ae2dc5eaf425',
+    messagingSenderId: '700671083968',
+    projectId: 'app1-50114',
+    storageBucket: 'app1-50114.firebasestorage.app',
+    iosBundleId: 'com.example.workoutApp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyA7em3lm_PlTWTlsNF-mwU2Y_BFOJ-_wAE',
-    appId: '1:628560871626:ios:bff27bbc29ad4b72fa7433',
-    messagingSenderId: '628560871626',
-    projectId: 'diarycloud-5257a',
-    storageBucket: 'diarycloud-5257a.firebasestorage.app',
-    iosBundleId: 'com.example.digitalDiaryApp',
+    apiKey: 'AIzaSyCiuGIDN7uFqM4GGEapCHYj0uNAXcLr9cE',
+    appId: '1:700671083968:ios:39d57b88d1ae2dc5eaf425',
+    messagingSenderId: '700671083968',
+    projectId: 'app1-50114',
+    storageBucket: 'app1-50114.firebasestorage.app',
+    iosBundleId: 'com.example.workoutApp',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBdKmwYEP_zmoHY2_yFS3-2uKRxx5NgaWs',
-    appId: '1:628560871626:web:ef5ce32fa229daaefa7433',
-    messagingSenderId: '628560871626',
-    projectId: 'diarycloud-5257a',
-    authDomain: 'diarycloud-5257a.firebaseapp.com',
-    storageBucket: 'diarycloud-5257a.firebasestorage.app',
-    measurementId: 'G-NGLCSD17SD',
+    apiKey: 'AIzaSyB8RLDnBKR7y_GHzlWAGtIwtKajx8UBKrA',
+    appId: '1:700671083968:web:d3364696f1e5c7ebeaf425',
+    messagingSenderId: '700671083968',
+    projectId: 'app1-50114',
+    authDomain: 'app1-50114.firebaseapp.com',
+    storageBucket: 'app1-50114.firebasestorage.app',
   );
 }
