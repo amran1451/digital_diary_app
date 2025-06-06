@@ -164,6 +164,7 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
       child: SizedBox(
         width: width,
         height: 300,
