@@ -27,6 +27,12 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
   bool _showEnergy = true;
   bool _showSleep = true;
   bool _showSteps = true;
+  bool _smoothLines = true;
+
+  static const _ratingColor = Colors.green;
+  static const _energyColor = Colors.orange;
+  static const _sleepColor = Colors.blueAccent;
+  static const _stepsColor = Colors.deepOrange;
 
   @override
   void initState() {
@@ -85,6 +91,17 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
     }
   }
 
+  Widget _legendItem(String label, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 12, height: 12, color: color),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(fontSize: 12)),
+      ],
+    );
+  }
+
   Widget _buildChart(BuildContext context) {
     if (_entries.isEmpty) return const Center(child: Text('Нет данных'));
 
@@ -128,42 +145,20 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
     }
 
     final lineBars = <LineChartBarData>[];
-    if (_showRating) {
-      lineBars.add(LineChartBarData(
-        spots: ratingSpots,
-        isCurved: true,
-        color: Colors.green,
-        barWidth: 2,
-        dotData: FlDotData(show: false),
-      ));
-    }
-    if (_showEnergy) {
-      lineBars.add(LineChartBarData(
-        spots: energySpots,
-        isCurved: true,
-        color: Colors.orange,
-        barWidth: 2,
-        dotData: FlDotData(show: false),
-      ));
-    }
-    if (_showSleep) {
-      lineBars.add(LineChartBarData(
-        spots: sleepSpots,
-        isCurved: true,
-        color: Colors.blueAccent,
-        barWidth: 2,
-        dotData: FlDotData(show: false),
-      ));
-    }
-    if (_showSteps) {
-      lineBars.add(LineChartBarData(
-        spots: stepsSpots,
-        isCurved: true,
-        color: Colors.deepOrange,
-        barWidth: 2,
-        dotData: FlDotData(show: false),
-      ));
-    }
+    LineChartBarData buildBar(List<FlSpot> spots, Color color) =>
+        LineChartBarData(
+          spots: spots,
+          isCurved: _smoothLines,
+          curveSmoothness: 0.25,
+          color: color,
+          barWidth: 2,
+          dotData: FlDotData(show: false),
+        );
+
+    if (_showRating) lineBars.add(buildBar(ratingSpots, _ratingColor));
+    if (_showEnergy) lineBars.add(buildBar(energySpots, _energyColor));
+    if (_showSleep) lineBars.add(buildBar(sleepSpots, _sleepColor));
+    if (_showSteps) lineBars.add(buildBar(stepsSpots, _stepsColor));
 
     final width = max(_entries.length * 40.0, MediaQuery.of(context).size.width);
 
@@ -174,8 +169,8 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
         height: 300,
         child: LineChart(
           LineChartData(
-            minY: 0,
-            maxY: 10.0,
+            minY: -0.5,
+            maxY: 10.5,
             gridData: FlGridData(
               show: true,
               horizontalInterval: 1,
@@ -186,7 +181,7 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  interval: (_entries.length / 7).ceilToDouble().clamp(1, double.infinity),
+                  interval: _entries.length > 7 ? 7 : 1,
                   reservedSize: 32,
                   getTitlesWidget: (v, _) {
                     final i = v.toInt();
@@ -205,10 +200,10 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
                 sideTitles: SideTitles(
                   showTitles: true,
                   interval: 1,
-                  reservedSize: 28,
+                  reservedSize: 24,
                   getTitlesWidget: (v, _) => Padding(
                     padding: const EdgeInsets.only(right: 6),
-                    child: Text(v.toInt().toString(), style: const TextStyle(fontSize: 10)),
+                    child: Text(v.toInt().toString(), style: const TextStyle(fontSize: 8)),
                   ),
                 ),
               ),
@@ -287,27 +282,46 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
                   label: const Text('Оценка'),
                   selected: _showRating,
                   onSelected: (v) => setState(() => _showRating = v),
-                  selectedColor: Colors.green.withOpacity(0.2),
+                  selectedColor: _ratingColor.withOpacity(0.2),
                 ),
                 FilterChip(
                   label: const Text('Энергия'),
                   selected: _showEnergy,
                   onSelected: (v) => setState(() => _showEnergy = v),
-                  selectedColor: Colors.orange.withOpacity(0.2),
+                  selectedColor: _energyColor.withOpacity(0.2),
                 ),
                 FilterChip(
                   label: const Text('Сон'),
                   selected: _showSleep,
                   onSelected: (v) => setState(() => _showSleep = v),
-                  selectedColor: Colors.blueAccent.withOpacity(0.2),
+                  selectedColor: _sleepColor.withOpacity(0.2),
                 ),
                 FilterChip(
                   label: const Text('Шаги'),
                   selected: _showSteps,
                   onSelected: (v) => setState(() => _showSteps = v),
-                  selectedColor: Colors.deepOrange.withOpacity(0.2),
+                  selectedColor: _stepsColor.withOpacity(0.2),
                 ),
               ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _legendItem('Оценка', _ratingColor),
+                const SizedBox(width: 12),
+                _legendItem('Энергия', _energyColor),
+                const SizedBox(width: 12),
+                _legendItem('Сон', _sleepColor),
+                const SizedBox(width: 12),
+                _legendItem('Шаги', _stepsColor),
+              ],
+            ),
+            SwitchListTile(
+              title: const Text('Сглаживание линий'),
+              value: _smoothLines,
+              onChanged: (v) => setState(() => _smoothLines = v),
+              dense: true,
             ),
             const SizedBox(height: 16),
             Expanded(child: _buildChart(context)),
