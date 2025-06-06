@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';  // ← анонимная а
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/finance_tracker_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 // flow_diary
 import 'screens/flow_diary/achievements_screen.dart';
@@ -54,7 +56,8 @@ import 'screens/planner_app_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ru', null);
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
+  await FirebaseAuth.instance.signInAnonymously();
   runApp(const MyApp());
 }
 
