@@ -79,14 +79,14 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _loadTheme();
     // Анонимный вход без await, чтобы не блокировать UI
-    FirebaseAuth.instance
-        .signInAnonymously()
-        .then((cred) {
-          debugPrint('Signed in as ${cred.user?.uid}');
-        })
-        .catchError((e) {
-          debugPrint('Anonymous sign-in failed: $e');
-        });
+    //FirebaseAuth.instance
+    //    .signInAnonymously()
+    //    .then((cred) {
+    //      debugPrint('Signed in as ${cred.user?.uid}');
+    //    })
+    //    .catchError((e) {
+    //      debugPrint('Anonymous sign-in failed: $e');
+    //    });
   }
 
   Future<void> _loadTheme() async {
