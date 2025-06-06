@@ -32,6 +32,9 @@ dependencies:
 
   planner_app:
     path: ../planner_app
+
+  workout_app:
+    path: ../workout_app
     
 dev_dependencies:
   flutter_launcher_icons: ^0.14.3

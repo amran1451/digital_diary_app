@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../main.dart';
-import 'workout_screen.dart';
+import 'workout_app_screen.dart';
 import 'expenses_screen.dart';
 import 'nutrition_screen.dart';
 import 'planner_screen.dart';
@@ -48,7 +48,7 @@ class HomeMenuScreen extends StatelessWidget {
             spacing: 16,
             runSpacing: 16,
             children: [
-              _buildTile(c, Icons.fitness_center, 'Тренировки', WorkoutScreen.routeName),
+              _buildTile(c, Icons.fitness_center, 'Тренировки', WorkoutAppScreen.routeName),
               _buildTile(c, Icons.attach_money, 'Расходы', FinanceTrackerScreen.routeName),
               _buildTile(c, Icons.restaurant, 'Питание',    NutritionScreen.routeName),
               _buildTile(c, Icons.check_box, 'Планер', PlannerAppScreen.routeName),

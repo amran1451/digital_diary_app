@@ -35,7 +35,7 @@ import 'screens/send_diary/preview_screen.dart';
 
 // screens
 import 'screens/home_menu_screen.dart';
-import 'screens/workout_screen.dart';
+import 'screens/workout_app_screen.dart';
 import 'screens/expenses_screen.dart';
 import 'screens/nutrition_screen.dart';
 import 'screens/planner_screen.dart';
@@ -125,7 +125,7 @@ class _MyAppState extends State<MyApp> {
         StepsAnalyticsScreen.routeName: (_) => const StepsAnalyticsScreen(),
         CorrelationsScreen.routeName: (_) => const CorrelationsScreen(),
         HomeMenuScreen.routeName:  (_) => const HomeMenuScreen(),
-        WorkoutScreen.routeName:   (_) => const WorkoutScreen(),
+        WorkoutAppScreen.routeName: (_) => const WorkoutAppScreen(),
         FinanceTrackerScreen.routeName: (_) => const FinanceTrackerScreen(),
         NutritionScreen.routeName: (_) => MultiProvider(
           providers: [
