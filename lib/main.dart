@@ -1,5 +1,5 @@
 // lib/main.dart
-
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';  // ← анонимная аутентификация
 import 'package:flutter/material.dart';
@@ -53,6 +53,7 @@ import 'screens/planner_app_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('ru', null);
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
