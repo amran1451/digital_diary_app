@@ -57,8 +57,8 @@ import 'screens/planner_app_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ru', null);
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
-  await FirebaseAuth.instance.signInAnonymously();
+  //await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
+  //await FirebaseAuth.instance.signInAnonymously();
   runApp(const MyApp());
 }
 
