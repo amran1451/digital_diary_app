@@ -222,11 +222,23 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
                   if (spots.isEmpty) return [];
                   final idx = spots.first.x.toInt();
                   final buf = StringBuffer(DateFormat('dd.MM.yyyy').format(dates[idx]));
-                  if (_showRating) buf.writeln('\nОценка: ${ratingRaw[idx].toStringAsFixed(1)}');
-                  if (_showEnergy) buf.writeln('Энергия: ${energyRaw[idx].toStringAsFixed(1)}');
-                  if (_showSleep) buf.writeln('Сон: ${sleepRaw[idx].toStringAsFixed(1)} ч');
-                  if (_showSteps) buf.writeln('Шаги: ${stepsRaw[idx].toInt()}');
-                  return [LineTooltipItem(buf.toString(), const TextStyle(fontSize: 12))];
+                  if (_showRating) {
+                    buf.writeln('\nОценка: ${ratingRaw[idx].toStringAsFixed(1)}');
+                  }
+                  if (_showEnergy) {
+                    buf.writeln('Энергия: ${energyRaw[idx].toStringAsFixed(1)}');
+                  }
+                  if (_showSleep) {
+                    buf.writeln('Сон: ${sleepRaw[idx].toStringAsFixed(1)} ч');
+                  }
+                  if (_showSteps) {
+                    buf.writeln('Шаги: ${stepsRaw[idx].toInt()}');
+                  }
+                  final item = LineTooltipItem(
+                    buf.toString(),
+                    const TextStyle(fontSize: 12),
+                  );
+                  return List.filled(spots.length, item);
                 },
               ),
             ),
