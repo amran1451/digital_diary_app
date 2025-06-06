@@ -8,6 +8,6 @@ class WorkoutAppScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const workout_app.MyApp();
+    return const workout_app.WorkoutApp();
   }
 }

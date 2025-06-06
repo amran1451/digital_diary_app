@@ -239,7 +239,10 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
                     buf.toString(),
                     const TextStyle(fontSize: 12),
                   );
-                  return List.filled(spots.length, item);
+                  return List.generate(
+                    spots.length,
+                        (i) => i == 0 ? item : null,
+                  );
                 },
               ),
             ),
