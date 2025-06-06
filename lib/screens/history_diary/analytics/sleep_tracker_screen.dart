@@ -116,6 +116,12 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     return h * 60 + m;
   }
 
+  // Returns minutes from the "sleep day" start (18:00).
+  // Times after midnight are shifted by 24h so that 00:30 > 23:00.
+  int _normalizeBedMinutes(int mins) {
+    return mins < 10 * 60 ? mins + 24 * 60 : mins;
+  }
+
   String _fmtTime(int mins) {
     final h = (mins ~/ 60) % 24;
     final m = mins % 60;
@@ -411,15 +417,17 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
       final durEntry = _toDateTime(e, e.bedTime) != null &&
           _toDateTime(e, e.wakeTime) != null
           ? _toDateTime(e, e.wakeTime)!
-          .difference(_toDateTime(e, e.bedTime)!)
+            .difference(_toDateTime(e, e.bedTime)!)
           : null;
 
       if (bedMin != null) {
-        if (earliestBed == null || bedMin < earliestBed!) {
+        if (earliestBed == null ||
+            _normalizeBedMinutes(bedMin) < _normalizeBedMinutes(earliestBed!)) {
           earliestBed = bedMin;
           earliestBedDate = _entryDate(e);
         }
-        if (latestBed == null || bedMin > latestBed!) {
+        if (latestBed == null ||
+            _normalizeBedMinutes(bedMin) > _normalizeBedMinutes(latestBed!)) {
           latestBed = bedMin;
           latestBedDate = _entryDate(e);
         }
@@ -451,33 +459,59 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     String dateFmt(DateTime? d) =>
         d == null ? '' : DateFormat('dd.MM').format(d);
 
-    return Center(
+    return SingleChildScrollView(
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Средняя длительность сна: ${_formatDuration(dur)}'),
-          const SizedBox(height: 12),
-          Text('Среднее время подъёма: $wake'),
-          const SizedBox(height: 12),
-          Text('Среднее время отбоя: $bed'),
-          const SizedBox(height: 12),
-          Text('Самое раннее время отбоя: '
-              '${earliestBed != null ? _fmtTime(earliestBed!) + ' — ' + dateFmt(earliestBedDate) : '-'}'),
-          const SizedBox(height: 12),
-          Text('Самое позднее время отбоя: '
-              '${latestBed != null ? _fmtTime(latestBed!) + ' — ' + dateFmt(latestBedDate) : '-'}'),
-          const SizedBox(height: 12),
-          Text('Самое раннее время подъёма: '
-              '${earliestWake != null ? _fmtTime(earliestWake!) + ' — ' + dateFmt(earliestWakeDate) : '-'}'),
-          const SizedBox(height: 12),
-          Text('Самое позднее время подъёма: '
-              '${latestWake != null ? _fmtTime(latestWake!) + ' — ' + dateFmt(latestWakeDate) : '-'}'),
-          const SizedBox(height: 12),
-          Text('Самый короткий сон: '
-              '${shortest != null ? _formatDuration(shortest!) + ' — ' + dateFmt(shortestDate) : '-'}'),
-          const SizedBox(height: 12),
-          Text('Самый длинный сон: '
-              '${longest != null ? _formatDuration(longest!) + ' — ' + dateFmt(longestDate) : '-'}'),
+          Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Средние показатели',
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 8),
+                  Text('Средняя длительность сна: ${_formatDuration(dur)}'),
+                  const SizedBox(height: 8),
+                  Text('Среднее время подъёма: $wake'),
+                  const SizedBox(height: 8),
+                  Text('Среднее время отбоя: $bed'),
+                ],
+              ),
+            ),
+          ),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Рекорды',
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 8),
+                  Text('Самый ранний отбой: '
+                      '${earliestBed != null ? _fmtTime(earliestBed!) + ' — ' + dateFmt(earliestBedDate) : '-'}'),
+                  const SizedBox(height: 8),
+                  Text('Самый поздний отбой: '
+                      '${latestBed != null ? _fmtTime(latestBed!) + ' — ' + dateFmt(latestBedDate) : '-'}'),
+                  const SizedBox(height: 8),
+                  Text('Самый ранний подъём: '
+                      '${earliestWake != null ? _fmtTime(earliestWake!) + ' — ' + dateFmt(earliestWakeDate) : '-'}'),
+                  const SizedBox(height: 8),
+                  Text('Самый поздний подъём: '
+                      '${latestWake != null ? _fmtTime(latestWake!) + ' — ' + dateFmt(latestWakeDate) : '-'}'),
+                  const SizedBox(height: 8),
+                  Text('Самый короткий сон: '
+                      '${shortest != null ? _formatDuration(shortest!) + ' — ' + dateFmt(shortestDate) : '-'}'),
+                  const SizedBox(height: 8),
+                  Text('Самый длинный сон: '
+                      '${longest != null ? _formatDuration(longest!) + ' — ' + dateFmt(longestDate) : '-'}'),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
