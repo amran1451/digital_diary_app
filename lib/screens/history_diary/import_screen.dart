@@ -1,7 +1,8 @@
 // lib/screens/import_screen.dart
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../models/entry_data.dart';
 import '../../services/csv_service.dart';
 import 'import_preview_screen.dart';
@@ -20,6 +21,21 @@ class _ImportScreenState extends State<ImportScreen> {
   String? _errorMessage;
   bool _useBotFormat = false;
   bool _useCsv = false;
+
+  Future<void> _loadFromFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['txt', 'csv'],
+    );
+    if (result == null || result.files.isEmpty) return;
+    final path = result.files.single.path;
+    if (path == null) return;
+    final f = File(path);
+    final content = await f.readAsString();
+    setState(() {
+      _textController.text = content;
+    });
+  }
 
   @override
   void dispose() {
@@ -601,6 +617,12 @@ class _ImportScreenState extends State<ImportScreen> {
                   border: OutlineInputBorder(),
                 ),
               ),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.upload_file),
+              label: const Text('Загрузить из файла'),
+              onPressed: _loadFromFile,
             ),
             const SizedBox(height: 12),
             if (_isParsing) const CircularProgressIndicator(),

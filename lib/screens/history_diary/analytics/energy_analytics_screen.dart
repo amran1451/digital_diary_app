@@ -42,10 +42,12 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     setState((){
       switch(_period){
         case _Period.week:
-          _ent = _all.length>7 ? _all.sublist(_all.length-7) : List.from(_all);
+          final cutoff = DateTime.now().subtract(const Duration(days: 7));
+          _ent = _all.where((e) => e.createdAt.isAfter(cutoff)).toList();
           break;
         case _Period.month:
-          _ent = _all.length>30? _all.sublist(_all.length-30):List.from(_all);
+          final cutoff = DateTime.now().subtract(const Duration(days: 30));
+          _ent = _all.where((e) => e.createdAt.isAfter(cutoff)).toList();
           break;
         case _Period.all:
           _ent = List.from(_all);

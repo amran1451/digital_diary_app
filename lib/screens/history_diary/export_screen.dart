@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../models/entry_data.dart';
 import '../../services/local_db.dart';
 import '../../services/pdf_service.dart';
@@ -92,7 +94,10 @@ class _ExportScreenState extends State<ExportScreen> {
       fileName = 'Выгрузка всех записей.csv';
     }
 
-    await Share.share(csvData, subject: fileName);
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/$fileName');
+    await file.writeAsString(csvData);
+    await Share.shareXFiles([XFile(file.path)], text: fileName);
   }
 
   @override
