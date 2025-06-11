@@ -13,7 +13,7 @@ import 'import_screen.dart';
 import 'analytics/analytics_menu_screen.dart';
 
 enum EntriesMenu {
-  exportPdf,
+  export,
   importEntries,
   deleteAll,
   sendAll,
@@ -211,7 +211,7 @@ class _EntriesScreenState extends State<EntriesScreen> {
           PopupMenuButton<EntriesMenu>(
             onSelected: (item) async {
               switch (item) {
-                case EntriesMenu.exportPdf:
+                case EntriesMenu.export:
                   Navigator.pushNamed(ctx, ExportScreen.routeName);
                   break;
                 case EntriesMenu.importEntries:
@@ -246,10 +246,10 @@ class _EntriesScreenState extends State<EntriesScreen> {
             },
             itemBuilder: (_) => [
               const PopupMenuItem(
-                value: EntriesMenu.exportPdf,
+                value: EntriesMenu.export,
                 child: ListTile(
-                  leading: Icon(Icons.picture_as_pdf),
-                  title: Text('Экспорт в PDF'),
+                  leading: Icon(Icons.share),
+                  title: Text('Экспорт'),
                 ),
               ),
               const PopupMenuItem(

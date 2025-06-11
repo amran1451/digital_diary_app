@@ -210,16 +210,27 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
   }
 
   Widget _buildTable(){
+    final grouped = <DateTime, List<double>>{};
+    for (var e in _ent) {
+      final k = DateTime(e.createdAt.year, e.createdAt.month, e.createdAt.day);
+      (grouped[k] ??= []).add(double.tryParse(e.energy) ?? 0);
+    }
+    final rows = grouped.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
     return SingleChildScrollView(
-      child: DataTable(columns: const[
-        DataColumn(label: Text('Дата')),
-        DataColumn(label: Text('Энергия')),
-      ], rows: _ent.map((e){
-        return DataRow(cells:[
-          DataCell(Text(DateFormat('dd.MM.yyyy').format(e.createdAt))),
-          DataCell(Text(e.energy)),
-        ]);
-      }).toList()),
+      child: DataTable(
+        columns: const [
+          DataColumn(label: Text('Дата')),
+          DataColumn(label: Text('Энергия')),
+        ],
+        rows: rows.map((e) {
+          final avg = e.value.reduce((a, b) => a + b) / e.value.length;
+          return DataRow(cells: [
+            DataCell(Text(DateFormat('dd.MM.yyyy').format(e.key))),
+            DataCell(Text(avg.toStringAsFixed(1))),
+          ]);
+        }).toList(),
+      ),
     );
   }
 
@@ -227,10 +238,10 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     if (_ent.isEmpty) return const Center(child: Text('Нет данных'));
 
     // Собираем значения энергии по дням без учёта времени
-    final raw = <DateTime, int>{};
+    final raw = <DateTime, List<double>>{};
     for (var e in _ent) {
       final key = DateTime(e.createdAt.year, e.createdAt.month, e.createdAt.day);
-      raw[key] = int.tryParse(e.energy) ?? 0;
+      (raw[key] ??= []).add(double.tryParse(e.energy) ?? 0);
     }
 
     // Диапазон от первой до последней даты записи
@@ -239,12 +250,17 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     final last = allKeys.last;
 
     // Заполняем все даты диапазона, если данных нет – значение 0
-    final data = <DateTime, int>{};
+    final data = <DateTime, double>{};
     for (var d = first; !d.isAfter(last); d = d.add(const Duration(days: 1))) {
-      data[d] = raw[d] ?? 0;
+      final list = raw[d];
+      if (list == null || list.isEmpty) {
+        data[d] = 0;
+      } else {
+        data[d] = list.reduce((a, b) => a + b) / list.length;
+      }
     }
 
-    Color _colorFor(int v) {
+    Color _colorFor(double v) {
       if (v <= 3) return Colors.red.shade200;
       if (v <= 6) return Colors.orange.shade300;
       if (v <= 8) return Colors.lightGreen.shade400;

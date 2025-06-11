@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/entry_data.dart';
+import '../../services/csv_service.dart';
 import 'import_preview_screen.dart';
 
 class ImportScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class _ImportScreenState extends State<ImportScreen> {
   bool _isParsing = false;
   String? _errorMessage;
   bool _useBotFormat = false;
+  bool _useCsv = false;
 
   @override
   void dispose() {
@@ -33,7 +35,9 @@ class _ImportScreenState extends State<ImportScreen> {
       _errorMessage = null;
     });
     try {
-      final List<EntryData> entries = _useBotFormat
+      final List<EntryData> entries = _useCsv
+          ? CsvService.parseCsv(raw)
+          : _useBotFormat
           ? _parseBotEntries(raw)
           : _parseEntries(raw);
       Navigator.pushNamed(
@@ -581,6 +585,11 @@ class _ImportScreenState extends State<ImportScreen> {
               title: const Text('Импорт из Telegram-бота'),
               value: _useBotFormat,
               onChanged: (v) => setState(() => _useBotFormat = v),
+            ),
+            SwitchListTile(
+              title: const Text('CSV формат'),
+              value: _useCsv,
+              onChanged: (v) => setState(() => _useCsv = v),
             ),
             const SizedBox(height: 8),
             Expanded(

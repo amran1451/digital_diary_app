@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../models/entry_data.dart';
 import '../../services/local_db.dart';
 import '../../services/pdf_service.dart';
+import '../../services/csv_service.dart';
 import '../../main.dart';
 
 class ExportScreen extends StatefulWidget {
@@ -33,7 +35,7 @@ class _ExportScreenState extends State<ExportScreen> {
     }
   }
 
-  Future<void> _export() async {
+  Future<void> _exportPdf() async {
     // Получаем все локальные записи
     final all = await LocalDb.fetchAll();
     // Фильтруем в памяти по диапазону
@@ -67,13 +69,39 @@ class _ExportScreenState extends State<ExportScreen> {
     );
   }
 
+  Future<void> _exportCsv() async {
+    final all = await LocalDb.fetchAll();
+    final filtered = all.where((e) {
+      final dt = e.createdAt;
+      if (_fromDate != null && dt.isBefore(_fromDate!)) return false;
+      if (_toDate != null && dt.isAfter(_toDate!)) return false;
+      return true;
+    }).toList();
+    final csvData = CsvService.generateCsv(filtered);
+
+    String format(DateTime d) =>
+        '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+    late final String fileName;
+    if (_fromDate != null && _toDate != null) {
+      fileName = 'Выгрузка записей за ${format(_fromDate!)} - ${format(_toDate!)}.csv';
+    } else if (_fromDate != null) {
+      fileName = 'Выгрузка записей с ${format(_fromDate!)}.csv';
+    } else if (_toDate != null) {
+      fileName = 'Выгрузка записей до ${format(_toDate!)}.csv';
+    } else {
+      fileName = 'Выгрузка всех записей.csv';
+    }
+
+    await Share.share(csvData, subject: fileName);
+  }
+
   @override
   Widget build(BuildContext ctx) {
     final appState = MyApp.of(ctx);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Экспорт в PDF'),
+        title: const Text('Экспорт'),
         actions: [
           IconButton(
             icon: Icon(appState.isDark ? Icons.sunny : Icons.nightlight_round),
@@ -107,7 +135,13 @@ class _ExportScreenState extends State<ExportScreen> {
             ElevatedButton.icon(
               icon: const Icon(Icons.picture_as_pdf),
               label: const Text('Сгенерировать PDF'),
-              onPressed: _export,
+              onPressed: _exportPdf,
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.table_view),
+              label: const Text('Выгрузить CSV'),
+              onPressed: _exportCsv,
             ),
           ],
         ),
