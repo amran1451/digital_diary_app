@@ -76,7 +76,9 @@ class CsvService {
       entries.add(EntryData(
         date: m['date']?.toString() ?? '',
         time: m['time']?.toString() ?? '',
-        createdAt: DateTime.tryParse(m['createdAt']?.toString() ?? '') ?? DateTime.now(),
+        createdAt: DateTime.tryParse(m['createdAt']?.toString() ?? '')
+            ?.toLocal() ??
+            DateTime.now(),
         rating: m['rating']?.toString() ?? '',
         ratingReason: m['ratingReason']?.toString() ?? '',
         bedTime: m['bedTime']?.toString() ?? '',

@@ -101,8 +101,9 @@ class EntryData {
       localId: m['id'] as int?,
       date: m['date'] ?? '',
       time: m['time'] ?? '',
-      createdAt:
-          created != null ? DateTime.parse(created) : DateTime.now(),
+      createdAt: created != null
+          ? DateTime.parse(created).toLocal()
+          : DateTime.now(),
       rating: m['rating'] ?? '',
       ratingReason: m['ratingReason'] ?? '',
       bedTime: m['bedTime'] ?? '',

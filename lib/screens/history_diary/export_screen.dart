@@ -100,6 +100,73 @@ class _ExportScreenState extends State<ExportScreen> {
     await Share.shareXFiles([XFile(file.path)], text: fileName);
   }
 
+  Future<void> _savePdf() async {
+    final all = await LocalDb.fetchAll();
+    final filtered = all.where((e) {
+      final dt = e.createdAt;
+      if (_fromDate != null && dt.isBefore(_fromDate!)) return false;
+      if (_toDate != null && dt.isAfter(_toDate!)) return false;
+      return true;
+    }).toList();
+
+    final pdfBytes = await PdfService.generatePdf(filtered);
+
+    String format(DateTime d) =>
+        '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+    late final String fileName;
+    if (_fromDate != null && _toDate != null) {
+      fileName = 'Выгрузка записей за ${format(_fromDate!)} - ${format(_toDate!)}.pdf';
+    } else if (_fromDate != null) {
+      fileName = 'Выгрузка записей с ${format(_fromDate!)}.pdf';
+    } else if (_toDate != null) {
+      fileName = 'Выгрузка записей до ${format(_toDate!)}.pdf';
+    } else {
+      fileName = 'Выгрузка всех записей.pdf';
+    }
+
+    Directory? dir = await getDownloadsDirectory();
+    dir ??= await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/$fileName');
+    await file.writeAsBytes(pdfBytes);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Файл сохранён: ${file.path}')),
+    );
+  }
+
+  Future<void> _saveCsv() async {
+    final all = await LocalDb.fetchAll();
+    final filtered = all.where((e) {
+      final dt = e.createdAt;
+      if (_fromDate != null && dt.isBefore(_fromDate!)) return false;
+      if (_toDate != null && dt.isAfter(_toDate!)) return false;
+      return true;
+    }).toList();
+    final csvData = CsvService.generateCsv(filtered);
+
+    String format(DateTime d) =>
+        '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+    late final String fileName;
+    if (_fromDate != null && _toDate != null) {
+      fileName = 'Выгрузка записей за ${format(_fromDate!)} - ${format(_toDate!)}.csv';
+    } else if (_fromDate != null) {
+      fileName = 'Выгрузка записей с ${format(_fromDate!)}.csv';
+    } else if (_toDate != null) {
+      fileName = 'Выгрузка записей до ${format(_toDate!)}.csv';
+    } else {
+      fileName = 'Выгрузка всех записей.csv';
+    }
+
+    Directory? dir = await getDownloadsDirectory();
+    dir ??= await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/$fileName');
+    await file.writeAsString(csvData);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Файл сохранён: ${file.path}')),
+    );
+  }
+
   @override
   Widget build(BuildContext ctx) {
     final appState = MyApp.of(ctx);
@@ -144,9 +211,21 @@ class _ExportScreenState extends State<ExportScreen> {
             ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
+              icon: const Icon(Icons.save_alt),
+              label: const Text('Сохранить PDF'),
+              onPressed: _savePdf,
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
               icon: const Icon(Icons.table_view),
               label: const Text('Выгрузить CSV'),
               onPressed: _exportCsv,
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.save_alt),
+              label: const Text('Сохранить CSV'),
+              onPressed: _saveCsv,
             ),
           ],
         ),
