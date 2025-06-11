@@ -9,7 +9,7 @@ class LocalDb {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       join(dbPath, 'diary.db'),
-      version: 1,
+      version: 2,
       onCreate: (db, v) async {
         await db.execute('''
           CREATE TABLE entries(
@@ -39,9 +39,15 @@ class LocalDb {
             tomorrowImprove TEXT,
             stepGoal TEXT,
             flow TEXT,
+            raw TEXT,
             needsSync INTEGER DEFAULT 1
           )
         ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('ALTER TABLE entries ADD COLUMN raw TEXT');
+        }
       },
     );
   }

@@ -77,6 +77,7 @@ class _ImportScreenState extends State<ImportScreen> {
     final lines = input.split(RegExp(r'\r?\n'));
     final result = <EntryData>[];
     Map<String, dynamic>? current;
+    StringBuffer? buffer;
     bool inEmotions = false,
          inInfluence = false,
          inImportant = false,
@@ -110,7 +111,11 @@ class _ImportScreenState extends State<ImportScreen> {
         continue;
       }
       if (line.startsWith('📖 ДНЕВНИК |')) {
-        if (current != null) result.add(_createEntry(current));
+        if (current != null && buffer != null) {
+          result.add(_createEntry(current, buffer.toString()));
+        }
+        buffer = StringBuffer();
+        buffer.writeln(rawLine);
         final parts = line.split('|');
         final dateStr = parts.length > 1 ? parts[1].trim() : '';
         DateTime parsedDate;
@@ -138,6 +143,7 @@ class _ImportScreenState extends State<ImportScreen> {
         continue;
       }
       if (current == null) continue;
+      buffer?.writeln(rawLine);
 
       if (line.startsWith('⏳ Время записи:')) {
         final t = line.substring(line.indexOf(':') + 1).trim();
@@ -392,8 +398,8 @@ class _ImportScreenState extends State<ImportScreen> {
       }
     }
 
-    if (current != null) {
-      result.add(_createEntry(current));
+    if (current != null && buffer != null) {
+      result.add(_createEntry(current, buffer.toString()));
     }
     return result;
   }
@@ -403,6 +409,7 @@ class _ImportScreenState extends State<ImportScreen> {
     final lines = input.split(RegExp(r'\r?\n'));
     final result = <EntryData>[];
     Map<String, dynamic>? current;
+    StringBuffer? buffer;
     bool inFlow = false;
 
     for (final rawLine in lines) {
@@ -412,7 +419,11 @@ class _ImportScreenState extends State<ImportScreen> {
       }
       // Новая запись
       if (line.startsWith('📖 ДНЕВНИК |')) {
-        if (current != null) result.add(_createEntry(current));
+        if (current != null && buffer != null) {
+          result.add(_createEntry(current, buffer.toString()));
+        }
+        buffer = StringBuffer();
+        buffer.writeln(rawLine);
         // вынимем всё после "|"
         final header = line.substring(line.indexOf('|') + 1).trim();
         // попробуем выцепить “за DD-MM-YYYY”
@@ -554,13 +565,13 @@ class _ImportScreenState extends State<ImportScreen> {
       }
     }
 
-    if (current != null) {
-      result.add(_createEntry(current));
+    if (current != null && buffer != null) {
+      result.add(_createEntry(current, buffer.toString()));
     }
     return result;
   }
 
-  EntryData _createEntry(Map<String, dynamic> m) => EntryData(
+  EntryData _createEntry(Map<String, dynamic> m, [String raw = '']) => EntryData(
     date: m['date'] as String,
     time: m['time'] as String,
     createdAt: m['createdAt'] as DateTime,
@@ -586,6 +597,7 @@ class _ImportScreenState extends State<ImportScreen> {
     tomorrowImprove: m['tomorrowImprove'] as String,
     stepGoal: m['stepGoal'] as String,
     flow: m['flow'] as String,
+    raw: raw,
     needsSync: true,
   );
 

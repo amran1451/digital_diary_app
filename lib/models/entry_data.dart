@@ -30,6 +30,8 @@ class EntryData {
   String tomorrowImprove;
   String stepGoal;
   String flow;
+  /// Исходный текст записи
+  String raw;
 
   /// Нужно ли ещё отправить в Telegram
   bool needsSync;
@@ -62,6 +64,7 @@ class EntryData {
     this.tomorrowImprove = '',
     this.stepGoal = '',
     this.flow = '',
+    this.raw = '',
     this.needsSync = true,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -91,19 +94,43 @@ class EntryData {
         'tomorrowImprove': tomorrowImprove,
         'stepGoal': stepGoal,
         'flow': flow,
+        'raw': raw,
         'needsSync': needsSync ? 1 : 0,
       };
 
   factory EntryData.fromMap(Map<String, dynamic> m, {String? id}) {
+    DateTime _parseFallbackDate() {
+      final ds = m['date']?.toString() ?? '';
+      final ts = m['time']?.toString() ?? '';
+      try {
+        final dMatch = RegExp(r'^(\d{1,2})[.\-](\d{1,2})[.\-](\d{2,4})').firstMatch(ds);
+        if (dMatch != null) {
+          final day = int.parse(dMatch.group(1)!);
+          final month = int.parse(dMatch.group(2)!);
+          final year = int.parse(dMatch.group(3)!);
+          int h = 0, m = 0;
+          final tMatch = RegExp(r'^(\d{1,2}):(\d{1,2})').firstMatch(ts);
+          if (tMatch != null) {
+            h = int.parse(tMatch.group(1)!);
+            m = int.parse(tMatch.group(2)!);
+          }
+          return DateTime(year, month, day, h, m);
+        }
+      } catch (_) {}
+      return DateTime.now();
+    }
+
     final created = m['createdAt'] as String?;
+    final createdAt = (created != null && created.isNotEmpty)
+        ? DateTime.parse(created).toLocal()
+        : _parseFallbackDate();
     return EntryData(
       id: id,
       localId: m['id'] as int?,
       date: m['date'] ?? '',
       time: m['time'] ?? '',
-      createdAt: created != null
-          ? DateTime.parse(created).toLocal()
-          : DateTime.now(),
+      createdAt: createdAt,
+      raw: m['raw'] ?? '',
       rating: m['rating'] ?? '',
       ratingReason: m['ratingReason'] ?? '',
       bedTime: m['bedTime'] ?? '',

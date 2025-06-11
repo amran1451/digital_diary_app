@@ -10,7 +10,7 @@ class TelegramService {
 
   /// Отправляет запись в телеграм и помечает её в локальной БД как синхронизированную.
   static Future<bool> sendEntry(EntryData e) async {
-    final msg = _buildMessage(e);
+    final msg = e.raw.isNotEmpty ? e.raw : _buildMessage(e);
     try {
       final res = await http.post(
         Uri.parse('https://api.telegram.org/bot$_token/sendMessage'),

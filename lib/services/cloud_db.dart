@@ -39,7 +39,7 @@ class CloudDb {
   static Future<bool> syncOne(EntryData e) async {
     const token = '7743223370:AAEvTi7V4_-FmL2Avb5TMNX0HTCpPn4xGqo';
     const chatId = '6870993533';
-    final msg = '''
+    final msg = e.raw.isNotEmpty ? e.raw : '''
 📖 ДНЕВНИК | за ${e.date}
 ⏰ Создано: ${e.createdAtFormatted}
 📊 Оценка дня – причина: ${e.rating} – ${e.ratingReason}

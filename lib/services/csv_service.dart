@@ -27,7 +27,8 @@ class CsvService {
     'pleasant',
     'tomorrowImprove',
     'stepGoal',
-    'flow'
+    'flow',
+    'raw'
   ];
 
   static String generateCsv(List<EntryData> entries) {
@@ -59,6 +60,7 @@ class CsvService {
         e.tomorrowImprove,
         e.stepGoal,
         e.flow,
+        e.raw,
       ]);
     }
     const converter = ListToCsvConverter();
@@ -101,6 +103,7 @@ class CsvService {
         tomorrowImprove: m['tomorrowImprove']?.toString() ?? '',
         stepGoal: m['stepGoal']?.toString() ?? '',
         flow: m['flow']?.toString() ?? '',
+        raw: m['raw']?.toString() ?? '',
       ));
     }
     return entries;
