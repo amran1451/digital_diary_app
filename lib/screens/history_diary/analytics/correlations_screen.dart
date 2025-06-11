@@ -28,6 +28,7 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
   bool _showSleep = true;
   bool _showSteps = true;
   bool _smoothLines = true;
+  bool _showStepsAxis = false;
 
   static const _ratingColor = Colors.green;
   static const _energyColor = Colors.orange;
@@ -118,18 +119,22 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
       sleepRaw.add(_sleepHours(e));
       stepsRaw.add((int.tryParse(e.steps) ?? 0).toDouble());
     }
-
+    final minRating = ratingRaw.isEmpty ? 0.0 : ratingRaw.reduce(min);
     final maxRating = ratingRaw.isEmpty ? 0.0 : ratingRaw.reduce(max);
+    final minEnergy = energyRaw.isEmpty ? 0.0 : energyRaw.reduce(min);
     final maxEnergy = energyRaw.isEmpty ? 0.0 : energyRaw.reduce(max);
+    final minSleep = sleepRaw.isEmpty ? 0.0 : sleepRaw.reduce(min);
     final maxSleep = sleepRaw.isEmpty ? 0.0 : sleepRaw.reduce(max);
+    final minSteps = stepsRaw.isEmpty ? 0.0 : stepsRaw.reduce(min);
     final maxSteps = stepsRaw.isEmpty ? 0.0 : stepsRaw.reduce(max);
 
-    double scale(double v, double maxVal) => maxVal == 0 ? 0 : v * 10 / maxVal;
+    double scale(double v, double minVal, double maxVal) =>
+        maxVal - minVal == 0 ? 5 : (v - minVal) * 10 / (maxVal - minVal);
 
-    final rating = ratingRaw.map((v) => scale(v, maxRating)).toList();
-    final energy = energyRaw.map((v) => scale(v, maxEnergy)).toList();
-    final sleep = sleepRaw.map((v) => scale(v, maxSleep)).toList();
-    final steps = stepsRaw.map((v) => scale(v, maxSteps)).toList();
+    final rating = ratingRaw.map((v) => scale(v, minRating, maxRating)).toList();
+    final energy = energyRaw.map((v) => scale(v, minEnergy, maxEnergy)).toList();
+    final sleep = sleepRaw.map((v) => scale(v, minSleep, maxSleep)).toList();
+    final steps = stepsRaw.map((v) => scale(v, minSteps, maxSteps)).toList();
 
     final ratingSpots = <FlSpot>[];
     final energySpots = <FlSpot>[];
@@ -212,7 +217,24 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
                 ),
               ),
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: _showStepsAxis,
+                  interval: 2,
+                  reservedSize: 40,
+                  getTitlesWidget: (v, _) {
+                    if (v < 0 || v > 10) return const SizedBox();
+                    final stepRange = maxSteps - minSteps;
+                    if (stepRange == 0) return const SizedBox();
+                    final real = (v / 10) * stepRange + minSteps;
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 6),
+                      child: Text(real.round().toString(),
+                          style: const TextStyle(fontSize: 8)),
+                    );
+                  },
+                ),
+              ),
             ),
             lineTouchData: LineTouchData(
               handleBuiltInTouches: true,
@@ -340,6 +362,12 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
               title: const Text('Сглаживание линий'),
               value: _smoothLines,
               onChanged: (v) => setState(() => _smoothLines = v),
+              dense: true,
+            ),
+            SwitchListTile(
+              title: const Text('Отображать ось шагов'),
+              value: _showStepsAxis,
+              onChanged: (v) => setState(() => _showStepsAxis = v),
               dense: true,
             ),
             const SizedBox(height: 16),
