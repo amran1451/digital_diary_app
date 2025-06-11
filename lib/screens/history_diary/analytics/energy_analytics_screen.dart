@@ -43,11 +43,19 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
       switch(_period){
         case _Period.week:
           final cutoff = DateTime.now().subtract(const Duration(days: 7));
-          _ent = _all.where((e) => e.createdAt.isAfter(cutoff)).toList();
+          final start = DateTime(cutoff.year, cutoff.month, cutoff.day);
+          _ent = _all
+              .where((e) =>
+          e.createdAt.isAfter(start) || e.createdAt.isAtSameMomentAs(start))
+              .toList();
           break;
         case _Period.month:
           final cutoff = DateTime.now().subtract(const Duration(days: 30));
-          _ent = _all.where((e) => e.createdAt.isAfter(cutoff)).toList();
+          final start = DateTime(cutoff.year, cutoff.month, cutoff.day);
+          _ent = _all
+              .where((e) =>
+          e.createdAt.isAfter(start) || e.createdAt.isAtSameMomentAs(start))
+              .toList();
           break;
         case _Period.all:
           _ent = List.from(_all);
