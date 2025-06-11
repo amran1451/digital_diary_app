@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
+import 'package:table_calendar/table_calendar.dart';
 import '../../../models/entry_data.dart';
 import '../../../services/local_db.dart';
 import '../../../main.dart';
@@ -223,26 +223,85 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     );
   }
 
-  Widget _buildCalendar(){
-    if(_ent.isEmpty) return const Center(child:Text('Нет данных'));
-    final map=<DateTime,int>{ for(var e in _ent) e.createdAt: int.tryParse(e.energy)??0 };
-    final first=_ent.first.createdAt;
-    final last=_ent.last.createdAt;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical:16),
-      child: HeatmapCalendar<num>(
-        startDate:first,
-        endedDate:last,
-        colorMap:{
-          1: Colors.red.shade200,
-          4: Colors.orange.shade300,
-          7: Colors.lightGreen.shade400,
-          9: Colors.green.shade600,
-        },
-        selectedMap: map,
-        cellSize: const Size.square(16),
-        colorTipCellSize: const Size.square(12),
+  Widget _buildCalendar() {
+    if (_ent.isEmpty) return const Center(child: Text('Нет данных'));
+
+    // Собираем значения энергии по дням без учёта времени
+    final raw = <DateTime, int>{};
+    for (var e in _ent) {
+      final key = DateTime(e.createdAt.year, e.createdAt.month, e.createdAt.day);
+      raw[key] = int.tryParse(e.energy) ?? 0;
+    }
+
+    // Диапазон от первой до последней даты записи
+    final allKeys = raw.keys.toList()..sort();
+    final first = allKeys.first;
+    final last = allKeys.last;
+
+    // Заполняем все даты диапазона, если данных нет – значение 0
+    final data = <DateTime, int>{};
+    for (var d = first; !d.isAfter(last); d = d.add(const Duration(days: 1))) {
+      data[d] = raw[d] ?? 0;
+    }
+
+    Color _colorFor(int v) {
+      if (v <= 3) return Colors.red.shade200;
+      if (v <= 6) return Colors.orange.shade300;
+      if (v <= 8) return Colors.lightGreen.shade400;
+      return Colors.green.shade600;
+    }
+
+    return TableCalendar(
+      firstDay: first,
+      lastDay: last,
+      focusedDay: last,
+      startingDayOfWeek: StartingDayOfWeek.monday,
+      headerStyle: const HeaderStyle(
+        formatButtonVisible: false,
+        titleCentered: true,
       ),
+      calendarStyle: const CalendarStyle(outsideDaysVisible: false),
+      daysOfWeekStyle: const DaysOfWeekStyle(
+        weekdayStyle: TextStyle(fontWeight: FontWeight.bold),
+        weekendStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+      ),
+      calendarBuilders: CalendarBuilders(
+        defaultBuilder: (ctx, date, _) {
+          final v = data[DateTime(date.year, date.month, date.day)]!;
+          return Container(
+            decoration: BoxDecoration(
+              color: _colorFor(v),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            margin: const EdgeInsets.all(4),
+            alignment: Alignment.center,
+            child: Text('${date.day}', style: const TextStyle(fontSize: 12)),
+          );
+        },
+        todayBuilder: (ctx, date, _) {
+          final v = data[DateTime(date.year, date.month, date.day)]!;
+          return Container(
+            decoration: BoxDecoration(
+              color: _colorFor(v),
+              border: Border.all(
+                  color: Theme.of(context).colorScheme.primary, width: 2),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            margin: const EdgeInsets.all(4),
+            alignment: Alignment.center,
+            child: Text('${date.day}',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+          );
+        },
+        outsideBuilder: (ctx, date, _) => const SizedBox.shrink(),
+      ),
+      onDaySelected: (date, _) {
+        final ds = DateFormat('dd.MM.yyyy').format(date);
+        final v = data[DateTime(date.year, date.month, date.day)]!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Дата: $ds — энергия: $v')),
+        );
+      },
     );
   }
 }
