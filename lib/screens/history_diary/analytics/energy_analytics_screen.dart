@@ -271,7 +271,7 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     }
 
     Color _colorFor(double v) {
-      if (v <= 3) return Colors.red.shade200;
+      if (v <= 3) return Colors.red.shade600;
       if (v <= 6) return Colors.orange.shade300;
       if (v <= 8) return Colors.lightGreen.shade400;
       return Colors.green.shade600;
