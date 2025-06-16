@@ -26,7 +26,7 @@ dependencies:
   table_calendar: ^3.0.9
   file_picker: ^10.1.9
   path_provider: ^2.0.15
-  flutter_keyboard_visibility: ^5.4.2
+  flutter_keyboard_visibility: ^5.4.1
 
   nutrition_tracker:
     path: ../nutrition_tracker
