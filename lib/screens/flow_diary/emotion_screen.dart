@@ -220,74 +220,76 @@ class _EmotionScreenState extends State<EmotionScreen> {
         ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: moodCtrl,
-              decoration: InputDecoration(
-                labelText: '😊 Общее настроение',
-                suffixIcon: Tooltip(
-                  message:
-                      'Одним словом, например: "спокойный день".',
-                  child: const Icon(Icons.info_outline),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              TextField(
+                controller: moodCtrl,
+                decoration: InputDecoration(
+                  labelText: '😊 Общее настроение',
+                    suffixIcon: Tooltip(
+                      message:
+                        'Одним словом, например: "спокойный день".',
+                      child: const Icon(Icons.info_outline),
+                    ),
                 ),
+                onChanged: (v) async {
+                  entry.mood = v;
+                  DraftService.currentDraft = entry;
+                  await DraftService.saveDraft();
+                },
               ),
-              onChanged: (v) async {
-                entry.mood = v;
-                DraftService.currentDraft = entry;
-                await DraftService.saveDraft();
-              },
-            ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text('🎭 Главные эмоции',
-                  style: Theme.of(ctx).textTheme.titleMedium),
-            ),
-            const SizedBox(height: 4),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: _emotionCategories.entries.map((cat) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(cat.key),
-                      const SizedBox(height: 4),
-                      Wrap(
-                        spacing: 8,
-                        children: cat.value.map((emotion) {
-                          final selected = _selectedEmotions.contains(emotion);
-                          return Tooltip(
-                            message: _emotionHints[emotion] ?? '',
-                            child: FilterChip(
-                              label: Text(emotion),
-                              selected: selected,
-                              onSelected: (v) async {
-                                setState(() {
-                                  if (v) {
-                                    _selectedEmotions.add(emotion);
-                                  } else {
-                                    _selectedEmotions.remove(emotion);
-                                  }
-                                  entry.mainEmotions =
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text('🎭 Главные эмоции',
+                style: Theme.of(ctx).textTheme.titleMedium),
+              ),
+              const SizedBox(height: 4),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _emotionCategories.entries.map((cat) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(cat.key),
+                          const SizedBox(height: 4),
+                          Wrap(
+                            spacing: 8,
+                              children: cat.value.map((emotion) {
+                                final selected = _selectedEmotions.contains(emotion);
+                                return Tooltip(
+                                  message: _emotionHints[emotion] ?? '',
+                                  child: FilterChip(
+                                  label: Text(emotion),
+                                  selected: selected,
+                                  onSelected: (v) async {
+                                    setState(() {
+                                      if (v) {
+                                        _selectedEmotions.add(emotion);
+                                      } else {
+                                        _selectedEmotions.remove(emotion);
+                                      }
+                                      entry.mainEmotions =
                                       _selectedEmotions.join(', ');
-                                });
-                                DraftService.currentDraft = entry;
-                                await DraftService.saveDraft();
-                              },
-                            ),
-                          );
-                        }).toList(),
+                                    });
+                                    DraftService.currentDraft = entry;
+                                    await DraftService.saveDraft();
+                                  },
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
+                    );
+                  }).toList(),
+                ),
             const SizedBox(height: 8),
             TextField(
               controller: influenceCtrl,
@@ -305,7 +307,7 @@ class _EmotionScreenState extends State<EmotionScreen> {
                 await DraftService.saveDraft();
               },
             ),
-            const Spacer(),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
