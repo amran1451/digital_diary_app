@@ -251,9 +251,13 @@ class _EmotionScreenState extends State<EmotionScreen> {
               const SizedBox(height: 4),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: _emotionCategories.entries.toList().asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final cat = entry.value;
+                children: _emotionCategories.entries
+                    .toList()
+                    .asMap()
+                    .entries
+                    .map((categoryEntry) {
+                  final index = categoryEntry.key;
+                  final cat = categoryEntry.value;
                   final emotions = cat.value;
                   final selectedCount = emotions.where(_selectedEmotions.contains).length;
                   return ExpansionTile(
