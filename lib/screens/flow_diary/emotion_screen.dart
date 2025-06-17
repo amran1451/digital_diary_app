@@ -264,46 +264,49 @@ class _EmotionScreenState extends State<EmotionScreen> {
                   final index = categoryEntry.key;
                   final cat = categoryEntry.value;
                   final emotions = cat.value;
-                  final selectedCount = emotions.where(_selectedEmotions.contains).length;
+                  final selectedCount =
+                    emotions.where(_selectedEmotions.contains).length;
                   return ExpansionPanelRadio(
                     value: index,
                     headerBuilder: (context, isExpanded) {
-                      return ListTile(
-                        title: Text(selectedCount > 0 ? '${cat.key} ($selectedCount)' : cat.key),
-                          DraftService.currentDraft = entry;
-                          await DraftService.saveDraft();
-                          },
+                      title: Text(
+                        selectedCount > 0
+                            ? '${cat.key} ($selectedCount)'
+                            : cat.key,
                         ),
                       );
-    },
-    body: Padding(
-    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-    child: Wrap(
-    spacing: 8,
-    children: emotions.map((emotion) {
-    final selected = _selectedEmotions.contains(emotion);
-    return Tooltip(
-    message: _emotionHints[emotion] ?? '',
-    child: FilterChip(
-    label: Text(emotion),
-    selected: selected,
-    onSelected: (v) async {
-    setState(() {
-    if (v) {
-    _selectedEmotions.add(emotion);
-    } else {
-    _selectedEmotions.remove(emotion);
-    }
-    entry.mainEmotions = _selectedEmotions.join(', ');
-    });
-    DraftService.currentDraft = entry;
-    await DraftService.saveDraft();
-    },
-    ),
-    );
-    }).toList(),
+                    },
+                    body: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 16, right: 16, bottom: 8),
+                      child: Wrap(
+                        spacing: 8,
+                        children: emotions.map((emotion) {
+                          final selected =
+                          _selectedEmotions.contains(emotion);
+                          return Tooltip(
+                            message: _emotionHints[emotion] ?? '',
+                            child: FilterChip(
+                              label: Text(emotion),
+                              selected: selected,
+                              onSelected: (v) async {
+                                setState(() {
+                                  if (v) {
+                                    _selectedEmotions.add(emotion);
+                                  } else {
+                                    _selectedEmotions.remove(emotion);
+                                  }
+                                  entry.mainEmotions =
+                                      _selectedEmotions.join(', ');
+                                });
+                                DraftService.currentDraft = entry;
+                                await DraftService.saveDraft();
+                              },
+                            ),
+                          );
+                        }).toList(),
                       ),
-    ),
+                    ),
                   );
                 }).toList(),
               ),
