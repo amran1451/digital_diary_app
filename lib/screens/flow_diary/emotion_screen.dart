@@ -332,6 +332,7 @@ class _EmotionScreenState extends State<EmotionScreen> {
           ],
         ),
       ),
+      ),
     );
   }
 }
