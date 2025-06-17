@@ -249,8 +249,13 @@ class _EmotionScreenState extends State<EmotionScreen> {
                 style: Theme.of(ctx).textTheme.titleMedium),
               ),
               const SizedBox(height: 4),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              ExpansionPanelList.radio(
+                initialOpenPanelValue: _expandedCategoryIndex,
+                expansionCallback: (panelIndex, isExpanded) {
+                  setState(() {
+                    _expandedCategoryIndex = isExpanded ? null : panelIndex as int;
+                  });
+                },
                 children: _emotionCategories.entries
                     .toList()
                     .asMap()
@@ -260,43 +265,45 @@ class _EmotionScreenState extends State<EmotionScreen> {
                   final cat = categoryEntry.value;
                   final emotions = cat.value;
                   final selectedCount = emotions.where(_selectedEmotions.contains).length;
-                  return ExpansionTile(
-                    key: PageStorageKey(cat.key),
-                    initiallyExpanded: _expandedCategoryIndex == index,
-                    onExpansionChanged: (expanded) {
-                      setState(() {
-                        _expandedCategoryIndex = expanded ? index : null;
-                      });
-                    },
-                    title: Text(selectedCount > 0 ? '${cat.key} ($selectedCount)' : cat.key),
-                    children: [
-                    Wrap(
-                    spacing: 8,
-                    children: emotions.map((emotion) {
-                      final selected = _selectedEmotions.contains(emotion);
-                      return Tooltip(
-                        message: _emotionHints[emotion] ?? '',
-                        child: FilterChip(
-                          label: Text(emotion),
-                          selected: selected,
-                          onSelected: (v) async {
-                            setState(() {
-                              if (v) {
-                                _selectedEmotions.add(emotion);
-                              } else {
-                                _selectedEmotions.remove(emotion);
-                              }
-                              entry.mainEmotions = _selectedEmotions.join(', ');
-                            });
-                            DraftService.currentDraft = entry;
-                            await DraftService.saveDraft();
+                  return ExpansionPanelRadio(
+                    value: index,
+                    headerBuilder: (context, isExpanded) {
+                      return ListTile(
+                        title: Text(selectedCount > 0 ? '${cat.key} ($selectedCount)' : cat.key),
+                          DraftService.currentDraft = entry;
+                          await DraftService.saveDraft();
                           },
                         ),
                       );
-                    }).toList(),
+    },
+    body: Padding(
+    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+    child: Wrap(
+    spacing: 8,
+    children: emotions.map((emotion) {
+    final selected = _selectedEmotions.contains(emotion);
+    return Tooltip(
+    message: _emotionHints[emotion] ?? '',
+    child: FilterChip(
+    label: Text(emotion),
+    selected: selected,
+    onSelected: (v) async {
+    setState(() {
+    if (v) {
+    _selectedEmotions.add(emotion);
+    } else {
+    _selectedEmotions.remove(emotion);
+    }
+    entry.mainEmotions = _selectedEmotions.join(', ');
+    });
+    DraftService.currentDraft = entry;
+    await DraftService.saveDraft();
+    },
+    ),
+    );
+    }).toList(),
                       ),
-                      const SizedBox(height: 8),
-                    ],
+    ),
                   );
                 }).toList(),
               ),
