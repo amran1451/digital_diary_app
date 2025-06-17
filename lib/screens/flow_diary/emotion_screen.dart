@@ -269,10 +269,11 @@ class _EmotionScreenState extends State<EmotionScreen> {
                   return ExpansionPanelRadio(
                     value: index,
                     headerBuilder: (context, isExpanded) {
-                      title: Text(
-                        selectedCount > 0
-                            ? '${cat.key} ($selectedCount)'
-                            : cat.key,
+                      return ListTile(
+                        title: Text(
+                          selectedCount > 0
+                              ? '${cat.key} ($selectedCount)'
+                              : cat.key,
                         ),
                       );
                     },
