@@ -20,6 +20,7 @@ class _EmotionScreenState extends State<EmotionScreen> {
   late TextEditingController moodCtrl;
   late TextEditingController influenceCtrl;
   final Set<String> _selectedEmotions = <String>{};
+  int? _expandedCategoryIndex;
 
   static const Map<String, List<String>> _emotionCategories = {
     '😄 Радость': [
@@ -250,46 +251,51 @@ class _EmotionScreenState extends State<EmotionScreen> {
               const SizedBox(height: 4),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: _emotionCategories.entries.map((cat) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(cat.key),
-                          const SizedBox(height: 4),
-                          Wrap(
-                            spacing: 8,
-                              children: cat.value.map((emotion) {
-                                final selected = _selectedEmotions.contains(emotion);
-                                return Tooltip(
-                                  message: _emotionHints[emotion] ?? '',
-                                  child: FilterChip(
-                                  label: Text(emotion),
-                                  selected: selected,
-                                  onSelected: (v) async {
-                                    setState(() {
-                                      if (v) {
-                                        _selectedEmotions.add(emotion);
-                                      } else {
-                                        _selectedEmotions.remove(emotion);
-                                      }
-                                      entry.mainEmotions =
-                                      _selectedEmotions.join(', ');
-                                    });
-                                    DraftService.currentDraft = entry;
-                                    await DraftService.saveDraft();
-                                  },
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                          const SizedBox(height: 8),
-                        ],
+                children: _emotionCategories.entries.toList().asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final cat = entry.value;
+                  final emotions = cat.value;
+                  final selectedCount = emotions.where(_selectedEmotions.contains).length;
+                  return ExpansionTile(
+                    key: PageStorageKey(cat.key),
+                    initiallyExpanded: _expandedCategoryIndex == index,
+                    onExpansionChanged: (expanded) {
+                      setState(() {
+                        _expandedCategoryIndex = expanded ? index : null;
+                      });
+                    },
+                    title: Text(selectedCount > 0 ? '${cat.key} ($selectedCount)' : cat.key),
+                    children: [
+                    Wrap(
+                    spacing: 8,
+                    children: emotions.map((emotion) {
+                      final selected = _selectedEmotions.contains(emotion);
+                      return Tooltip(
+                        message: _emotionHints[emotion] ?? '',
+                        child: FilterChip(
+                          label: Text(emotion),
+                          selected: selected,
+                          onSelected: (v) async {
+                            setState(() {
+                              if (v) {
+                                _selectedEmotions.add(emotion);
+                              } else {
+                                _selectedEmotions.remove(emotion);
+                              }
+                              entry.mainEmotions = _selectedEmotions.join(', ');
+                            });
+                            DraftService.currentDraft = entry;
+                            await DraftService.saveDraft();
+                          },
+                        ),
+                      );
+                    }).toList(),
                       ),
-                    );
-                  }).toList(),
-                ),
+                      const SizedBox(height: 8),
+                    ],
+                  );
+                }).toList(),
+              ),
             const SizedBox(height: 8),
             TextField(
               controller: influenceCtrl,
