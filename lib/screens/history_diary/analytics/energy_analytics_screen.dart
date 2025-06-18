@@ -34,8 +34,8 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
 
   Future<void> _load() async {
     final all = await LocalDb.fetchAll();
-    all.sort((a,b)=>a.createdAt.compareTo(b.createdAt));
-    setState(()=>_all=all);
+    all.sort((a, b) => _entryDate(a).compareTo(_entryDate(b)));
+    setState(() => _all = all);
     _apply();
   }
 
@@ -47,7 +47,8 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
           final start = DateTime(cutoff.year, cutoff.month, cutoff.day);
           _ent = _all
               .where((e) =>
-          e.createdAt.isAfter(start) || e.createdAt.isAtSameMomentAs(start))
+              _entryDate(e).isAfter(start) ||
+              _entryDate(e).isAtSameMomentAs(start))
               .toList();
           break;
         case _Period.month:
@@ -55,7 +56,8 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
           final start = DateTime(cutoff.year, cutoff.month, cutoff.day);
           _ent = _all
               .where((e) =>
-          e.createdAt.isAfter(start) || e.createdAt.isAtSameMomentAs(start))
+              _entryDate(e).isAfter(start) ||
+              _entryDate(e).isAtSameMomentAs(start))
               .toList();
           break;
         case _Period.all:
@@ -80,6 +82,17 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     final vs =
     _ent.map((e) => pow((ParseUtils.parseDouble(e.energy) - m), 2)).reduce((a, b) => a + b);
     return sqrt(vs/(_ent.length-1));
+  }
+
+  DateTime _entryDate(EntryData e) {
+    final parts = e.date.split('-');
+    if (parts.length == 3) {
+      final d = int.tryParse(parts[0]) ?? 1;
+      final m = int.tryParse(parts[1]) ?? 1;
+      final y = int.tryParse(parts[2]) ?? DateTime.now().year;
+      return DateTime(y, m, d);
+    }
+    return DateTime(e.createdAt.year, e.createdAt.month, e.createdAt.day);
   }
 
   Future<void> _share() async {
@@ -158,7 +171,7 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     final dates=<DateTime>[];
     for(int i=0;i<_ent.length;i++){
       final e=_ent[i];
-      dates.add(e.createdAt);
+      dates.add(_entryDate(e));
       spots.add(FlSpot(i.toDouble(), ParseUtils.parseDouble(e.energy)));
     }
     final today=DateTime.now();
@@ -226,7 +239,7 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
   Widget _buildTable(){
     final grouped = <DateTime, List<double>>{};
     for (var e in _ent) {
-      final k = DateTime(e.createdAt.year, e.createdAt.month, e.createdAt.day);
+      final k = _entryDate(e);
       (grouped[k] ??= []).add(ParseUtils.parseDouble(e.energy));
     }
     final rows = grouped.entries.toList()
@@ -254,7 +267,7 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     // Собираем значения энергии по дням без учёта времени
     final raw = <DateTime, List<double>>{};
     for (var e in _ent) {
-      final key = DateTime(e.createdAt.year, e.createdAt.month, e.createdAt.day);
+      final key = _entryDate(e);
       (raw[key] ??= []).add(ParseUtils.parseDouble(e.energy));
     }
 
