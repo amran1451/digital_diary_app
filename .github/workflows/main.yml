@@ -13,13 +13,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Download Flutter SDK manually (v3.22.1)
+      - name: Download Flutter SDK (v3.22.1) manually
         run: |
           git clone https://github.com/flutter/flutter.git --branch 3.22.1 --depth 1 flutter_sdk
-          echo "$GITHUB_WORKSPACE/flutter_sdk/bin" >> $GITHUB_PATH
+          echo "$GITHUB_WORKSPACE/flutter_sdk/bin" >> $GITHUB_ENV
+          echo "FLUTTER_HOME=$GITHUB_WORKSPACE/flutter_sdk" >> $GITHUB_ENV
 
-      - name: Run Flutter doctor
-        run: flutter doctor
+      - name: Warm up Flutter
+        run: |
+          flutter --version
+          flutter doctor
 
       - name: Install dependencies
         run: flutter pub get
