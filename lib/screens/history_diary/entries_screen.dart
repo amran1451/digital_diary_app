@@ -372,7 +372,14 @@ class _EntriesScreenState extends State<EntriesScreen> {
                     subtitle: e.needsSync
                         ? const Text('Не отправлено')
                         : null,
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: Switch(
+                      value: !e.needsSync,
+                      onChanged: (v) async {
+                        e.needsSync = !v;
+                        await LocalDb.saveOrUpdate(e);
+                        setState(() {});
+                      },
+                    ),
                     onTap: () async {
                       await Navigator.pushNamed(
                         ctx,

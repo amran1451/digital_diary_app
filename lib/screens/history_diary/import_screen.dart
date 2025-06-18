@@ -420,7 +420,7 @@ class _ImportScreenState extends State<ImportScreen> {
       // Новая запись
       if (line.startsWith('📖 ДНЕВНИК |')) {
         if (current != null && buffer != null) {
-          result.add(_createEntry(current, buffer.toString()));
+          result.add(_createEntry(current, buffer.toString(), false));
         }
         buffer = StringBuffer();
         buffer.writeln(rawLine);
@@ -566,12 +566,17 @@ class _ImportScreenState extends State<ImportScreen> {
     }
 
     if (current != null && buffer != null) {
-      result.add(_createEntry(current, buffer.toString()));
+      result.add(_createEntry(current, buffer.toString(), false));
     }
     return result;
   }
 
-  EntryData _createEntry(Map<String, dynamic> m, [String raw = '']) => EntryData(
+  EntryData _createEntry(
+      Map<String, dynamic> m, [
+        String raw = '',
+        bool needsSync = true,
+      ]) =>
+      EntryData(
     date: m['date'] as String,
     time: m['time'] as String,
     createdAt: m['createdAt'] as DateTime,
@@ -598,7 +603,7 @@ class _ImportScreenState extends State<ImportScreen> {
     stepGoal: m['stepGoal'] as String,
     flow: m['flow'] as String,
     raw: raw,
-    needsSync: true,
+    needsSync: needsSync,
   );
 
   @override
