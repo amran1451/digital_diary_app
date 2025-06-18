@@ -7,7 +7,7 @@ class HighlightService {
     required String prompt,
     int maxHighlights = 3,
   }) async {
-    final apiKey = const String.fromEnvironment('AIzaSyBXEXVwHxCZkRgY0JeFvDwkyNfkKiYkJX0');
+    final apiKey = const String.fromEnvironment('GEMINI_API_KEY');
     if (apiKey.isEmpty) return [];
     final uri = Uri.parse(
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$apiKey',

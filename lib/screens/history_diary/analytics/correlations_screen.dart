@@ -86,11 +86,13 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
     try {
       final bed = _toDateTime(e, e.bedTime);
       final wake = _toDateTime(e, e.wakeTime);
-      if (bed == null || wake == null || wake.isBefore(bed)) return 0;
-      return wake.difference(bed).inMinutes / 60.0;
+      if (bed != null && wake != null && !wake.isBefore(bed)) {
+        return wake.difference(bed).inMinutes / 60.0;
+      }
     } catch (_) {
-      return 0;
+      // ignore parsing errors and fallback to duration
     }
+    return ParseUtils.parseHours(e.sleepDuration);
   }
 
   Widget _legendItem(String label, Color color) {
