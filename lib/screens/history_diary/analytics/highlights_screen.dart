@@ -241,8 +241,14 @@ class _HighlightsScreenState extends State<HighlightsScreen> {
                           return Card(
                             child: ListTile(
                               leading: const Icon(Icons.star),
-                              title: Text(h),
-                              subtitle: Text(snippet),
+                              title: Text(
+                                h,
+                                textAlign: TextAlign.center,
+                              ),
+                              subtitle: Text(
+                                snippet,
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           );
                         },
