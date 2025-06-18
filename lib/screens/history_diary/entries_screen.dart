@@ -194,6 +194,41 @@ class _EntriesScreenState extends State<EntriesScreen> {
     }
   }
 
+  Future<void> _editSendStatus(EntryData e) async {
+    bool isSent = !e.needsSync;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        bool val = isSent;
+        return StatefulBuilder(
+          builder: (ctx, setState) => AlertDialog(
+            title: const Text('Статус отправки'),
+            content: CheckboxListTile(
+              title: const Text('Отправлено'),
+              value: val,
+              onChanged: (v) => setState(() => val = v ?? false),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Отмена'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, val),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (result != null) {
+      e.needsSync = !result;
+      await LocalDb.saveOrUpdate(e);
+      if (mounted) setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext ctx) {
     final appState = MyApp.of(ctx);
@@ -374,6 +409,7 @@ class _EntriesScreenState extends State<EntriesScreen> {
                         : null,
                     trailing: Switch(
                       value: !e.needsSync,
+                      onLongPress: () => _editSendStatus(e),
                       onChanged: (v) async {
                         e.needsSync = !v;
                         await LocalDb.saveOrUpdate(e);
