@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../models/entry_data.dart';
 import '../../services/csv_service.dart';
+import '../../utils/parse_utils.dart';
 import 'import_preview_screen.dart';
 
 class ImportScreen extends StatefulWidget {
@@ -191,8 +192,8 @@ class _ImportScreenState extends State<ImportScreen> {
       if (line.contains('⚡') && line.contains('Энергия')) {
         final idx = line.indexOf(':');
         final data = idx >= 0 ? line.substring(idx + 1).trim() : '';
-        final num = RegExp(r'(\d+)').firstMatch(data)?.group(1) ?? data;
-        current['energy'] = num;
+        final numVal = ParseUtils.parseDouble(data);
+        current['energy'] = numVal.toString();
         continue;
       }
 
@@ -498,7 +499,8 @@ class _ImportScreenState extends State<ImportScreen> {
         continue;
       }
       if (line.startsWith('⚡️ Энергия:')) {
-        current['energy'] = line.substring(line.indexOf(':') + 1).trim();
+        final val = line.substring(line.indexOf(':') + 1).trim();
+        current['energy'] = ParseUtils.parseDouble(val).toString();
         continue;
       }
       if (line.startsWith('😊 Настроение:')) {

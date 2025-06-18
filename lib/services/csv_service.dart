@@ -1,5 +1,6 @@
 import 'package:csv/csv.dart';
 import '../models/entry_data.dart';
+import '../utils/parse_utils.dart';
 
 class CsvService {
   static const headers = [
@@ -68,8 +69,19 @@ class CsvService {
   }
 
   static List<EntryData> parseCsv(String csvStr) {
-    const converter = CsvToListConverter();
-    final rows = converter.convert(csvStr);
+    var data = csvStr.trimLeft();
+    if (data.startsWith('\uFEFF')) {
+      data = data.substring(1);
+    }
+    // Auto-detect delimiter (comma or semicolon)
+    CsvToListConverter conv;
+    if (data.contains(';') && !data.contains(',')) {
+      conv = const CsvToListConverter(fieldDelimiter: ';');
+    } else {
+      conv = const CsvToListConverter();
+    }
+
+    final rows = conv.convert(data);
     if (rows.isEmpty) return [];
     final header = rows.first.map((e) => e.toString()).toList();
     final entries = <EntryData>[];
@@ -88,7 +100,7 @@ class CsvService {
         sleepDuration: m['sleepDuration']?.toString() ?? '',
         steps: m['steps']?.toString() ?? '',
         activity: m['activity']?.toString() ?? '',
-        energy: m['energy']?.toString() ?? '',
+        energy: ParseUtils.parseDouble(m['energy']?.toString() ?? '').toString(),
         mood: m['mood']?.toString() ?? '',
         mainEmotions: m['mainEmotions']?.toString() ?? '',
         influence: m['influence']?.toString() ?? '',

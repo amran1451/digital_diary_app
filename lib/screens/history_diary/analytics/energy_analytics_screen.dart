@@ -7,6 +7,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../../../models/entry_data.dart';
 import '../../../services/local_db.dart';
 import '../../../main.dart';
+import '../../../utils/parse_utils.dart';
 
 enum _Period { week, month, all }
 
@@ -64,8 +65,10 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     });
   }
 
-  double get _min => _ent.isEmpty?0:_ent.map((e)=>double.tryParse(e.energy)??0).reduce(min);
-  double get _max => _ent.isEmpty?0:_ent.map((e)=>double.tryParse(e.energy)??0).reduce(max);
+  double get _min =>
+      _ent.isEmpty ? 0 : _ent.map((e) => ParseUtils.parseDouble(e.energy)).reduce(min);
+  double get _max =>
+      _ent.isEmpty ? 0 : _ent.map((e) => ParseUtils.parseDouble(e.energy)).reduce(max);
   double get _avg {
     if(_ent.isEmpty) return 0;
     final s = _ent.map((e)=>double.tryParse(e.energy)??0).reduce((a,b)=>a+b);
@@ -74,7 +77,8 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
   double get _sd {
     if(_ent.length<2) return 0;
     final m=_avg;
-    final vs = _ent.map((e)=>pow((double.tryParse(e.energy)??0)-m,2)).reduce((a,b)=>a+b);
+    final vs =
+    _ent.map((e) => pow((ParseUtils.parseDouble(e.energy) - m), 2)).reduce((a, b) => a + b);
     return sqrt(vs/(_ent.length-1));
   }
 
@@ -155,7 +159,7 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     for(int i=0;i<_ent.length;i++){
       final e=_ent[i];
       dates.add(e.createdAt);
-      spots.add(FlSpot(i.toDouble(), double.tryParse(e.energy)??0));
+      spots.add(FlSpot(i.toDouble(), ParseUtils.parseDouble(e.energy)));
     }
     final today=DateTime.now();
     final wi=max(_ent.length*40.0, MediaQuery.of(c).size.width);
@@ -223,7 +227,7 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     final grouped = <DateTime, List<double>>{};
     for (var e in _ent) {
       final k = DateTime(e.createdAt.year, e.createdAt.month, e.createdAt.day);
-      (grouped[k] ??= []).add(double.tryParse(e.energy) ?? 0);
+      (grouped[k] ??= []).add(ParseUtils.parseDouble(e.energy));
     }
     final rows = grouped.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key));
@@ -251,7 +255,7 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     final raw = <DateTime, List<double>>{};
     for (var e in _ent) {
       final key = DateTime(e.createdAt.year, e.createdAt.month, e.createdAt.day);
-      (raw[key] ??= []).add(double.tryParse(e.energy) ?? 0);
+      (raw[key] ??= []).add(ParseUtils.parseDouble(e.energy));
     }
 
     // Диапазон от первой до последней даты записи

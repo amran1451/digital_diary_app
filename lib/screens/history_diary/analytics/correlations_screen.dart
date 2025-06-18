@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../utils/parse_utils.dart';
 
 import '../../../models/entry_data.dart';
 import '../../../services/local_db.dart';
@@ -115,7 +116,7 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
     for (final e in _entries) {
       dates.add(_entryDate(e));
       ratingRaw.add(double.tryParse(e.rating) ?? 0);
-      energyRaw.add(double.tryParse(e.energy) ?? 0);
+      energyRaw.add(ParseUtils.parseDouble(e.energy));
       sleepRaw.add(_sleepHours(e));
       stepsRaw.add((int.tryParse(e.steps) ?? 0).toDouble());
     }
