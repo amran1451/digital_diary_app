@@ -15,8 +15,8 @@ jobs:
 
       - name: Download Flutter SDK manually (v3.22.1)
         run: |
-          git clone https://github.com/flutter/flutter.git --branch 3.22.1 --depth 1
-          echo "$GITHUB_WORKSPACE/flutter/bin" >> $GITHUB_PATH
+          git clone https://github.com/flutter/flutter.git --branch 3.22.1 --depth 1 flutter_sdk
+          echo "$GITHUB_WORKSPACE/flutter_sdk/bin" >> $GITHUB_PATH
 
       - name: Run Flutter doctor
         run: flutter doctor
