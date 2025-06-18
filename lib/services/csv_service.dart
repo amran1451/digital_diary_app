@@ -100,7 +100,10 @@ class CsvService {
         sleepDuration: m['sleepDuration']?.toString() ?? '',
         steps: m['steps']?.toString() ?? '',
         activity: m['activity']?.toString() ?? '',
-        energy: ParseUtils.parseDouble(m['energy']?.toString() ?? '').toString(),
+        energy: ParseUtils
+            .parseDouble(m['energy']?.toString() ?? '')
+            .toInt()
+            .toString(),
         mood: m['mood']?.toString() ?? '',
         mainEmotions: m['mainEmotions']?.toString() ?? '',
         influence: m['influence']?.toString() ?? '',

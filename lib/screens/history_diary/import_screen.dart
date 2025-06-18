@@ -193,7 +193,7 @@ class _ImportScreenState extends State<ImportScreen> {
         final idx = line.indexOf(':');
         final data = idx >= 0 ? line.substring(idx + 1).trim() : '';
         final numVal = ParseUtils.parseDouble(data);
-        current['energy'] = numVal.toString();
+        current['energy'] = numVal.toInt().toString();
         continue;
       }
 
@@ -500,7 +500,8 @@ class _ImportScreenState extends State<ImportScreen> {
       }
       if (line.startsWith('⚡️ Энергия:')) {
         final val = line.substring(line.indexOf(':') + 1).trim();
-        current['energy'] = ParseUtils.parseDouble(val).toString();
+        current['energy'] =
+            ParseUtils.parseDouble(val).toInt().toString();
         continue;
       }
       if (line.startsWith('😊 Настроение:')) {
