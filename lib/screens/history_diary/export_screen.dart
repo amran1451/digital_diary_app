@@ -124,7 +124,14 @@ class _ExportScreenState extends State<ExportScreen> {
       fileName = 'Выгрузка всех записей.pdf';
     }
 
-    Directory? dir = await getDownloadsDirectory();
+    Directory? dir;
+    if (Platform.isAndroid) {
+      final dirs =
+      await getExternalStorageDirectories(type: StorageDirectory.downloads);
+      if (dirs != null && dirs.isNotEmpty) dir = dirs.first;
+    } else {
+      dir = await getDownloadsDirectory();
+    }
     dir ??= await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/$fileName');
     await file.writeAsBytes(pdfBytes);
@@ -157,7 +164,14 @@ class _ExportScreenState extends State<ExportScreen> {
       fileName = 'Выгрузка всех записей.csv';
     }
 
-    Directory? dir = await getDownloadsDirectory();
+    Directory? dir;
+    if (Platform.isAndroid) {
+      final dirs =
+      await getExternalStorageDirectories(type: StorageDirectory.downloads);
+      if (dirs != null && dirs.isNotEmpty) dir = dirs.first;
+    } else {
+      dir = await getDownloadsDirectory();
+    }
     dir ??= await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/$fileName');
     await file.writeAsString(csvData);
