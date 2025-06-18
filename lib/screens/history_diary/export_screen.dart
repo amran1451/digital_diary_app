@@ -96,7 +96,7 @@ class _ExportScreenState extends State<ExportScreen> {
 
     final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/$fileName');
-    await file.writeAsString(csvData);
+    await file.writeAsString(csvData, flush: true);
     await Share.shareXFiles([XFile(file.path)], text: fileName);
   }
 
@@ -127,12 +127,15 @@ class _ExportScreenState extends State<ExportScreen> {
     Directory? dir;
     if (Platform.isAndroid) {
       final dirs =
-      await getExternalStorageDirectories(type: StorageDirectory.downloads);
+        await getExternalStorageDirectories(type: StorageDirectory.downloads);
       if (dirs != null && dirs.isNotEmpty) dir = dirs.first;
     } else {
       dir = await getDownloadsDirectory();
     }
     dir ??= await getApplicationDocumentsDirectory();
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
     final file = File('${dir.path}/$fileName');
     await file.writeAsBytes(pdfBytes);
     if (!mounted) return;
@@ -167,14 +170,17 @@ class _ExportScreenState extends State<ExportScreen> {
     Directory? dir;
     if (Platform.isAndroid) {
       final dirs =
-      await getExternalStorageDirectories(type: StorageDirectory.downloads);
+        await getExternalStorageDirectories(type: StorageDirectory.downloads);
       if (dirs != null && dirs.isNotEmpty) dir = dirs.first;
     } else {
       dir = await getDownloadsDirectory();
     }
     dir ??= await getApplicationDocumentsDirectory();
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
     final file = File('${dir.path}/$fileName');
-    await file.writeAsString(csvData);
+    await file.writeAsString(csvData, flush: true);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Файл сохранён: ${file.path}')),
