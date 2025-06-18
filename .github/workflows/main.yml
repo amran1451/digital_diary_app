@@ -13,9 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Download Flutter SDK (v3.22.1)
+      - name: Download Flutter SDK (v3.32.4)
         run: |
-          git clone https://github.com/flutter/flutter.git --branch 3.22.1 --depth 1 flutter_sdk
+          git clone https://github.com/flutter/flutter.git --branch 3.32.4 --depth 1 flutter_sdk
           echo "PATH=$GITHUB_WORKSPACE/flutter_sdk/bin:$PATH" >> $GITHUB_ENV
 
       - name: Warm up Flutter
