@@ -67,7 +67,7 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
       final raw = e.mainEmotions.trim();
       if (raw.isEmpty) continue;
       final parts = raw
-          .split(RegExp(r'[,\s]+'))
+          .split(',')
           .map((s) => s.trim().toLowerCase())
           .where((s) => s.isNotEmpty);
       for (var emo in parts) {
