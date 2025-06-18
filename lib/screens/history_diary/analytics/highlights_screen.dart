@@ -71,7 +71,7 @@ class _HighlightsScreenState extends State<HighlightsScreen> {
       _applySearch();
       return;
     }
-    const apiKey = String.fromEnvironment('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');
+    const apiKey = String.fromEnvironment('OPENAI_API_KEY');
     if (apiKey.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Не указан OPENAI_API_KEY')),
