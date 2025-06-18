@@ -407,15 +407,8 @@ class _EntriesScreenState extends State<EntriesScreen> {
                     subtitle: e.needsSync
                         ? const Text('Не отправлено')
                         : null,
-                    trailing: GestureDetector(
-                      onLongPress: () => _editSendStatus(e),
-                      child: Switch(
-                        value: !e.needsSync,
-                        onChanged: (v) async {
-                          e.needsSync = !v;
-                          await LocalDb.saveOrUpdate(e);
-                          setState(() {});
-                        },
+                    onLongPress: () => _editSendStatus(e),
+                    trailing: const Icon(Icons.chevron_right),
                       ),
                     ),
                     onTap: () async {
