@@ -7,29 +7,36 @@ class HighlightService {
     required String prompt,
     int maxHighlights = 3,
   }) async {
-    final apiKey = const String.fromEnvironment('OPENAI_API_KEY');
+    final apiKey = const String.fromEnvironment('AIzaSyBXEXVwHxCZkRgY0JeFvDwkyNfkKiYkJX0');
     if (apiKey.isEmpty) return [];
-    final uri = Uri.parse('https://api.openai.com/v1/chat/completions');
+    final uri = Uri.parse(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$apiKey',
+    );
     final res = await http.post(
       uri,
       headers: {
-        'Authorization': 'Bearer $apiKey',
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        'model': 'gpt-3.5-turbo',
-        'messages': [
-          {'role': 'system', 'content': prompt},
-          {'role': 'user', 'content': flowText},
+        'contents': [
+          {
+            'role': 'user',
+            'parts': [
+              {
+                'text': '$prompt\n$flowText',
+              }
+            ]
+          }
         ],
-        'max_tokens': 150,
-        'n': 1,
+        'generationConfig': {
+          'maxOutputTokens': 150,
+        }
       }),
     );
     if (res.statusCode != 200) return [];
     try {
       final data = jsonDecode(res.body);
-      final content = data['choices'][0]['message']['content'] as String;
+      final content = data['candidates'][0]['content']['parts'][0]['text'] as String;
       final lines = content
           .split(RegExp(r'[\n\r]+'))
           .map((e) => e.trim())

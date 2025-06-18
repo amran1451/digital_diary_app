@@ -71,10 +71,10 @@ class _HighlightsScreenState extends State<HighlightsScreen> {
       _applySearch();
       return;
     }
-    const apiKey = String.fromEnvironment('OPENAI_API_KEY');
+    const apiKey = String.fromEnvironment('AIzaSyBXEXVwHxCZkRgY0JeFvDwkyNfkKiYkJX0');
     if (apiKey.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не указан OPENAI_API_KEY')),
+        const SnackBar(content: Text('Не указан GEMINI_API_KEY')),
       );
       setState(() => _highlights = []);
       _applySearch();
