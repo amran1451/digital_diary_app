@@ -399,18 +399,19 @@ class _EntriesScreenState extends State<EntriesScreen> {
                   },
                   child: ListTile(
                     leading: e.needsSync
-                        ? const Icon(Icons.cloud_upload,
-                            color: Colors.amber)
-                        : const Icon(Icons.event_note_outlined,
-                            color: Colors.grey),
+                        ? const Icon(
+                      Icons.cloud_upload,
+                      color: Colors.amber,
+                    )
+                        : const Icon(
+                      Icons.event_note_outlined,
+                      color: Colors.grey,
+                    ),
                     title: Text(e.date),
-                    subtitle: e.needsSync
-                        ? const Text('Не отправлено')
-                        : null,
+                    subtitle:
+                    e.needsSync ? const Text('Не отправлено') : null,
                     onLongPress: () => _editSendStatus(e),
                     trailing: const Icon(Icons.chevron_right),
-                      ),
-                    ),
                     onTap: () async {
                       await Navigator.pushNamed(
                         ctx,
