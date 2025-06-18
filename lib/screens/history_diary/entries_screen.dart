@@ -389,12 +389,17 @@ class _EntriesScreenState extends State<EntriesScreen> {
                     }
                   },
                   onDismissed: (dir) {
-                    setState(() {});
+                    setState(() {
+                      _entries.removeAt(i);
+                    });
                     ScaffoldMessenger.of(ctx).showSnackBar(
                       SnackBar(
-                          content: Text(dir == DismissDirection.endToStart
+                          content: Text(
+                              dir == DismissDirection.endToStart
                               ? 'Запись удалена'
-                              : 'Отправка выполнена')),
+                                  : 'Отправка выполнена',
+                          ),
+                      ),
                     );
                   },
                   child: ListTile(
