@@ -71,7 +71,7 @@ class _HighlightsScreenState extends State<HighlightsScreen> {
       _applySearch();
       return;
     }
-    const apiKey = String.fromEnvironment('AIzaSyBXEXVwHxCZkRgY0JeFvDwkyNfkKiYkJX0');
+    const apiKey = String.fromEnvironment('GEMINI_API_KEY');
     if (apiKey.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Не указан GEMINI_API_KEY')),
