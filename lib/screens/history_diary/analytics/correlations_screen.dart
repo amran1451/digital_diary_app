@@ -158,7 +158,7 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
           curveSmoothness: 0.25,
           color: color,
           barWidth: 2,
-          dotData: FlDotData(show: false),
+          dotData: const FlDotData(show: true),
         );
 
     if (_showRating) lineBars.add(buildBar(ratingSpots, _ratingColor));
