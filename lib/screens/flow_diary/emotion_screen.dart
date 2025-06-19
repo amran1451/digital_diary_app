@@ -150,10 +150,17 @@ class _EmotionScreenState extends State<EmotionScreen> {
       entry =
           ModalRoute.of(context)!.settings.arguments as EntryData;
       moodCtrl = TextEditingController(text: entry.mood);
-      final regex = RegExp(r'(.*?)\s*[—-]\s*\(([^)]*)\)');
+      // Parse influences in either "Эмоция — (текст)" or new
+      // "Эмоция — текст" formats for backward compatibility.
+      final regex =
+      RegExp(r'(.*?)\s*[—-]\s*(\([^)]*\)|[^,]+)(?:,|$)');
       for (final match in regex.allMatches(entry.influence)) {
-        _influenceCtrls[match.group(1)!.trim()] =
-            TextEditingController(text: match.group(2)!.trim());
+        final emo = match.group(1)!.trim();
+        var text = match.group(2)!.trim();
+        if (text.startsWith('(') && text.endsWith(')')) {
+          text = text.substring(1, text.length - 1).trim();
+        }
+        _influenceCtrls[emo] = TextEditingController(text: text);
       }
 
       _selectedEmotions.addAll(
@@ -189,7 +196,7 @@ class _EmotionScreenState extends State<EmotionScreen> {
     for (final emo in _selectedEmotions) {
       final text = _influenceCtrls[emo]?.text.trim() ?? '';
       if (text.isEmpty) continue;
-      parts.add('$emo — ($text)');
+      parts.add('$emo — $text');
     }
     setState(() => entry.influence = parts.join(', '));
     if (save) {
