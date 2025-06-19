@@ -102,7 +102,11 @@ class _Tile extends StatelessWidget {
             children: [
               Icon(icon, size: 48, color: color),
               const SizedBox(height: 8),
-              Text(label, style: Theme.of(c).textTheme.titleMedium),
+              Text(
+                label,
+                style: Theme.of(c).textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),
