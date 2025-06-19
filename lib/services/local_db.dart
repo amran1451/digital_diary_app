@@ -9,7 +9,7 @@ class LocalDb {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       join(dbPath, 'diary.db'),
-      version: 3,
+      version: 4,
       onCreate: (db, v) async {
         await db.execute('''
           CREATE TABLE entries(
@@ -51,6 +51,13 @@ class LocalDb {
         }
         if (oldVersion < 3) {
           await db.execute('ALTER TABLE entries ADD COLUMN highlights TEXT');
+        }
+        if (oldVersion < 4) {
+          final cols = await db.rawQuery('PRAGMA table_info(entries)');
+          final exists = cols.any((c) => c['name'] == 'highlights');
+          if (!exists) {
+            await db.execute('ALTER TABLE entries ADD COLUMN highlights TEXT');
+          }
         }
       },
     );
