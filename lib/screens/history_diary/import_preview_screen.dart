@@ -89,6 +89,7 @@ class _ImportPreviewScreenState extends State<ImportPreviewScreen> {
                       _buildField('Улучшить завтра', e.tomorrowImprove, (v) => e.tomorrowImprove = v),
                       _buildField('Шаг к цели', e.stepGoal, (v) => e.stepGoal = v),
                       _buildField('Поток мыслей', e.flow, (v) => e.flow = v, maxLines: 4),
+                      _buildField('Ключевые моменты', e.highlights, (v) => e.highlights = v, maxLines: 3),
                       const SizedBox(height: 8),
                     ],
                   ),

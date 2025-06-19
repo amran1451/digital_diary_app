@@ -29,6 +29,7 @@ class CsvService {
     'tomorrowImprove',
     'stepGoal',
     'flow',
+    'highlights',
     'raw'
   ];
 
@@ -61,6 +62,7 @@ class CsvService {
         e.tomorrowImprove,
         e.stepGoal,
         e.flow,
+        e.highlights,
         e.raw,
       ]);
     }
@@ -118,6 +120,7 @@ class CsvService {
         tomorrowImprove: m['tomorrowImprove']?.toString() ?? '',
         stepGoal: m['stepGoal']?.toString() ?? '',
         flow: m['flow']?.toString() ?? '',
+        highlights: m['highlights']?.toString() ?? '',
         raw: m['raw']?.toString() ?? '',
       ));
     }

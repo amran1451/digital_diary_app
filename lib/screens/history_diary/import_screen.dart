@@ -605,6 +605,7 @@ class _ImportScreenState extends State<ImportScreen> {
     tomorrowImprove: m['tomorrowImprove'] as String,
     stepGoal: m['stepGoal'] as String,
     flow: m['flow'] as String,
+    highlights: m['highlights'] as String? ?? '',
     raw: raw,
     needsSync: needsSync,
   );

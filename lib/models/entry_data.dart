@@ -32,7 +32,8 @@ class EntryData {
   String flow;
   /// Исходный текст записи
   String raw;
-
+  /// Ручные заметки/планы для дня (до 3 строк)
+  String highlights;
   /// Нужно ли ещё отправить в Telegram
   bool needsSync;
 
@@ -66,6 +67,7 @@ class EntryData {
     this.flow = '',
     this.raw = '',
     this.needsSync = true,
+    this.highlights = '',
   }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() => {
@@ -94,6 +96,7 @@ class EntryData {
         'tomorrowImprove': tomorrowImprove,
         'stepGoal': stepGoal,
         'flow': flow,
+        'highlights': highlights,
         'raw': raw,
         'needsSync': needsSync ? 1 : 0,
       };
@@ -154,6 +157,7 @@ class EntryData {
       stepGoal: m['stepGoal'] ?? '',
       flow: m['flow'] ?? '',
       needsSync: (m['needsSync'] as int? ?? 1) == 1,
+      highlights: m['highlights'] ?? '',
     );
   }
 
