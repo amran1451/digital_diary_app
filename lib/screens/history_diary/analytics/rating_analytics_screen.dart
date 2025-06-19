@@ -437,6 +437,7 @@ Widget _heatmapTab() {
   }
 
   return TableCalendar(
+    key: ValueKey('${start.toIso8601String()}-${end.toIso8601String()}'),
     firstDay: start,
     lastDay: end,
     focusedDay: end,
@@ -445,7 +446,7 @@ Widget _heatmapTab() {
       formatButtonVisible: false,
       titleCentered: true,
     ),
-    calendarStyle: const CalendarStyle(outsideDaysVisible: false),
+    calendarStyle: const CalendarStyle(outsideDaysVisible: true),
     daysOfWeekStyle: const DaysOfWeekStyle(
       weekdayStyle: TextStyle(fontWeight: FontWeight.bold),
       weekendStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
@@ -487,7 +488,23 @@ Widget _heatmapTab() {
           child: Text('${date.day}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
         );
       },
-      outsideBuilder: (ctx, date, _) => const SizedBox.shrink(),
+      outsideBuilder: (ctx, date, _) {
+        final rating = data[DateTime(date.year, date.month, date.day)] ?? 0;
+        final color = rating <= 3
+            ? Colors.red.shade200
+            : rating <= 6
+            ? Colors.orange.shade300
+            : rating <= 8
+            ? Colors.lightGreen.shade400
+            : Colors.green.shade600;
+        return Container(
+          decoration:
+          BoxDecoration(color: color, borderRadius: BorderRadius.circular(4)),
+          margin: const EdgeInsets.all(4),
+          alignment: Alignment.center,
+          child: Text('${date.day}', style: const TextStyle(fontSize: 12)),
+        );
+      },
     ),
     onDaySelected: (date, _) {
       final ds = DateFormat('dd.MM.yyyy').format(date);
