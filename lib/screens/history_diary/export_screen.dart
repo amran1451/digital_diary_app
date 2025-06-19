@@ -53,15 +53,11 @@ class _ExportScreenState extends State<ExportScreen> {
   }
 
   Future<void> _exportPdf() async {
-    // Получаем все локальные записи
-    final all = await LocalDb.fetchAll();
-    // Фильтруем в памяти по диапазону
-    final filtered = all.where((e) {
-      final dt = e.createdAt;
-      if (_fromDate != null && dt.isBefore(_fromDate!)) return false;
-      if (_toDate != null && dt.isAfter(_toDate!)) return false;
-      return true;
-    }).toList();
+    // Получаем записи из локальной БД c учётом выбранного диапазона
+    final filtered = await LocalDb.fetchFiltered(
+      from: _fromDate,
+      to: _toDate,
+    );
 
     final pdfBytes = await PdfService.generatePdf(filtered);
 
@@ -95,13 +91,10 @@ class _ExportScreenState extends State<ExportScreen> {
       }
       return;
     }
-    final all = await LocalDb.fetchAll();
-    final filtered = all.where((e) {
-      final dt = e.createdAt;
-      if (_fromDate != null && dt.isBefore(_fromDate!)) return false;
-      if (_toDate != null && dt.isAfter(_toDate!)) return false;
-      return true;
-    }).toList();
+    final filtered = await LocalDb.fetchFiltered(
+      from: _fromDate,
+      to: _toDate,
+    );
     final csvData = CsvService.generateCsv(filtered);
 
     String format(DateTime d) =>
@@ -132,13 +125,10 @@ class _ExportScreenState extends State<ExportScreen> {
       }
       return;
     }
-    final all = await LocalDb.fetchAll();
-    final filtered = all.where((e) {
-      final dt = e.createdAt;
-      if (_fromDate != null && dt.isBefore(_fromDate!)) return false;
-      if (_toDate != null && dt.isAfter(_toDate!)) return false;
-      return true;
-    }).toList();
+    final filtered = await LocalDb.fetchFiltered(
+      from: _fromDate,
+      to: _toDate,
+    );
 
     final pdfBytes = await PdfService.generatePdf(filtered);
 
@@ -193,13 +183,10 @@ class _ExportScreenState extends State<ExportScreen> {
       }
       return;
     }
-    final all = await LocalDb.fetchAll();
-    final filtered = all.where((e) {
-      final dt = e.createdAt;
-      if (_fromDate != null && dt.isBefore(_fromDate!)) return false;
-      if (_toDate != null && dt.isAfter(_toDate!)) return false;
-      return true;
-    }).toList();
+    final filtered = await LocalDb.fetchFiltered(
+      from: _fromDate,
+      to: _toDate,
+    );
     final csvData = CsvService.generateCsv(filtered);
 
     String format(DateTime d) =>
