@@ -525,6 +525,15 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     final dates = eventsMap.keys.toList()..sort();
     final first = dates.first;
     final last = dates.last;
+
+    // Clamp focused day to the available range to avoid asserts inside
+    // TableCalendar when the current day is outside of [first, last].
+    if (_focusedDay.isAfter(last)) {
+      _focusedDay = last;
+    } else if (_focusedDay.isBefore(first)) {
+      _focusedDay = first;
+    }
+
     return TableCalendar<int>(
       firstDay: first,
       lastDay: last,
