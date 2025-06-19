@@ -87,6 +87,14 @@ class _ExportScreenState extends State<ExportScreen> {
   }
 
   Future<void> _exportCsv() async {
+    if (!await PermissionService.requestStoragePermission()) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Нет доступа к памяти устройства')),
+        );
+      }
+      return;
+    }
     final all = await LocalDb.fetchAll();
     final filtered = all.where((e) {
       final dt = e.createdAt;
