@@ -298,13 +298,11 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
           : last.subtract(const Duration(days: 30));
     }
 
-    // Заполняем все даты диапазона, если данных нет – значение 0
+    // Заполняем значения энергии только для дат с данными
     final data = <DateTime, double>{};
     for (var d = first; !d.isAfter(last); d = d.add(const Duration(days: 1))) {
       final list = raw[d];
-      if (list == null || list.isEmpty) {
-        data[d] = 0;
-      } else {
+      if (list != null && list.isNotEmpty) {
         data[d] = list.reduce((a, b) => a + b) / list.length;
       }
     }
@@ -334,7 +332,9 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
       ),
       calendarBuilders: CalendarBuilders(
         defaultBuilder: (ctx, date, _) {
-          final v = data[DateTime(date.year, date.month, date.day)]!;
+          final key = DateTime(date.year, date.month, date.day);
+          final v = data[key];
+          if (v == null) return null;
           return Container(
             decoration: BoxDecoration(
               color: _colorFor(v),
@@ -346,7 +346,9 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
           );
         },
         todayBuilder: (ctx, date, _) {
-          final v = data[DateTime(date.year, date.month, date.day)]!;
+          final key = DateTime(date.year, date.month, date.day);
+          final v = data[key];
+          if (v == null) return null;
           return Container(
             decoration: BoxDecoration(
               color: _colorFor(v),
@@ -363,7 +365,7 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
         outsideBuilder: (ctx, date, _) {
           final key = DateTime(date.year, date.month, date.day);
           final v = data[key];
-          if (v == null) return const SizedBox.shrink();
+          if (v == null) return null;
           return Container(
             decoration: BoxDecoration(
               color: _colorFor(v),
@@ -379,9 +381,12 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
       ),
       onDaySelected: (date, _) {
         final ds = DateFormat('dd.MM.yyyy').format(date);
-        final v = data[DateTime(date.year, date.month, date.day)]!;
+        final key = DateTime(date.year, date.month, date.day);
+        final v = data[key];
+        final msg =
+        v == null ? 'Дата: $ds — нет данных' : 'Дата: $ds — энергия: $v';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Дата: $ds — энергия: $v')),
+          SnackBar(content: Text(msg)),
         );
       },
       onPageChanged: (d) => setState(() => _calendarFocused = d),
