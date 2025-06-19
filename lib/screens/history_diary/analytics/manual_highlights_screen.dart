@@ -76,7 +76,7 @@ class _ManualHighlightsScreenState extends State<ManualHighlightsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Планы и заметки')),
+      appBar: AppBar(title: const Text('Ключевые заметки')),
       body: _entries.isEmpty
           ? const Center(child: Text('Записей нет'))
           : ListView.builder(
