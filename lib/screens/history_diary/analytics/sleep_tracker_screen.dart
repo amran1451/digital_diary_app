@@ -526,8 +526,9 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     final first = dates.first;
     final last = dates.last;
     Color _colorFor(double hours) {
-      final ratio = (hours / 12).clamp(0.0, 1.0);
-      return Color.lerp(Colors.red, Colors.green, ratio)!;
+      if (hours >= 7) return Colors.green.shade600;
+      if (hours >= 3) return Colors.yellow.shade600;
+      return Colors.red.shade600;
     }
 
     // Clamp focused day to the available range to avoid asserts inside
