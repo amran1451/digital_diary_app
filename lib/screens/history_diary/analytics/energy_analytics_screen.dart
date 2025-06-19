@@ -24,6 +24,7 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
   late TabController _tabController;
   List<EntryData> _all = [], _ent = [];
   _Period _period = _Period.week;
+  DateTime _calendarFocused = DateTime.now();
 
   @override
   void initState() {
@@ -63,6 +64,11 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
         case _Period.all:
           _ent = List.from(_all);
           break;
+      }
+      if(_ent.isNotEmpty){
+        _calendarFocused = _entryDate(_ent.last);
+      } else {
+        _calendarFocused = DateTime.now();
       }
     });
   }
@@ -271,10 +277,26 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
       (raw[key] ??= []).add(ParseUtils.parseDouble(e.energy));
     }
 
-    // Диапазон от первой до последней даты записи
-    final allKeys = raw.keys.toList()..sort();
-    final first = allKeys.first;
-    final last = allKeys.last;
+    // Диапазон отображаемых дат в зависимости от выбранного периода
+    late DateTime first;
+    late DateTime last;
+    if (_period == _Period.all) {
+      final allKeys = raw.keys.toList()..sort();
+      if (allKeys.isNotEmpty) {
+        first = allKeys.first;
+        last = allKeys.last;
+      } else {
+        final now = DateTime.now();
+        first = DateTime(now.year, now.month, now.day);
+        last = first;
+      }
+    } else {
+      final now = DateTime.now();
+      last = DateTime(now.year, now.month, now.day);
+      first = _period == _Period.week
+          ? last.subtract(const Duration(days: 7))
+          : last.subtract(const Duration(days: 30));
+    }
 
     // Заполняем все даты диапазона, если данных нет – значение 0
     final data = <DateTime, double>{};
@@ -297,13 +319,15 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     return TableCalendar(
       firstDay: first,
       lastDay: last,
-      focusedDay: last,
+      focusedDay: _calendarFocused.isBefore(first) || _calendarFocused.isAfter(last)
+          ? last
+          : _calendarFocused,
       startingDayOfWeek: StartingDayOfWeek.monday,
       headerStyle: const HeaderStyle(
         formatButtonVisible: false,
         titleCentered: true,
       ),
-      calendarStyle: const CalendarStyle(outsideDaysVisible: false),
+      calendarStyle: const CalendarStyle(outsideDaysVisible: true),
       daysOfWeekStyle: const DaysOfWeekStyle(
         weekdayStyle: TextStyle(fontWeight: FontWeight.bold),
         weekendStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
@@ -336,7 +360,22 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           );
         },
-        outsideBuilder: (ctx, date, _) => const SizedBox.shrink(),
+        outsideBuilder: (ctx, date, _) {
+          final key = DateTime(date.year, date.month, date.day);
+          final v = data[key];
+          if (v == null) return const SizedBox.shrink();
+          return Container(
+            decoration: BoxDecoration(
+              color: _colorFor(v),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            margin: const EdgeInsets.all(4),
+            alignment: Alignment.center,
+            child: Text('${date.day}',
+                style:
+                const TextStyle(fontSize: 12, color: Colors.black54)),
+          );
+        },
       ),
       onDaySelected: (date, _) {
         final ds = DateFormat('dd.MM.yyyy').format(date);
@@ -345,6 +384,7 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
           SnackBar(content: Text('Дата: $ds — энергия: $v')),
         );
       },
+      onPageChanged: (d) => setState(() => _calendarFocused = d),
     );
   }
 }
