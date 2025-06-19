@@ -19,9 +19,51 @@ class ExportScreen extends StatefulWidget {
   State<ExportScreen> createState() => _ExportScreenState();
 }
 
+enum _PeriodPreset {
+  last7,
+  last30,
+  thisMonth,
+  prevMonth,
+  allTime,
+  manual,
+}
+
 class _ExportScreenState extends State<ExportScreen> {
   DateTime? _fromDate;
   DateTime? _toDate;
+  _PeriodPreset _preset = _PeriodPreset.allTime;
+
+  void _applyPreset() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    switch (_preset) {
+      case _PeriodPreset.last7:
+        _fromDate = today.subtract(const Duration(days: 6));
+        _toDate = today;
+        break;
+      case _PeriodPreset.last30:
+        _fromDate = today.subtract(const Duration(days: 29));
+        _toDate = today;
+        break;
+      case _PeriodPreset.thisMonth:
+        _fromDate = DateTime(now.year, now.month, 1);
+        _toDate = DateTime(now.year, now.month + 1, 0);
+        break;
+      case _PeriodPreset.prevMonth:
+        final firstCurrent = DateTime(now.year, now.month, 1);
+        final lastPrev = firstCurrent.subtract(const Duration(days: 1));
+        _fromDate = DateTime(lastPrev.year, lastPrev.month, 1);
+        _toDate = DateTime(lastPrev.year, lastPrev.month + 1, 0);
+        break;
+      case _PeriodPreset.allTime:
+        _fromDate = null;
+        _toDate = null;
+        break;
+      case _PeriodPreset.manual:
+      // keep current manual values
+        break;
+    }
+  }
 
 
   Future<void> _pickDate({required bool isFrom}) async {
@@ -249,24 +291,64 @@ class _ExportScreenState extends State<ExportScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            ListTile(
-              title: const Text('Дата от'),
-              trailing: Text(
-                _fromDate == null
-                    ? '—'
-                    : '${_fromDate!.day}.${_fromDate!.month}.${_fromDate!.year}',
-              ),
-              onTap: () => _pickDate(isFrom: true),
+            title: const Text('Период'),
+        trailing: DropdownButton<_PeriodPreset>(
+          value: _preset,
+          items: const [
+            DropdownMenuItem(
+              value: _PeriodPreset.last7,
+              child: Text('Последние 7 дней'),
             ),
-            ListTile(
-              title: const Text('Дата до'),
-              trailing: Text(
-                _toDate == null
-                    ? '—'
-                    : '${_toDate!.day}.${_toDate!.month}.${_toDate!.year}',
-              ),
-              onTap: () => _pickDate(isFrom: false),
+            DropdownMenuItem(
+              value: _PeriodPreset.last30,
+              child: Text('Последние 30 дней'),
             ),
+            DropdownMenuItem(
+              value: _PeriodPreset.thisMonth,
+              child: Text('Текущий месяц'),
+            ),
+            DropdownMenuItem(
+              value: _PeriodPreset.prevMonth,
+              child: Text('Предыдущий месяц'),
+            ),
+            DropdownMenuItem(
+              value: _PeriodPreset.allTime,
+              child: Text('Весь период'),
+            ),
+            DropdownMenuItem(
+              value: _PeriodPreset.manual,
+              child: Text('Выбрать вручную'),
+            ),
+          ],
+          onChanged: (v) {
+            if (v == null) return;
+            setState(() {
+              _preset = v;
+              if (_preset != _PeriodPreset.manual) {
+                _applyPreset();
+              }
+            });
+          },
+              ),
+            ),
+        if (_preset == _PeriodPreset.manual) ...[
+    ListTile(
+    title: const Text('Дата от'),
+    trailing: Text(
+    _fromDate == null
+    ? '—'
+        : '${_fromDate!.day}.${_fromDate!.month}.${_fromDate!.year}',
+    ),
+    ListTile(
+    title: const Text('Дата до'),
+    trailing: Text(
+    _toDate == null
+    ? '—'
+        : '${_toDate!.day}.${_toDate!.month}.${_toDate!.year}',
+    ),
+    onTap: () => _pickDate(isFrom: false),
+    ),
+    ],
             const SizedBox(height: 24),
             ElevatedButton.icon(
               icon: const Icon(Icons.picture_as_pdf),
