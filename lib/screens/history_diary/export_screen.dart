@@ -66,21 +66,26 @@ class _ExportScreenState extends State<ExportScreen> {
   }
 
 
-  Future<void> _pickDate({required bool isFrom}) async {
-    final initial = isFrom ? (_fromDate ?? DateTime.now()) : (_toDate ?? DateTime.now());
-    final picked = await showDatePicker(
+  Future<void> _pickDateRange() async {
+    final now = DateTime.now();
+    final start = _fromDate ?? now;
+    final end = _toDate ?? start;
+    final picked = await showDateRangePicker(
       context: context,
-      initialDate: initial,
       firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
+      lastDate: now,
+      initialDateRange: DateTimeRange(start: start, end: end),
     );
     if (picked != null) {
       setState(() {
-        if (isFrom) _fromDate = picked;
-        else _toDate = picked;
+        _fromDate = picked.start;
+        _toDate = picked.end;
       });
     }
   }
+
+  String _fmt(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
 
   Future<Directory?> _selectDirectory() async {
     final path = await FilePicker.platform.getDirectoryPath(
@@ -321,37 +326,30 @@ class _ExportScreenState extends State<ExportScreen> {
               child: Text('Выбрать вручную'),
             ),
           ],
-          onChanged: (v) {
+          onChanged: (v) async {
             if (v == null) return;
-            setState(() {
-              _preset = v;
-              if (_preset != _PeriodPreset.manual) {
+            if (v != _PeriodPreset.manual) {
+              setState(() {
+                _preset = v;
                 _applyPreset();
               }
-            });
-          },
+                  });
+            } else {
+        setState(() => _preset = v);
+        await _pickDateRange();
+        }
               ),
             ),
-            if (_preset == _PeriodPreset.manual) ...[
+            if (_preset == _PeriodPreset.manual)
               ListTile(
-                title: const Text('Дата от'),
+                title: const Text('Диапазон'),
                 trailing: Text(
                   _fromDate == null
                       ? '—'
-                      : '${_fromDate!.day}.${_fromDate!.month}.${_fromDate!.year}',
+                      : '${_fmt(_fromDate!)} – ${_fmt(_toDate!)}',
                 ),
-                onTap: () => _pickDate(isFrom: true),
+                onTap: _pickDateRange,
               ),
-              ListTile(
-                title: const Text('Дата до'),
-                trailing: Text(
-                  _toDate == null
-                      ? '—'
-                      : '${_toDate!.day}.${_toDate!.month}.${_toDate!.year}',
-                ),
-                onTap: () => _pickDate(isFrom: false),
-              ),
-            ],
             const SizedBox(height: 24),
             ElevatedButton.icon(
               icon: const Icon(Icons.picture_as_pdf),
