@@ -196,11 +196,13 @@ class _EntriesScreenState extends State<EntriesScreen> {
 
   Future<void> _editSendStatus(EntryData e) async {
     bool isSent = !e.needsSync;
-    bool markAll = false;
+    bool bulkAction = false;
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) {
         bool val = isSent;
+        final anyUnsent = _entries.any((el) => el.needsSync);
+        final anySent = _entries.any((el) => !el.needsSync);
         return StatefulBuilder(
           builder: (ctx, setState) => AlertDialog(
             title: const Text('Статус отправки'),
@@ -210,14 +212,24 @@ class _EntriesScreenState extends State<EntriesScreen> {
               onChanged: (v) => setState(() => val = v ?? false),
             ),
             actions: [
-              TextButton(
-                onPressed: () async {
-                  markAll = true;
-                  await LocalDb.markAllSynced();
-                  Navigator.pop(ctx, val);
-                },
-                child: const Text('Отметить все как отправленные'),
-              ),
+              if (anyUnsent)
+                TextButton(
+                  onPressed: () async {
+                    bulkAction = true;
+                    await LocalDb.markAllSynced();
+                    Navigator.pop(ctx, val);
+                  },
+                  child: const Text('Отметить все как отправленные'),
+                ),
+              if (anySent)
+                TextButton(
+                  onPressed: () async {
+                    bulkAction = true;
+                    await LocalDb.markAllUnsent();
+                    Navigator.pop(ctx, val);
+                  },
+                  child: const Text('Снять отметку у всех'),
+                ),
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
                 child: const Text('Отмена'),
@@ -231,7 +243,7 @@ class _EntriesScreenState extends State<EntriesScreen> {
         );
       },
     );
-    if (markAll) {
+    if (bulkAction) {
       await _loadEntries();
       return;
     }

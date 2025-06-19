@@ -93,6 +93,12 @@ class LocalDb {
     await db.update('entries', {'needsSync': 0});
   }
 
+  /// Снять отметку "отправлено" со всех записей
+  static Future<void> markAllUnsent() async {
+    final db = await _openDb();
+    await db.update('entries', {'needsSync': 1});
+  }
+
   /// Полная выборка
   static Future<List<EntryData>> fetchAll() => fetchFiltered();
 
