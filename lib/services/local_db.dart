@@ -76,6 +76,12 @@ class LocalDb {
     );
   }
 
+  /// Отметить все записи как синхронизированные
+  static Future<void> markAllSynced() async {
+    final db = await _openDb();
+    await db.update('entries', {'needsSync': 0});
+  }
+
   /// Полная выборка
   static Future<List<EntryData>> fetchAll() => fetchFiltered();
 

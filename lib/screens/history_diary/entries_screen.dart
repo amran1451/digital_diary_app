@@ -196,6 +196,7 @@ class _EntriesScreenState extends State<EntriesScreen> {
 
   Future<void> _editSendStatus(EntryData e) async {
     bool isSent = !e.needsSync;
+    bool markAll = false;
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) {
@@ -210,6 +211,14 @@ class _EntriesScreenState extends State<EntriesScreen> {
             ),
             actions: [
               TextButton(
+                onPressed: () async {
+                  markAll = true;
+                  await LocalDb.markAllSynced();
+                  Navigator.pop(ctx, val);
+                },
+                child: const Text('Отметить все как отправленные'),
+              ),
+              TextButton(
                 onPressed: () => Navigator.pop(ctx),
                 child: const Text('Отмена'),
               ),
@@ -222,6 +231,10 @@ class _EntriesScreenState extends State<EntriesScreen> {
         );
       },
     );
+    if (markAll) {
+      await _loadEntries();
+      return;
+    }
     if (result != null) {
       e.needsSync = !result;
       await LocalDb.saveOrUpdate(e);
