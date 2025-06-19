@@ -103,19 +103,10 @@ class LocalDb {
     int? minRating,
     String? search,
   }) async {
-        final db = await _openDb();
+    final db = await _openDb();
     final where = <String>[];
     final args = <dynamic>[];
 
-    if (from != null) {
-      where.add('createdAt >= ?');
-      args.add(from.toIso8601String());
-    }
-    if (to != null) {
-      final endOfDay = DateTime(to.year, to.month, to.day, 23, 59, 59);
-      where.add('createdAt <= ?');
-      args.add(endOfDay.toIso8601String());
-    }
     if (minRating != null) {
       where.add('CAST(rating AS INTEGER) = ?');
       args.add(minRating);
@@ -139,7 +130,26 @@ class LocalDb {
       whereArgs: args.isNotEmpty ? args : null,
       orderBy: 'createdAt DESC',
     );
-    return rows.map((m) => EntryData.fromMap(m, id: null)).toList();
+
+    List<EntryData> result =
+    rows.map((m) => EntryData.fromMap(m, id: null)).toList();
+
+    if (from != null || to != null) {
+      result = result.where((e) {
+        final parts = e.date.split('-');
+        if (parts.length != 3) return false;
+        final day = int.tryParse(parts[0]);
+        final month = int.tryParse(parts[1]);
+        final year = int.tryParse(parts[2]);
+        if (day == null || month == null || year == null) return false;
+        final dt = DateTime(year, month, day);
+        if (from != null && dt.isBefore(from)) return false;
+        if (to != null && dt.isAfter(to)) return false;
+        return true;
+      }).toList();
+    }
+
+    return result;
   }
 
   static Future<void> delete(int localId) async {
