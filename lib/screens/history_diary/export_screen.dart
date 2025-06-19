@@ -332,13 +332,13 @@ class _ExportScreenState extends State<ExportScreen> {
               setState(() {
                 _preset = v;
                 _applyPreset();
-              }
-                  });
+    });
             } else {
-        setState(() => _preset = v);
-        await _pickDateRange();
-        }
-              ),
+              setState(() => _preset = v);
+              await _pickDateRange();
+            }
+          },
+        ),
             ),
             if (_preset == _PeriodPreset.manual)
               ListTile(
