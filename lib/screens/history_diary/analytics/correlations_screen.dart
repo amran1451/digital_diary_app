@@ -131,12 +131,22 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
     final minSteps = stepsRaw.isEmpty ? 0.0 : stepsRaw.reduce(min);
     final maxSteps = stepsRaw.isEmpty ? 0.0 : stepsRaw.reduce(max);
 
+    // Общие границы для левой оси графика (оценка/энергия/сон)
+    final leftValues = <double>[];
+    if (_showRating) leftValues.addAll(ratingRaw);
+    if (_showEnergy) leftValues.addAll(energyRaw);
+    if (_showSleep) leftValues.addAll(sleepRaw);
+    final leftMin = leftValues.isEmpty ? 0.0 : leftValues.reduce(min);
+    final leftMax = leftValues.isEmpty ? 10.0 : leftValues.reduce(max);
+
     double scale(double v, double minVal, double maxVal) =>
         maxVal - minVal == 0 ? 5 : (v - minVal) * 10 / (maxVal - minVal);
 
-    final rating = ratingRaw.map((v) => scale(v, minRating, maxRating)).toList();
-    final energy = energyRaw.map((v) => scale(v, minEnergy, maxEnergy)).toList();
-    final sleep = sleepRaw.map((v) => scale(v, minSleep, maxSleep)).toList();
+    // Масштабируем все линии относительно общих границ левой оси
+    final rating = ratingRaw.map((v) => scale(v, leftMin, leftMax)).toList();
+    final energy = energyRaw.map((v) => scale(v, leftMin, leftMax)).toList();
+    final sleep = sleepRaw.map((v) => scale(v, leftMin, leftMax)).toList();
+    // Ось шагов остаётся отдельной
     final steps = stepsRaw.map((v) => scale(v, minSteps, maxSteps)).toList();
 
     final ratingSpots = <FlSpot>[];
@@ -209,12 +219,14 @@ class _CorrelationsScreenState extends State<CorrelationsScreen> {
                 sideTitles: SideTitles(
                   showTitles: true,
                   interval: 1,
-                  reservedSize: 24,
+                  reservedSize: 28,
                   getTitlesWidget: (v, _) {
-                    if (v > 10) return const SizedBox();
+                    if (v < 0 || v > 10) return const SizedBox();
+                    final real = leftMin + (v / 10) * (leftMax - leftMin);
+                    final text = real.toStringAsFixed(1);
                     return Padding(
                       padding: const EdgeInsets.only(right: 6),
-                      child: Text(v.toInt().toString(), style: const TextStyle(fontSize: 8)),
+                      child: Text(text, style: const TextStyle(fontSize: 8)),
                     );
                   },
                 ),
