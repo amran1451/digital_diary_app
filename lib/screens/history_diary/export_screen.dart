@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
+import '../../services/permission_service.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../models/entry_data.dart';
 import '../../services/local_db.dart';
@@ -23,15 +23,6 @@ class _ExportScreenState extends State<ExportScreen> {
   DateTime? _fromDate;
   DateTime? _toDate;
 
-  Future<bool> _requestStoragePermission() async {
-    if (!Platform.isAndroid) return true;
-    var status = await Permission.manageExternalStorage.status;
-    if (status.isGranted) return true;
-    status = await Permission.manageExternalStorage.request();
-    if (status.isGranted) return true;
-    final legacy = await Permission.storage.request();
-    return legacy.isGranted;
-  }
 
   Future<void> _pickDate({required bool isFrom}) async {
     final initial = isFrom ? (_fromDate ?? DateTime.now()) : (_toDate ?? DateTime.now());
@@ -125,7 +116,7 @@ class _ExportScreenState extends State<ExportScreen> {
   }
 
   Future<void> _savePdf() async {
-    if (!await _requestStoragePermission()) {
+    if (!await PermissionService.requestStoragePermission()) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Нет доступа к памяти устройства')),
@@ -186,7 +177,7 @@ class _ExportScreenState extends State<ExportScreen> {
   }
 
   Future<void> _saveCsv() async {
-    if (!await _requestStoragePermission()) {
+    if (!await PermissionService.requestStoragePermission()) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Нет доступа к памяти устройства')),
