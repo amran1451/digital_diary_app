@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../models/entry_data.dart';
 import '../../services/local_db.dart';
 import '../../services/pdf_service.dart';
@@ -35,6 +36,18 @@ class _ExportScreenState extends State<ExportScreen> {
         else _toDate = picked;
       });
     }
+  }
+
+  Future<Directory?> _selectDirectory() async {
+    final path = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: 'Выберите папку для сохранения',
+    );
+    if (path == null) return null;
+    final dir = Directory(path);
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+    return dir;
   }
 
   Future<void> _exportPdf() async {
@@ -124,13 +137,15 @@ class _ExportScreenState extends State<ExportScreen> {
       fileName = 'Выгрузка всех записей.pdf';
     }
 
-    Directory? dir;
-    if (Platform.isAndroid) {
-      final dirs =
+    Directory? dir = await _selectDirectory();
+    if (dir == null) {
+      if (Platform.isAndroid) {
+        final dirs =
         await getExternalStorageDirectories(type: StorageDirectory.downloads);
-      if (dirs != null && dirs.isNotEmpty) dir = dirs.first;
-    } else {
-      dir = await getDownloadsDirectory();
+        if (dirs != null && dirs.isNotEmpty) dir = dirs.first;
+      } else {
+        dir = await getDownloadsDirectory();
+      }
     }
     dir ??= await getApplicationDocumentsDirectory();
     if (!await dir.exists()) {
@@ -167,13 +182,15 @@ class _ExportScreenState extends State<ExportScreen> {
       fileName = 'Выгрузка всех записей.csv';
     }
 
-    Directory? dir;
-    if (Platform.isAndroid) {
-      final dirs =
+    Directory? dir = await _selectDirectory();
+    if (dir == null) {
+      if (Platform.isAndroid) {
+        final dirs =
         await getExternalStorageDirectories(type: StorageDirectory.downloads);
-      if (dirs != null && dirs.isNotEmpty) dir = dirs.first;
-    } else {
-      dir = await getDownloadsDirectory();
+        if (dirs != null && dirs.isNotEmpty) dir = dirs.first;
+      } else {
+        dir = await getDownloadsDirectory();
+      }
     }
     dir ??= await getApplicationDocumentsDirectory();
     if (!await dir.exists()) {
