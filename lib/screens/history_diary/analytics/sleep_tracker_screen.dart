@@ -525,6 +525,10 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
     final dates = eventsMap.keys.toList()..sort();
     final first = dates.first;
     final last = dates.last;
+    Color _colorFor(double hours) {
+      final ratio = (hours / 12).clamp(0.0, 1.0);
+      return Color.lerp(Colors.red, Colors.green, ratio)!;
+    }
 
     // Clamp focused day to the available range to avoid asserts inside
     // TableCalendar when the current day is outside of [first, last].
@@ -545,30 +549,46 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
         return eventsMap[key] != null ? [eventsMap[key]!] : [];
       },
       calendarBuilders: CalendarBuilders(
-        markerBuilder: (ctx, day, events) {
-          if (events.isEmpty) return const SizedBox();
-          final v = events.first as int; // minutes
-          final hours = v / 60;
-          Color bg;
-          if (hours <= 3) bg = Colors.red.shade200;
-          else if (hours <= 6) bg = Colors.orange.shade300;
-          else if (hours <= 8) bg = Colors.lightGreen.shade400;
-          else bg = Colors.green.shade600;
-          return Positioned.fill(
-            child: Container(
-              margin: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: bg,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              alignment: Alignment.center,
-              child: Text('${hours.toStringAsFixed(1)}',
-                  style: const TextStyle(fontSize: 12, color: Colors.black)),
+        defaultBuilder: (ctx, day, _) {
+          final key = DateTime(day.year, day.month, day.day);
+          final mins = eventsMap[key];
+          if (mins == null) return null;
+          final hours = mins / 60;
+          return Container(
+            decoration: BoxDecoration(
+              color: _colorFor(hours),
+              borderRadius: BorderRadius.circular(4),
             ),
+            margin: const EdgeInsets.all(4),
+            alignment: Alignment.center,
+            child: Text('${day.day}',
+                style: const TextStyle(fontSize: 12)),
           );
         },
+        todayBuilder: (ctx, day, _) {
+          final key = DateTime(day.year, day.month, day.day);
+          final mins = eventsMap[key];
+          if (mins == null) return null;
+          final hours = mins / 60;
+          return Container(
+            decoration: BoxDecoration(
+              color: _colorFor(hours),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            margin: const EdgeInsets.all(4),
+            alignment: Alignment.center,
+            child: Text('${day.day}',
+                style: const TextStyle(
+                    fontSize: 12, fontWeight: FontWeight.bold)),
+          );
+        },
+        outsideBuilder: (ctx, day, _) => const SizedBox.shrink(),
       ),
-      onDaySelected: (selectedDay, focusedDay) {
+      onDayLongPressed: (selectedDay, focusedDay) {
         final key = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
         final v = eventsMap[key];
         if (v == null) return;
