@@ -23,6 +23,16 @@ class _ExportScreenState extends State<ExportScreen> {
   DateTime? _fromDate;
   DateTime? _toDate;
 
+  Future<bool> _requestStoragePermission() async {
+    if (!Platform.isAndroid) return true;
+    var status = await Permission.manageExternalStorage.status;
+    if (status.isGranted) return true;
+    status = await Permission.manageExternalStorage.request();
+    if (status.isGranted) return true;
+    final legacy = await Permission.storage.request();
+    return legacy.isGranted;
+  }
+
   Future<void> _pickDate({required bool isFrom}) async {
     final initial = isFrom ? (_fromDate ?? DateTime.now()) : (_toDate ?? DateTime.now());
     final picked = await showDatePicker(
@@ -115,6 +125,14 @@ class _ExportScreenState extends State<ExportScreen> {
   }
 
   Future<void> _savePdf() async {
+    if (!await _requestStoragePermission()) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Нет доступа к памяти устройства')),
+        );
+      }
+      return;
+    }
     final all = await LocalDb.fetchAll();
     final filtered = all.where((e) {
       final dt = e.createdAt;
@@ -153,14 +171,29 @@ class _ExportScreenState extends State<ExportScreen> {
       await dir.create(recursive: true);
     }
     final file = File('${dir.path}/$fileName');
-    await file.writeAsBytes(pdfBytes);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Файл сохранён: ${file.path}')),
-    );
+    try {
+      await file.writeAsBytes(pdfBytes);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Файл сохранён: ${file.path}')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Не удалось сохранить файл: $e')),
+      );
+    }
   }
 
   Future<void> _saveCsv() async {
+    if (!await _requestStoragePermission()) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Нет доступа к памяти устройства')),
+        );
+      }
+      return;
+    }
     final all = await LocalDb.fetchAll();
     final filtered = all.where((e) {
       final dt = e.createdAt;
@@ -198,11 +231,18 @@ class _ExportScreenState extends State<ExportScreen> {
       await dir.create(recursive: true);
     }
     final file = File('${dir.path}/$fileName');
-    await file.writeAsString(csvData, flush: true);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Файл сохранён: ${file.path}')),
-    );
+    try {
+      await file.writeAsString(csvData, flush: true);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Файл сохранён: ${file.path}')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Не удалось сохранить файл: $e')),
+      );
+    }
   }
 
   @override
