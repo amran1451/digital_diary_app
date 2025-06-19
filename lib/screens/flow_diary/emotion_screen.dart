@@ -18,7 +18,7 @@ class EmotionScreen extends StatefulWidget {
 class _EmotionScreenState extends State<EmotionScreen> {
   late EntryData entry;
   late TextEditingController moodCtrl;
-  late TextEditingController influenceCtrl;
+  final Map<String, TextEditingController> _influenceCtrls = {};
   final Set<String> _selectedEmotions = <String>{};
   int? _expandedCategoryIndex;
 
@@ -150,8 +150,11 @@ class _EmotionScreenState extends State<EmotionScreen> {
       entry =
           ModalRoute.of(context)!.settings.arguments as EntryData;
       moodCtrl = TextEditingController(text: entry.mood);
-      influenceCtrl =
-          TextEditingController(text: entry.influence);
+      final regex = RegExp(r'(.*?)\s*[—-]\s*\(([^)]*)\)');
+      for (final match in regex.allMatches(entry.influence)) {
+        _influenceCtrls[match.group(1)!.trim()] =
+            TextEditingController(text: match.group(2)!.trim());
+      }
 
       _selectedEmotions.addAll(
         entry.mainEmotions
@@ -159,6 +162,11 @@ class _EmotionScreenState extends State<EmotionScreen> {
             .map((e) => e.trim())
             .where((e) => e.isNotEmpty),
       );
+      for (final emo in _selectedEmotions) {
+        _influenceCtrls.putIfAbsent(emo, () => TextEditingController());
+      }
+
+      _updateInfluenceString(save: false);
 
       DraftService.currentDraft = entry;
       DraftService.saveDraft();
@@ -170,8 +178,24 @@ class _EmotionScreenState extends State<EmotionScreen> {
   @override
   void dispose() {
     moodCtrl.dispose();
-    influenceCtrl.dispose();
+    for (final c in _influenceCtrls.values) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  Future<void> _updateInfluenceString({bool save = true}) async {
+    final parts = <String>[];
+    for (final emo in _selectedEmotions) {
+      final text = _influenceCtrls[emo]?.text.trim() ?? '';
+      if (text.isEmpty) continue;
+      parts.add('$emo — ($text)');
+    }
+    setState(() => entry.influence = parts.join(', '));
+    if (save) {
+      DraftService.currentDraft = entry;
+      await DraftService.saveDraft();
+    }
   }
 
   @override
@@ -296,14 +320,16 @@ class _EmotionScreenState extends State<EmotionScreen> {
                                 setState(() {
                                   if (v) {
                                     _selectedEmotions.add(emotion);
+                                    _influenceCtrls.putIfAbsent(
+                                        emotion, () => TextEditingController());
                                   } else {
                                     _selectedEmotions.remove(emotion);
+                                    _influenceCtrls.remove(emotion)?.dispose();
                                   }
                                   entry.mainEmotions =
                                       _selectedEmotions.join(', ');
                                 });
-                                DraftService.currentDraft = entry;
-                                await DraftService.saveDraft();
+                                await _updateInfluenceString();
                               },
                             ),
                           );
@@ -314,22 +340,32 @@ class _EmotionScreenState extends State<EmotionScreen> {
                 }).toList(),
               ),
             const SizedBox(height: 8),
-            TextField(
-              controller: influenceCtrl,
-              decoration: InputDecoration(
-                labelText: '💭 Что повлияло',
-                suffixIcon: Tooltip(
-                  message:
-                      'Например: "мало общения, тревога за будущее".',
-                  child: const Icon(Icons.info_outline),
-                ),
+            if (_selectedEmotions.isNotEmpty)
+          Column(
+          children: _selectedEmotions.map((emo) {
+    final ctrl =
+    _influenceCtrls.putIfAbsent(emo, () => TextEditingController());
+    return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+    children: [
+    Expanded(child: Text(emo)),
+    const SizedBox(width: 8),
+    Expanded(
+    flex: 3,
+    child: TextField(
+    controller: ctrl,
+    decoration: const InputDecoration(
+    hintText: 'Что повлияло',
+    ),
+    onChanged: (_) => _updateInfluenceString(),
+    ),
+    ),
+    ],
+    ),
+    );
+    }).toList(),
               ),
-              onChanged: (v) async {
-                entry.influence = v;
-                DraftService.currentDraft = entry;
-                await DraftService.saveDraft();
-              },
-            ),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
