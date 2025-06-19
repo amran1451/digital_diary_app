@@ -60,7 +60,10 @@ class _StateScreenState extends State<StateScreen> {
 
       _energy = int.tryParse(entry.energy) ?? 5;
       _energyDesc = _energyLabels[_energy]!;
-
+      // Ensure energy is stored even if the user does not move the slider.
+      if (entry.energy.trim().isEmpty) {
+        entry.energy = '$_energy';
+      }
       DraftService.currentDraft = entry;
       DraftService.saveDraft();
 
