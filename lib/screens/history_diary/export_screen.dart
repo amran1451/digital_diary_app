@@ -291,7 +291,8 @@ class _ExportScreenState extends State<ExportScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            title: const Text('Период'),
+        ListTile(
+        title: const Text('Период'),
         trailing: DropdownButton<_PeriodPreset>(
           value: _preset,
           items: const [
@@ -331,24 +332,26 @@ class _ExportScreenState extends State<ExportScreen> {
           },
               ),
             ),
-        if (_preset == _PeriodPreset.manual) ...[
-    ListTile(
-    title: const Text('Дата от'),
-    trailing: Text(
-    _fromDate == null
-    ? '—'
-        : '${_fromDate!.day}.${_fromDate!.month}.${_fromDate!.year}',
-    ),
-    ListTile(
-    title: const Text('Дата до'),
-    trailing: Text(
-    _toDate == null
-    ? '—'
-        : '${_toDate!.day}.${_toDate!.month}.${_toDate!.year}',
-    ),
-    onTap: () => _pickDate(isFrom: false),
-    ),
-    ],
+            if (_preset == _PeriodPreset.manual) ...[
+              ListTile(
+                title: const Text('Дата от'),
+                trailing: Text(
+                  _fromDate == null
+                      ? '—'
+                      : '${_fromDate!.day}.${_fromDate!.month}.${_fromDate!.year}',
+                ),
+                onTap: () => _pickDate(isFrom: true),
+              ),
+              ListTile(
+                title: const Text('Дата до'),
+                trailing: Text(
+                  _toDate == null
+                      ? '—'
+                      : '${_toDate!.day}.${_toDate!.month}.${_toDate!.year}',
+                ),
+                onTap: () => _pickDate(isFrom: false),
+              ),
+            ],
             const SizedBox(height: 24),
             ElevatedButton.icon(
               icon: const Icon(Icons.picture_as_pdf),
