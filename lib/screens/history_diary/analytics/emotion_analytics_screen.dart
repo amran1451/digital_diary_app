@@ -29,8 +29,14 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _loadEntries();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadEntries() async {
@@ -173,6 +179,85 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
     );
   }
 
+  Widget _buildHistogram() {
+    if (_counts.isEmpty) {
+      return const Center(child: Text('Нет данных'));
+    }
+    final entries = _counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final maxCount = entries.first.value.toDouble();
+    final groups = List.generate(entries.length, (i) {
+      return BarChartGroupData(
+        x: i,
+        barRods: [
+          BarChartRodData(
+            toY: entries[i].value.toDouble(),
+            width: 16,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ],
+      );
+    });
+
+    final chartWidth = max(entries.length * 40.0, MediaQuery.of(context).size.width);
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SizedBox(
+        width: chartWidth,
+        child: BarChart(
+          BarChartData(
+            alignment: BarChartAlignment.spaceAround,
+            maxY: maxCount + 1,
+            barGroups: groups,
+            titlesData: FlTitlesData(
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    final i = value.toInt();
+                    if (i < 0 || i >= entries.length) return const SizedBox();
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Transform.rotate(
+                        angle: -0.4,
+                        child: Text(
+                          _capitalize(entries[i].key),
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  interval: 1,
+                  reservedSize: 28,
+                  getTitlesWidget: (value, meta) {
+                    if (value >= meta.max) return const SizedBox();
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Text(
+                        value.toInt().toString(),
+                        style: const TextStyle(fontSize: 10),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            ),
+            gridData: FlGridData(show: false),
+            borderData: FlBorderData(show: false),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = MyApp.of(context);
@@ -184,6 +269,7 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
           controller: _tabController,
           tabs: const [
             Tab(text: 'Топ-5'),
+            Tab(text: 'Гистограмма'),
             Tab(text: 'Все'),
           ],
         ),
@@ -238,6 +324,7 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _buildTop5Chart(),
+                  _buildHistogram(),
                   _buildAllTable(),
                 ],
               ),
