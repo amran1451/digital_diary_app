@@ -167,4 +167,21 @@ class LocalDb {
     final db = await _openDb();
     await db.delete('entries');
   }
+
+  static Future<void> clearHighlights() async {
+    final db = await _openDb();
+    await db.update('entries', {'highlights': ''});
+  }
+
+  static Future<EntryData?> getByDate(String date) async {
+    final db = await _openDb();
+    final rows = await db.query(
+      'entries',
+      where: 'date = ?',
+      whereArgs: [date],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return EntryData.fromMap(rows.first);
+  }
 }
