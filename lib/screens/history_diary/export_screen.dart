@@ -9,6 +9,8 @@ import '../../models/entry_data.dart';
 import '../../services/local_db.dart';
 import '../../services/pdf_service.dart';
 import '../../services/csv_service.dart';
+import '../../services/text_export_service.dart';
+import 'package:flutter/services.dart';
 import '../../main.dart';
 
 class ExportScreen extends StatefulWidget {
@@ -278,6 +280,29 @@ class _ExportScreenState extends State<ExportScreen> {
     }
   }
 
+  Future<void> _copyText() async {
+    final filtered = await LocalDb.fetchFiltered(
+      from: _fromDate,
+      to: _toDate,
+    );
+    if (filtered.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Нет записей для копирования')),
+        );
+      }
+      return;
+    }
+
+    final text = TextExportService.buildEntriesText(filtered);
+    await Clipboard.setData(ClipboardData(text: text));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Текст скопирован в буфер обмена')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext ctx) {
     final appState = MyApp.of(ctx);
@@ -373,6 +398,12 @@ class _ExportScreenState extends State<ExportScreen> {
               icon: const Icon(Icons.save_alt),
               label: const Text('Сохранить CSV'),
               onPressed: _saveCsv,
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.copy),
+              label: const Text('Копировать в текст'),
+              onPressed: _copyText,
             ),
           ],
         ),
