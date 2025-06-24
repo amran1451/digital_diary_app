@@ -301,6 +301,12 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            const Text(
+              'Период считается от сегодняшней даты. Полные данные в разделе "По месяцам".',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
             const SizedBox(height: 16),
             // контент вкладок
             Expanded(

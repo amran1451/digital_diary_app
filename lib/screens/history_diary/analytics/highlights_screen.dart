@@ -168,40 +168,49 @@ class _HighlightsScreenState extends State<HighlightsScreen> {
           IconButton(icon: const Icon(Icons.share), onPressed: _share),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ChoiceChip(
-                  label: const Text('7 дней'),
-                  selected: _period == _Period.week,
-                  onSelected: (_) {
-                    setState(() => _period = _Period.week);
-                    _applyPeriod();
-                  },
+          preferredSize: const Size.fromHeight(68),
+          child: Column(
+              children:[
+          Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ChoiceChip(
+                label: const Text('7 дней'),
+                selected: _period == _Period.week,
+                onSelected: (_) {
+                  setState(() => _period = _Period.week);
+                  _applyPeriod();
+                },
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: const Text('30 дней'),
+                selected: _period == _Period.month,
+                onSelected: (_) {
+                  setState(() => _period = _Period.month);
+                  _applyPeriod();
+                },
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: const Text('Весь период'),
+                selected: _period == _Period.all,
+                onSelected: (_) {
+                  setState(() => _period = _Period.all);
+                  _applyPeriod();
+                },
+              ),
+            ],
                 ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('30 дней'),
-                  selected: _period == _Period.month,
-                  onSelected: (_) {
-                    setState(() => _period = _Period.month);
-                    _applyPeriod();
-                  },
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('Весь период'),
-                  selected: _period == _Period.all,
-                  onSelected: (_) {
-                    setState(() => _period = _Period.all);
-                    _applyPeriod();
-                  },
+          ),
+                const Text(
+                  'Период считается от сегодняшней даты. Полные данные в разделе "По месяцам".',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
-            ),
           ),
         ),
       ),

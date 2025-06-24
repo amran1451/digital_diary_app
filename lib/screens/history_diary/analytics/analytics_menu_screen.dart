@@ -9,6 +9,7 @@ import 'steps_analytics_screen.dart';
 import 'correlations_screen.dart';
 import 'highlights_screen.dart';
 import 'manual_highlights_screen.dart';
+import 'monthly_summary_screen.dart';
 
 class AnalyticsMenuScreen extends StatelessWidget {
   static const routeName = '/analytics';
@@ -64,6 +65,12 @@ class AnalyticsMenuScreen extends StatelessWidget {
               label: 'Ключевые моменты',
               color: Colors.indigo,
               onTap: () => Navigator.pushNamed(ctx, ManualHighlightsScreen.routeName),
+            ),
+            _Tile(
+              icon: Icons.calendar_month,
+              label: 'По месяцам',
+              color: Colors.blueGrey,
+              onTap: () => Navigator.pushNamed(ctx, MonthlySummaryScreen.routeName),
             ),
             _Tile(
               icon: Icons.multiline_chart,

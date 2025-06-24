@@ -27,6 +27,7 @@ import 'screens/history_diary/analytics/steps_analytics_screen.dart';
 import 'screens/history_diary/analytics/correlations_screen.dart';
 import 'screens/history_diary/analytics/highlights_screen.dart';
 import 'screens/history_diary/analytics/manual_highlights_screen.dart';
+import 'screens/history_diary/analytics/monthly_summary_screen.dart';
 
 // history_diary - entries
 import 'screens/history_diary/entries_screen.dart';
@@ -135,6 +136,7 @@ class _MyAppState extends State<MyApp> {
         CorrelationsScreen.routeName: (_) => const CorrelationsScreen(),
         HighlightsScreen.routeName: (_) => const HighlightsScreen(),
         ManualHighlightsScreen.routeName: (_) => const ManualHighlightsScreen(),
+        MonthlySummaryScreen.routeName: (_) => const MonthlySummaryScreen(),
         HomeMenuScreen.routeName:  (_) => const HomeMenuScreen(),
         WorkoutAppScreen.routeName: (_) => const WorkoutAppScreen(),
         FinanceTrackerScreen.routeName: (_) => const FinanceTrackerScreen(),
