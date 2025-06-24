@@ -1,6 +1,5 @@
 // lib/screens/emotion_analytics_screen.dart
 
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -179,82 +178,68 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
     );
   }
 
-  Widget _buildHistogram() {
+  Widget _buildPieChart() {
     if (_counts.isEmpty) {
       return const Center(child: Text('Нет данных'));
     }
     final entries = _counts.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
-    final maxCount = entries.first.value.toDouble();
-    final groups = List.generate(entries.length, (i) {
-      return BarChartGroupData(
-        x: i,
-        barRods: [
-          BarChartRodData(
-            toY: entries[i].value.toDouble(),
-            width: 16,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ],
+    final total = entries.fold<int>(0, (sum, e) => sum + e.value);
+    const palette = Colors.primaries;
+    final sections = List.generate(entries.length, (i) {
+      final entry = entries[i];
+      final color = palette[i % palette.length];
+      final value = entry.value.toDouble();
+      final percent = total == 0 ? 0 : (value / total * 100).round();
+      return PieChartSectionData(
+        value: value,
+        color: color,
+        title: percent > 0 ? '$percent%' : '',
+        radius: 60,
+        titleStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
       );
     });
 
-    final chartWidth = max(entries.length * 40.0, MediaQuery.of(context).size.width);
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SizedBox(
-        width: chartWidth,
-        child: BarChart(
-          BarChartData(
-            alignment: BarChartAlignment.spaceAround,
-            maxY: maxCount + 1,
-            barGroups: groups,
-            titlesData: FlTitlesData(
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) {
-                    final i = value.toInt();
-                    if (i < 0 || i >= entries.length) return const SizedBox();
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Transform.rotate(
-                        angle: -0.4,
-                        child: Text(
-                          _capitalize(entries[i].key),
-                          style: const TextStyle(fontSize: 10),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  interval: 1,
-                  reservedSize: 28,
-                  getTitlesWidget: (value, meta) {
-                    if (value >= meta.max) return const SizedBox();
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 6),
-                      child: Text(
-                        value.toInt().toString(),
-                        style: const TextStyle(fontSize: 10),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          height: 220,
+          child: PieChart(
+            PieChartData(
+              sections: sections,
+              sectionsSpace: 2,
+              centerSpaceRadius: 0,
+              borderData: FlBorderData(show: false),
             ),
-            gridData: FlGridData(show: false),
-            borderData: FlBorderData(show: false),
           ),
         ),
-      ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          alignment: WrapAlignment.center,
+          children: List.generate(entries.length, (i) {
+            final entry = entries[i];
+            final color = palette[i % palette.length];
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(width: 10, height: 10, color: color),
+                const SizedBox(width: 4),
+                Text(
+                  '${_capitalize(entry.key)} (${entry.value})',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
+            );
+          }),
+        ),
+      ],
     );
   }
 
@@ -269,7 +254,7 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
           controller: _tabController,
           tabs: const [
             Tab(text: 'Топ-5'),
-            Tab(text: 'Гистограмма'),
+            Tab(text: 'Круговая'),
             Tab(text: 'Все'),
           ],
         ),
@@ -324,7 +309,7 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _buildTop5Chart(),
-                  _buildHistogram(),
+                  _buildPieChart(),
                   _buildAllTable(),
                 ],
               ),
