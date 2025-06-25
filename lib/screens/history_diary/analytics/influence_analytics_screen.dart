@@ -279,49 +279,52 @@ class _InfluenceAnalyticsScreenState extends State<InfluenceAnalyticsScreen>
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                DropdownButton<String?>(
-                  value: _emotion,
-                  hint: const Text('Все эмоции'),
-                  items: [
-                    const DropdownMenuItem(value: null, child: Text('Все эмоции')),
-                    ..._emotions.map((e) => DropdownMenuItem(value: e, child: Text(e))),
-                  ],
-                  onChanged: (v) {
-                    setState(() => _emotion = v);
-                    _recompute();
-                  },
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('7 дней'),
-                  selected: _period == _Period.week,
-                  onSelected: (_) {
-                    setState(() => _period = _Period.week);
-                    _apply();
-                  },
-                ),
-                const SizedBox(width: 4),
-                ChoiceChip(
-                  label: const Text('30 дней'),
-                  selected: _period == _Period.month,
-                  onSelected: (_) {
-                    setState(() => _period = _Period.month);
-                    _apply();
-                  },
-                ),
-                const SizedBox(width: 4),
-                ChoiceChip(
-                  label: const Text('Весь период'),
-                  selected: _period == _Period.all,
-                  onSelected: (_) {
-                    setState(() => _period = _Period.all);
-                    _apply();
-                  },
-                ),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  DropdownButton<String?>(
+                    value: _emotion,
+                    hint: const Text('Все эмоции'),
+                    items: [
+                      const DropdownMenuItem(value: null, child: Text('Все эмоции')),
+                      ..._emotions.map((e) => DropdownMenuItem(value: e, child: Text(e))),
+                    ],
+                    onChanged: (v) {
+                      setState(() => _emotion = v);
+                      _recompute();
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('7 дней'),
+                    selected: _period == _Period.week,
+                    onSelected: (_) {
+                      setState(() => _period = _Period.week);
+                      _apply();
+                    },
+                  ),
+                  const SizedBox(width: 4),
+                  ChoiceChip(
+                    label: const Text('30 дней'),
+                    selected: _period == _Period.month,
+                    onSelected: (_) {
+                      setState(() => _period = _Period.month);
+                      _apply();
+                    },
+                  ),
+                  const SizedBox(width: 4),
+                  ChoiceChip(
+                    label: const Text('Весь период'),
+                    selected: _period == _Period.all,
+                    onSelected: (_) {
+                      setState(() => _period = _Period.all);
+                      _apply();
+                    },
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
             Expanded(
