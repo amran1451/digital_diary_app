@@ -1,20 +1,28 @@
 class NotificationLogItem {
   final String type;
-  final String time;
+  final String sentTime;
+  final String answerTime;
   final String text;
 
-  NotificationLogItem({required this.type, required this.time, required this.text});
+  NotificationLogItem({
+    required this.type,
+    required this.sentTime,
+    required this.answerTime,
+    required this.text,
+  });
 
   Map<String, dynamic> toMap() => {
     'type': type,
-    'time': time,
+    'sentTime': sentTime,
+    'answerTime': answerTime,
     'text': text,
   };
 
   factory NotificationLogItem.fromMap(Map<String, dynamic> m) {
     return NotificationLogItem(
       type: m['type'] ?? '',
-      time: m['time'] ?? '',
+      sentTime: m['sentTime'] ?? m['time'] ?? '',
+      answerTime: m['answerTime'] ?? '',
       text: m['text'] ?? '',
     );
   }

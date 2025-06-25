@@ -8,6 +8,7 @@ import 'history_diary/entries_screen.dart';
 import 'flow_diary/date_time_screen.dart';
 import 'finance_tracker_screen.dart';
 import 'planner_app_screen.dart';
+import 'notification_settings_screen.dart';
 
 class HomeMenuScreen extends StatelessWidget {
   static const routeName = '/home';
@@ -53,6 +54,7 @@ class HomeMenuScreen extends StatelessWidget {
               _buildTile(c, Icons.restaurant, 'Питание',    NutritionScreen.routeName),
               _buildTile(c, Icons.check_box, 'Планер', PlannerAppScreen.routeName),
               _buildTile(c, Icons.book,   'Дневник',         DateTimeScreen.routeName),
+              _buildTile(c, Icons.notifications, 'Уведомления', NotificationSettingsScreen.routeName),
             ],
           ),
         ),

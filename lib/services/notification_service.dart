@@ -1,82 +1,196 @@
+import 'dart:convert';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
 import '../models/entry_data.dart';
-import 'local_db.dart';
 import '../models/notification_log_item.dart';
+import '../models/notification_settings.dart';
+import 'local_db.dart';
 
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
+  static final _questions = <String, String>{
+    'thought': 'О чём ты сейчас думаешь?',
+    'activity': 'Чем занят?',
+    'emotion': 'Что чувствуешь?',
+    'flow': 'Как день идёт?'
+  };
+  static late NotificationSettings settings;
+  static final Map<String, bool> _pending = {
+    'thought': false,
+    'activity': false,
+    'emotion': false,
+    'flow': false,
+  };
 
   static Future<void> init() async {
     tz.initializeTimeZones();
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const ios = DarwinInitializationSettings();
-    const settings = InitializationSettings(android: android, iOS: ios);
+    const initSettings = InitializationSettings(android: android, iOS: ios);
+    await _plugin.initialize(initSettings,
     await _plugin.initialize(settings,
         onDidReceiveNotificationResponse: _onNotificationResponse);
     await Permission.notification.request();
+    settings = await loadSettings();
+    await _restorePending();
+    await scheduleAll();
   }
 
-  static Future<void> scheduleDailyNotifications() async {
-    final questions = {
-      'thought': 'О чём ты сейчас думаешь?',
-      'activity': 'Чем занят?',
-      'emotion': 'Что чувствуешь?',
-      'flow': 'Как день идёт?'
-    };
+  static Future<void> updateSettings(NotificationSettings newSettings) async {
+    settings = newSettings;
+    await _saveSettings(settings);
+    await cancelAll();
+    await scheduleAll();
+  }
+
+  static Future<void> cancelAll() async {
+    for (final id in [0, 1, 2, 3]) {
+      await _plugin.cancel(id);
+    }
+  }
+
+  static Future<void> scheduleAll() async {
     int id = 0;
-    for (final entry in questions.entries) {
-      final hour = 9 + id * 3; // 9, 12, 15, 18
-      await _plugin.zonedSchedule(
-        id++,
-        'Дневник',
-        entry.value,
-        _nextInstanceOfHour(hour),
-        const NotificationDetails(
-            android: AndroidNotificationDetails('diary', 'Diary')),
-        uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time,
-        payload: entry.key,
-      );
+    for (final cat in _questions.keys) {
+      if (settings.categories[cat]?.enabled ?? false) {
+        if (!_pending[cat]!) {
+          await _scheduleNext(cat, id);
+        }
+      } else {
+        await _plugin.cancel(id);
+      }
+      id++;
     }
   }
 
-  static tz.TZDateTime _nextInstanceOfHour(int hour) {
+  static Future<void> _scheduleNext(String cat, int id) async {
+    final cs = settings.categories[cat]!;
     final now = tz.TZDateTime.now(tz.local);
-    var scheduled =
-    tz.TZDateTime(tz.local, now.year, now.month, now.day, hour);
-    if (scheduled.isBefore(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
+    var next = now.add(Duration(minutes: cs.intervalMinutes));
+    while (true) {
+      if (next.hour >= cs.endHour) {
+        next = tz.TZDateTime(tz.local, next.year, next.month, next.day)
+            .add(const Duration(days: 1));
+        next = tz.TZDateTime(tz.local, next.year, next.month, next.day, cs.startHour);
+      }
+      if (next.hour < cs.startHour) {
+        next = tz.TZDateTime(tz.local, next.year, next.month, next.day, cs.startHour);
+      }
+      if (!_dayAllowed(next, cs.days)) {
+        next = next.add(const Duration(days: 1));
+        next = tz.TZDateTime(tz.local, next.year, next.month, next.day, cs.startHour);
+        continue;
+      }
+      if (next.isBefore(now)) {
+        next = next.add(Duration(minutes: cs.intervalMinutes));
+        continue;
+      }
+      break;
     }
-    return scheduled;
+    final question = _questions[cat]!;
+    await _plugin.zonedSchedule(
+      id,
+      'Дневник',
+      question,
+      next,
+      const NotificationDetails(android: AndroidNotificationDetails('diary', 'Diary')),
+      uiLocalNotificationDateInterpretation:
+      UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      payload: jsonEncode({'cat': cat, 'time': next.toIso8601String()}),
+    );
+    await _setPending(cat, true);
+    await _logSent(cat, next);
   }
 
-  static Future<void> _onNotificationResponse(
-      NotificationResponse response) async {
-    final type = response.payload;
-    if (type == null) return;
-    // Create or load today's entry
-    final date = _todayStr();
-    var entry = await LocalDb.getByDate(date);
-    entry ??= EntryData(date: date, time: _nowStr());
+  static bool _dayAllowed(tz.TZDateTime dt, DayFilter filter) {
+    if (filter == DayFilter.any) return true;
+    if (filter == DayFilter.workdays) return dt.weekday <= 5;
+    return dt.weekday >= 6;
+  }
+
+  static Future<void> _onNotificationResponse(NotificationResponse response) async {
+    if (response.payload == null) return;
+    final data = jsonDecode(response.payload!);
+    final cat = data['cat'] as String?;
+    final timeIso = data['time'] as String?;
+    if (cat == null || timeIso == null) return;
+    final sent = DateTime.parse(timeIso).toLocal();
+    await _setPending(cat, false);
+
+    final dateStr = _dateStr(sent);
+    var entry = await LocalDb.getByDate(dateStr);
+    entry ??= EntryData(date: dateStr, time: _timeStr(sent));
+    for (final n in entry.notificationsLog) {
+      if (n.type == cat && n.sentTime == _timeStr(sent)) {
+        entry.notificationsLog.remove(n);
+        break;
+      }
+    }
     entry.notificationsLog.add(NotificationLogItem(
-        type: type, time: _nowStr(), text: ''));
+      type: cat,
+      sentTime: _timeStr(sent),
+      answerTime: _nowStr(),
+      text: '',
+    ));
+    await LocalDb.saveOrUpdate(entry);
+    await _scheduleNext(cat, _questions.keys.toList().indexOf(cat));
+  }
+
+  static Future<void> _logSent(String cat, tz.TZDateTime when) async {
+    final dateStr = _dateStr(when);
+    var entry = await LocalDb.getByDate(dateStr);
+    entry ??= EntryData(date: dateStr, time: _timeStr(when));
+    entry.notificationsLog.add(NotificationLogItem(
+      type: cat,
+      sentTime: _timeStr(when),
+      answerTime: '',
+      text: '',
+    ));
     await LocalDb.saveOrUpdate(entry);
   }
 
-  static String _todayStr() {
-    final now = DateTime.now();
-    String two(int v) => v.toString().padLeft(2, '0');
-    return '${two(now.day)}-${two(now.month)}-${now.year}';
+  static Future<void> _restorePending() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (final key in _pending.keys) {
+      _pending[key] = prefs.getBool('pending_$key') ?? false;
+    }
   }
 
-  static String _nowStr() {
-    final now = DateTime.now();
-    String two(int v) => v.toString().padLeft(2, '0');
-    return '${two(now.hour)}:${two(now.minute)}';
+  static Future<void> _setPending(String cat, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    _pending[cat] = value;
+    await prefs.setBool('pending_$cat', value);
   }
+
+  static Future<NotificationSettings> loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final str = prefs.getString('notification_settings');
+    if (str == null) return NotificationSettings.defaultSettings();
+    final map = jsonDecode(str) as Map<String, dynamic>;
+    final cats = (map['categories'] as Map<String, dynamic>).map((k, v) =>
+        MapEntry(k, CategorySettings.fromMap(Map<String, dynamic>.from(v))));
+    return NotificationSettings(categories: cats);
+  }
+
+  static Future<void> _saveSettings(NotificationSettings s) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('notification_settings', jsonEncode(s.toMap()));
+  }
+
+  static String _dateStr(DateTime dt) {
+    String two(int v) => v.toString().padLeft(2, '0');
+    return '${two(dt.day)}-${two(dt.month)}-${dt.year}';
+  }
+
+  static String _timeStr(DateTime dt) {
+    String two(int v) => v.toString().padLeft(2, '0');
+    return '${two(dt.hour)}:${two(dt.minute)}';
+  }
+
+  static String _nowStr() => _timeStr(DateTime.now());
 }

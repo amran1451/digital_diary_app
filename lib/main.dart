@@ -59,6 +59,7 @@ import 'package:nutrition_tracker/providers/product_provider.dart';
 import 'package:nutrition_tracker/app.dart';
 
 import 'screens/planner_app_screen.dart';
+import 'screens/notification_settings_screen.dart';
 import 'services/permission_service.dart';
 import 'services/notification_service.dart';
 
@@ -67,7 +68,6 @@ Future<void> main() async {
   await initializeDateFormatting('ru', null);
   await PermissionService.requestStoragePermission();
   await NotificationService.init();
-  await NotificationService.scheduleDailyNotifications();
   //await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
   //await FirebaseAuth.instance.signInAnonymously();
   runApp(const MyApp());
@@ -147,6 +147,7 @@ class _MyAppState extends State<MyApp> {
         ActivityAnalyticsScreen.routeName: (_) => const ActivityAnalyticsScreen(),
         InfluenceAnalyticsScreen.routeName: (_) => const InfluenceAnalyticsScreen(),
         HomeMenuScreen.routeName:  (_) => const HomeMenuScreen(),
+        NotificationSettingsScreen.routeName: (_) => const NotificationSettingsScreen(),
         WorkoutAppScreen.routeName: (_) => const WorkoutAppScreen(),
         FinanceTrackerScreen.routeName: (_) => const FinanceTrackerScreen(),
         NutritionScreen.routeName: (_) => MultiProvider(

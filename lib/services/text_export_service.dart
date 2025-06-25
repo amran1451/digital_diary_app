@@ -36,7 +36,8 @@ ${e.flow}''');
       buffer.writeln('\n\n📌 Что происходило в течение дня');
       for (final n in e.notificationsLog) {
         final label = _typeLabel(n.type);
-        buffer.writeln('— $label в ${n.time}: ${n.text}');
+        final time = n.answerTime.isNotEmpty ? n.answerTime : n.sentTime;
+        buffer.writeln('— $label в $time: ${n.text}');
       }
     }
 
