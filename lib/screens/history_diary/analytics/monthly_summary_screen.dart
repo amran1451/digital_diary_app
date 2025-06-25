@@ -24,28 +24,35 @@ class _MonthlySummaryScreenState extends State<MonthlySummaryScreen> {
   @override
   void initState() {
     super.initState();
-    _generateMonths();
     _load();
   }
 
-  void _generateMonths() {
-    DateTime cur = DateTime(2024, 1);
-    final end = DateTime(2025, 6);
-    int idx = 0;
-    final now = DateTime(DateTime.now().year, DateTime.now().month);
-    while (!cur.isAfter(end)) {
-      _months.add(cur);
-      if (cur.year == now.year && cur.month == now.month) {
-        _selectedIndex = idx;
-      }
-      cur = DateTime(cur.year, cur.month + 1);
-      idx++;
-    }
-  }
+  bool get _hasPrev => _selectedIndex > 0;
+  bool get _hasNext => _selectedIndex < _months.length - 1;
 
   Future<void> _load() async {
     final all = await LocalDb.fetchAll();
-    setState(() => _all = all);
+    final months = <DateTime>{};
+    final now = DateTime(DateTime.now().year, DateTime.now().month);
+    months.add(now);
+    for (final e in all) {
+      final parts = e.date.split('-');
+      if (parts.length != 3) continue;
+      final d = int.tryParse(parts[0]);
+      final m = int.tryParse(parts[1]);
+      final y = int.tryParse(parts[2]);
+      if (d == null || m == null || y == null) continue;
+      months.add(DateTime(y, m));
+    }
+    final sorted = months.toList()..sort();
+    final idx = sorted.indexWhere((m) => m.year == now.year && m.month == now.month);
+    setState(() {
+      _all = all;
+      _months
+        ..clear()
+        ..addAll(sorted);
+      _selectedIndex = idx >= 0 ? idx : 0;
+    });
   }
 
   List<EntryData> get _entries {
@@ -98,20 +105,23 @@ class _MonthlySummaryScreenState extends State<MonthlySummaryScreen> {
           children: [
             SizedBox(
               height: 48,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _months.length,
-                itemBuilder: (_, i) {
-                  final sel = i == _selectedIndex;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: ChoiceChip(
-                      label: Text(monthNames[i]),
-                      selected: sel,
-                      onSelected: (_) => setState(() => _selectedIndex = i),
-                    ),
-                  );
-                },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left),
+                    onPressed: _hasPrev
+                        ? () => setState(() => _selectedIndex--)
+                        : null,
+                  ),
+                  Text(monthNames.isEmpty ? '' : monthNames[_selectedIndex]),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right),
+                    onPressed: _hasNext
+                        ? () => setState(() => _selectedIndex++)
+                        : null,
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 8),
