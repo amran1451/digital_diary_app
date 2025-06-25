@@ -176,7 +176,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                     .map((n) => ListTile(
                   leading: Text(_iconForType(n.type)),
                   title: Text(n.text),
-                  subtitle: Text(n.time),
+                  subtitle: Text(
+                    n.answerTime.isNotEmpty ? n.answerTime : n.sentTime,
+                  ),
                 ))
                     .toList(),
               ),

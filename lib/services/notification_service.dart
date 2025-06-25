@@ -30,10 +30,12 @@ class NotificationService {
   static Future<void> init() async {
     tz.initializeTimeZones();
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const ios = DarwinInitializationSettings();
     const initSettings = InitializationSettings(android: android, iOS: ios);
-    await _plugin.initialize(initSettings,
-    await _plugin.initialize(settings,
-        onDidReceiveNotificationResponse: _onNotificationResponse);
+    await _plugin.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: _onNotificationResponse,
+    );
     await Permission.notification.request();
     settings = await loadSettings();
     await _restorePending();
