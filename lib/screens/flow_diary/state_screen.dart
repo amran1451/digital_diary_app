@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
 import '../../main.dart';
+import 'activity_screen.dart';
 import 'emotion_screen.dart';
 import '../history_diary/entries_screen.dart';
 
@@ -230,11 +231,11 @@ class _StateScreenState extends State<StateScreen> {
                     await DraftService.saveDraft();
                     Navigator.pushNamed(
                       ctx,
-                      EmotionScreen.routeName,
+                      ActivityScreen.routeName,
                       arguments: entry,
                     );
                   },
-                  child: const Text('→ Далее: Настроение'),
+                  child: const Text('→ Далее: Активность'),
                 ),
               ],
             ),
