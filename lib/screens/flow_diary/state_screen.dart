@@ -220,10 +220,11 @@ class _StateScreenState extends State<StateScreen> {
         ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
             TextField(
               controller: bedCtrl,
               decoration: const InputDecoration(labelText: '⏰ Лёг в:'),
@@ -355,7 +356,7 @@ class _StateScreenState extends State<StateScreen> {
             Text(_energyDesc,
                 style: Theme.of(ctx).textTheme.bodyMedium,
                 textAlign: TextAlign.center),
-            const Spacer(),
+                const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
