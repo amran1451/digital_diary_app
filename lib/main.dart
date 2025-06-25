@@ -88,6 +88,9 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _loadTheme();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationService.requestPermission();
+    });
     // Анонимный вход без await, чтобы не блокировать UI
     //FirebaseAuth.instance
     //    .signInAnonymously()

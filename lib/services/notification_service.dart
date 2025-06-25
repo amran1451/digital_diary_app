@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -37,10 +38,24 @@ class NotificationService {
       initSettings,
       onDidReceiveNotificationResponse: _onNotificationResponse,
     );
-    await Permission.notification.request();
     settings = await loadSettings();
     await _restorePending();
     await scheduleAll();
+  }
+
+  static Future<void> requestPermission() async {
+    try {
+      final status = await Permission.notification.request();
+      if (!status.isGranted) {
+        // Permission denied - notifications will remain disabled
+        return;
+      }
+      // Reschedule notifications after permission granted
+      await scheduleAll();
+    } catch (e) {
+      // Log and ignore to avoid crash
+      debugPrint('Notification permission error: $e');
+    }
   }
 
   static Future<void> updateSettings(NotificationSettings newSettings) async {
