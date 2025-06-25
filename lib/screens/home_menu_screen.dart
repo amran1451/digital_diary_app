@@ -9,6 +9,7 @@ import 'flow_diary/date_time_screen.dart';
 import 'finance_tracker_screen.dart';
 import 'planner_app_screen.dart';
 import 'notification_settings_screen.dart';
+import '../app_config.dart';
 
 class HomeMenuScreen extends StatelessWidget {
   static const routeName = '/home';
