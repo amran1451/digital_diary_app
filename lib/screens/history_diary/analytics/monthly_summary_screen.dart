@@ -31,9 +31,15 @@ class _MonthlySummaryScreenState extends State<MonthlySummaryScreen> {
   void _generateMonths() {
     DateTime cur = DateTime(2024, 1);
     final end = DateTime(2025, 6);
+    int idx = 0;
+    final now = DateTime(DateTime.now().year, DateTime.now().month);
     while (!cur.isAfter(end)) {
       _months.add(cur);
+      if (cur.year == now.year && cur.month == now.month) {
+        _selectedIndex = idx;
+      }
       cur = DateTime(cur.year, cur.month + 1);
+      idx++;
     }
   }
 
