@@ -10,6 +10,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../models/entry_data.dart';
 import '../models/notification_log_item.dart';
 import '../models/notification_settings.dart';
+import '../app_config.dart';
 import 'local_db.dart';
 import 'draft_service.dart';
 
@@ -30,6 +31,8 @@ class NotificationService {
   };
 
   static Future<void> init() async {
+    settings = await loadSettings();
+    if (!notificationsEnabled) return;
     tz.initializeTimeZones();
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const ios = DarwinInitializationSettings();
@@ -38,12 +41,12 @@ class NotificationService {
       initSettings,
       onDidReceiveNotificationResponse: _onNotificationResponse,
     );
-    settings = await loadSettings();
     await _restorePending();
     await scheduleAll();
   }
 
   static Future<void> requestPermission() async {
+    if (!notificationsEnabled) return;
     try {
       final status = await Permission.notification.request();
       if (!status.isGranted) {
@@ -61,17 +64,20 @@ class NotificationService {
   static Future<void> updateSettings(NotificationSettings newSettings) async {
     settings = newSettings;
     await _saveSettings(settings);
+    if (!notificationsEnabled) return;
     await cancelAll();
     await scheduleAll();
   }
 
   static Future<void> cancelAll() async {
+    if (!notificationsEnabled) return;
     for (final id in [0, 1, 2, 3]) {
       await _plugin.cancel(id);
     }
   }
 
   static Future<void> scheduleAll() async {
+    if (!notificationsEnabled) return;
     int id = 0;
     for (final cat in _questions.keys) {
       if (settings.categories[cat]?.enabled ?? false) {
@@ -86,6 +92,7 @@ class NotificationService {
   }
 
   static Future<void> _scheduleNext(String cat, int id) async {
+    if (!notificationsEnabled) return;
     final cs = settings.categories[cat]!;
     final now = tz.TZDateTime.now(tz.local);
     var next = now.add(Duration(minutes: cs.intervalMinutes));
@@ -132,6 +139,7 @@ class NotificationService {
   }
 
   static Future<void> _onNotificationResponse(NotificationResponse response) async {
+    if (!notificationsEnabled) return;
     if (response.payload == null) return;
     final data = jsonDecode(response.payload!);
     final cat = data['cat'] as String?;
@@ -173,6 +181,7 @@ class NotificationService {
   }
 
   static Future<void> _logSent(String cat, tz.TZDateTime when) async {
+    if (!notificationsEnabled) return;
     final dateStr = _dateStr(when);
     var entry = await LocalDb.getByDate(dateStr);
 

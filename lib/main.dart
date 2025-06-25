@@ -61,11 +61,14 @@ import 'screens/planner_app_screen.dart';
 import 'screens/notification_settings_screen.dart';
 import 'services/permission_service.dart';
 import 'services/notification_service.dart';
+import 'app_config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ru', null);
-  await PermissionService.requestStoragePermission();
+  if (notificationsEnabled) {
+    await NotificationService.init();
+  }
   await NotificationService.init();
   //await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
   //await FirebaseAuth.instance.signInAnonymously();
@@ -89,7 +92,9 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _loadTheme();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      NotificationService.requestPermission();
+      if (notificationsEnabled) {
+        NotificationService.requestPermission();
+      }
     });
     // Анонимный вход без await, чтобы не блокировать UI
     //FirebaseAuth.instance

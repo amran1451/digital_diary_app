@@ -54,7 +54,8 @@ class HomeMenuScreen extends StatelessWidget {
               _buildTile(c, Icons.restaurant, 'Питание',    NutritionScreen.routeName),
               _buildTile(c, Icons.check_box, 'Планер', PlannerAppScreen.routeName),
               _buildTile(c, Icons.book,   'Дневник',         DateTimeScreen.routeName),
-              _buildTile(c, Icons.notifications, 'Уведомления', NotificationSettingsScreen.routeName),
+              if (notificationsEnabled)
+                _buildTile(c, Icons.notifications, 'Уведомления', NotificationSettingsScreen.routeName),
             ],
           ),
         ),

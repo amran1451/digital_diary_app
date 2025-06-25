@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/notification_settings.dart';
 import '../services/notification_service.dart';
+import '../app_config.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   static const routeName = '/notification-settings';
@@ -140,6 +141,12 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   Widget build(BuildContext context) {
     if (!_loaded) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (!notificationsEnabled) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Настройки уведомлений')),
+        body: const Center(child: Text('Уведомления временно отключены')),
+      );
     }
     return Scaffold(
       appBar: AppBar(title: const Text('Настройки уведомлений')),
