@@ -7,6 +7,94 @@ import '../../../models/entry_data.dart';
 import '../../../services/local_db.dart';
 import '../../../main.dart';
 
+// Emotion categories used in entry editing screen. Key contains emoji and name.
+const Map<String, List<String>> _emotionCategories = {
+  '😄 Радость': [
+    'Воодушевление',
+    'Восторг',
+    'Интерес',
+    'Радость',
+    'Счастье',
+    'Лёгкость',
+    'Теплота',
+    'Любовь',
+    'Обожание',
+  ],
+  '😔 Грусть': [
+    'Печаль',
+    'Одиночество',
+    'Уныние',
+    'Потерянность',
+    'Безысходность',
+    'Ностальгия',
+    'Тоска',
+    'Экзистенциальная тоска',
+    'Меланхолия',
+  ],
+  '😰 Тревога': [
+    'Беспокойство',
+    'Неуверенность',
+    'Паника',
+    'Напряжение',
+    'Предвкушение негатива',
+    'Тревога',
+    'Растерянность',
+    'Трепет',
+  ],
+  '😡 Злость': [
+    'Раздражение',
+    'Обида',
+    'Зависть',
+    'Агрессия',
+    'Неприязнь',
+    'Фрустрация',
+    'Сопротивление',
+  ],
+  '😶 Оцепенение': [
+    'Пустота',
+    'Замерзание',
+    'Онемение',
+    'Тупик',
+    'Хтонь',
+  ],
+  '🤍 Принятие': [
+    'Спокойствие',
+    'Устойчивость',
+    'Принятие',
+    'Доверие',
+    'Резонанс',
+  ],
+  '💭 Сложные/смешанные': [
+    'Вина',
+    'Стыд',
+    'Смущение',
+    'Неловкость',
+    'Амбивалентность',
+    'Уязвимость',
+    'Катарсис',
+  ],
+};
+
+final Map<String, String> _emotionToCategory = (() {
+  final map = <String, String>{};
+  _emotionCategories.forEach((cat, list) {
+    for (final emo in list) {
+      map[emo] = cat;
+    }
+  });
+  return map;
+})();
+
+class _ReasonStat {
+  final String reason;
+  final String emotion;
+  final String category;
+  int count = 0;
+  double ratingSum = 0;
+  _ReasonStat(this.reason, this.emotion, this.category);
+  double get avgRating => count == 0 ? 0 : ratingSum / count;
+}
+
 enum _Period { week, month, all }
 
 class InfluenceAnalyticsScreen extends StatefulWidget {
@@ -25,6 +113,11 @@ class _InfluenceAnalyticsScreenState extends State<InfluenceAnalyticsScreen>
   String? _emotion;
   List<String> _emotions = [];
   Map<String, int> _reasonCounts = {};
+
+  /// Aggregated statistics per reason-emotion pair
+  final Map<String, _ReasonStat> _stats = {};
+  final Set<String> _selectedReasons = <String>{};
+  final Set<String> _selectedEmotions = <String>{};
 
   @override
   void initState() {
@@ -73,8 +166,10 @@ class _InfluenceAnalyticsScreenState extends State<InfluenceAnalyticsScreen>
   void _recompute() {
     final counts = <String, int>{};
     final emotions = <String>{};
-    final regex = RegExp(r'(.*?)\\s*[—-]\\s*(\\([^)]*\\)|[^,]+)(?:,|$)');
+    _stats.clear();
+    final regex = RegExp(r'(.*?)\s*[—-]\s*(\([^)]*\)|[^,]+)(?:,|$)');
     for (final e in _entries) {
+      final rating = double.tryParse(e.rating) ?? 0;
       for (final m in regex.allMatches(e.influence)) {
         final emo = m.group(1)!.trim();
         var reason = m.group(2)!.trim();
@@ -85,111 +180,91 @@ class _InfluenceAnalyticsScreenState extends State<InfluenceAnalyticsScreen>
         if (_emotion == null || _emotion == emo) {
           counts[reason] = (counts[reason] ?? 0) + 1;
         }
+        final key = '$emo|$reason';
+        final cat = _emotionToCategory[emo] ?? '';
+        final stat = _stats.putIfAbsent(key, () => _ReasonStat(reason, emo, cat));
+        stat.count += 1;
+        stat.ratingSum += rating;
       }
     }
     _reasonCounts = counts;
     _emotions = emotions.toList()..sort();
   }
 
+
   Widget _buildReasonChart() {
-    if (_reasonCounts.isEmpty) return const Center(child: Text('Нет данных'));
-    final entries = _reasonCounts.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    final groups = <BarChartGroupData>[];
-    final labels = <String>[];
-    int maxVal = 0;
-    for (var i = 0; i < entries.length; i++) {
-      final reason = entries[i].key;
-      final count = entries[i].value;
-      if (count > maxVal) maxVal = count;
-      labels.add(reason);
-      groups.add(
-        BarChartGroupData(x: i, barRods: [
-          BarChartRodData(
-            toY: count.toDouble(),
-            width: 16,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ]),
-      );
+    if (_stats.isEmpty) {
+      return const Center(child: Text('Нет доступных данных для выбранного периода'));
     }
-    final maxY = (maxVal * 1.2).ceil().clamp(1, double.infinity).toDouble();
-    final labelStep = max(1, (entries.length / 10).ceil());
-    return BarChart(
-      BarChartData(
-        maxY: maxY,
-        barGroups: groups,
-        titlesData: FlTitlesData(
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              interval: 1,
-              reservedSize: 28,
-              getTitlesWidget: (v, _) {
-                if (v > maxY) return const SizedBox();
-                return Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: Text(v.toInt().toString(), style: const TextStyle(fontSize: 10)),
-                );
-              },
-            ),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              interval: labelStep.toDouble(),
-              getTitlesWidget: (v, _) {
-                final i = v.toInt();
-                if (i < 0 || i >= labels.length || i % labelStep != 0) {
-                  return const SizedBox();
-                }
-                return Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: Transform.rotate(
-                    angle: -0.4,
-                    child: Text(labels[i], style: const TextStyle(fontSize: 10)),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-        gridData: FlGridData(show: false),
-        borderData: FlBorderData(show: false),
-      ),
+    final list = _stats.values.toList()
+      ..sort((a, b) => b.count.compareTo(a.count));
+    return ListView.separated(
+      itemCount: list.length,
+      itemBuilder: (ctx, i) {
+        final s = list[i];
+        final emoji = s.category.isNotEmpty ? s.category.split(' ').first : '';
+        return ListTile(
+          leading: Text(emoji, style: const TextStyle(fontSize: 20)),
+          title: Text(s.reason),
+          subtitle: Text('${s.emotion} • ${s.avgRating.toStringAsFixed(1)}'),
+          trailing: Text(s.count.toString()),
+        );
+      },
+      separatorBuilder: (_, __) => const Divider(height: 1),
     );
   }
 
   Widget _buildLineChart() {
-    if (_entries.isEmpty) return const Center(child: Text('Нет данных'));
-    final daily = <DateTime, int>{};
-    final regex = RegExp(r'(.*?)\\s*[—-]\\s*(\\([^)]*\\)|[^,]+)(?:,|$)');
+    if (_entries.isEmpty) {
+      return const Center(child: Text('Нет доступных данных для выбранного периода'));
+    }
+    final series = <String, Map<DateTime, int>>{};
+    final regex = RegExp(r'(.*?)\s*[—-]\s*(\([^)]*\)|[^,]+)(?:,|$)');
     for (final e in _entries) {
-      int count = 0;
+      final date = _entryDate(e);
       for (final m in regex.allMatches(e.influence)) {
         final emo = m.group(1)!.trim();
-        if (_emotion != null && _emotion != emo) continue;
-        count++;
+        var reason = m.group(2)!.trim();
+        if (reason.startsWith('(') && reason.endsWith(')')) {
+          reason = reason.substring(1, reason.length - 1).trim();
+        }
+        if (_selectedEmotions.isNotEmpty && !_selectedEmotions.contains(emo)) continue;
+        if (_selectedReasons.isNotEmpty && !_selectedReasons.contains(reason)) continue;
+        final key = '$emo|$reason';
+        final map = series.putIfAbsent(key, () => <DateTime, int>{});
+        map[date] = (map[date] ?? 0) + 1;
       }
-      if (count == 0) continue;
-      final d = _entryDate(e);
-      daily[d] = (daily[d] ?? 0) + count;
     }
-    if (daily.isEmpty) return const Center(child: Text('Нет данных'));
-    final dates = daily.keys.toList()..sort();
-    final values = dates.map((d) => daily[d]!.toDouble()).toList();
-    final spots = List.generate(dates.length, (i) => FlSpot(i.toDouble(), values[i]));
-    final maxV = values.reduce(max);
+    if (series.isEmpty) {
+      return const Center(child: Text('Нет доступных данных для выбранного периода'));
+    }
+    final dates = series.values.expand((m) => m.keys).toSet().toList()..sort();
+    final bars = <LineChartBarData>[];
+    double maxVal = 0;
+    final palette = Colors.primaries;
+    var idx = 0;
+    series.forEach((name, data) {
+      final spots = <FlSpot>[];
+      for (var i = 0; i < dates.length; i++) {
+        final d = dates[i];
+        final v = (data[d] ?? 0).toDouble();
+        if (v > maxVal) maxVal = v;
+        spots.add(FlSpot(i.toDouble(), v));
+      }
+      bars.add(LineChartBarData(
+        spots: spots,
+        isCurved: true,
+        barWidth: 2,
+        color: palette[idx % palette.length],
+      ));
+      idx++;
+    });
     final labelStep = max(1, (dates.length / 10).ceil());
     return LineChart(
       LineChartData(
-        maxY: maxV + 1,
+        maxY: maxVal + 1,
         minY: 0,
-        lineBarsData: [
-          LineChartBarData(spots: spots, isCurved: true, barWidth: 2),
-        ],
+        lineBarsData: bars,
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
@@ -214,7 +289,7 @@ class _InfluenceAnalyticsScreenState extends State<InfluenceAnalyticsScreen>
               interval: 1,
               reservedSize: 28,
               getTitlesWidget: (v, _) {
-                if (v > maxV + 1) return const SizedBox();
+                if (v > maxVal + 1) return const SizedBox();
                 return Padding(
                   padding: const EdgeInsets.only(right: 6),
                   child: Text(v.toInt().toString(), style: const TextStyle(fontSize: 10)),
@@ -231,24 +306,95 @@ class _InfluenceAnalyticsScreenState extends State<InfluenceAnalyticsScreen>
     );
   }
 
+  Widget _dynamicTab() {
+    if (_stats.isEmpty) {
+      return const Center(child: Text('Нет доступных данных для выбранного периода'));
+    }
+    final reasons = _reasonCounts.keys.toList()..sort();
+    return Column(
+      children: [
+        Wrap(
+          spacing: 8,
+          children: reasons.map((r) {
+            final selected = _selectedReasons.contains(r);
+            return FilterChip(
+              label: Text(r),
+              selected: selected,
+              onSelected: (v) {
+                setState(() {
+                  if (v) {
+                    if (_selectedReasons.length < 3) _selectedReasons.add(r);
+                  } else {
+                    _selectedReasons.remove(r);
+                  }
+                });
+              },
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: _emotions.map((e) {
+            final selected = _selectedEmotions.contains(e);
+            return FilterChip(
+              label: Text(e),
+              selected: selected,
+              onSelected: (v) {
+                setState(() {
+                  if (v) {
+                    if (_selectedEmotions.length < 3) _selectedEmotions.add(e);
+                  } else {
+                    _selectedEmotions.remove(e);
+                  }
+                });
+              },
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 8),
+        Expanded(child: _buildLineChart()),
+      ],
+    );
+  }
+
+
   Widget _buildTable() {
-    if (_reasonCounts.isEmpty) return const Center(child: Text('Нет данных'));
-    final entries = _reasonCounts.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
+    if (_entries.isEmpty) {
+      return const Center(child: Text('Нет доступных данных для выбранного периода'));
+    }
+    final rows = <DataRow>[];
+    final regex = RegExp(r'(.*?)\s*[—-]\s*(\([^)]*\)|[^,]+)(?:,|$)');
+    for (final e in _entries) {
+      for (final m in regex.allMatches(e.influence)) {
+        final emo = m.group(1)!.trim();
+        var reason = m.group(2)!.trim();
+        if (reason.startsWith('(') && reason.endsWith(')')) {
+          reason = reason.substring(1, reason.length - 1).trim();
+        }
+        final cat = _emotionToCategory[emo] ?? '';
+        rows.add(DataRow(cells: [
+          DataCell(Text(e.date)),
+          DataCell(Text(emo)),
+          DataCell(Text(cat)),
+          DataCell(Text(reason)),
+          DataCell(Text(e.rating)),
+        ]));
+      }
+    }
+    if (rows.isEmpty) {
+      return const Center(child: Text('Нет доступных данных для выбранного периода'));
+    }
     return SingleChildScrollView(
       child: DataTable(
         columns: const [
+          DataColumn(label: Text('Дата')),
+          DataColumn(label: Text('Эмоция')),
+          DataColumn(label: Text('Категория')),
           DataColumn(label: Text('Причина')),
-          DataColumn(label: Text('Кол-во')),
+          DataColumn(label: Text('Оценка')),
         ],
-        rows: entries
-            .map(
-              (e) => DataRow(cells: [
-            DataCell(Text(e.key)),
-            DataCell(Text(e.value.toString())),
-          ]),
-        )
-            .toList(),
+        rows: rows,
       ),
     );
   }
@@ -332,7 +478,7 @@ class _InfluenceAnalyticsScreenState extends State<InfluenceAnalyticsScreen>
                 controller: _tabController,
                 children: [
                   _buildReasonChart(),
-                  _buildLineChart(),
+                  _dynamicTab(),
                   _buildTable(),
                 ],
               ),
