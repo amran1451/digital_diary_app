@@ -60,11 +60,14 @@ import 'package:nutrition_tracker/app.dart';
 
 import 'screens/planner_app_screen.dart';
 import 'services/permission_service.dart';
+import 'services/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ru', null);
   await PermissionService.requestStoragePermission();
+  await NotificationService.init();
+  await NotificationService.scheduleDailyNotifications();
   //await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
   //await FirebaseAuth.instance.signInAnonymously();
   runApp(const MyApp());

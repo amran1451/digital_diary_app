@@ -1,6 +1,8 @@
 import 'package:csv/csv.dart';
 import '../models/entry_data.dart';
+import '../models/notification_log_item.dart';
 import '../utils/parse_utils.dart';
+import 'dart:convert';
 
 class CsvService {
   static const headers = [
@@ -29,6 +31,7 @@ class CsvService {
     'tomorrowImprove',
     'stepGoal',
     'flow',
+    'notificationsLog',
     'highlights',
     'raw'
   ];
@@ -62,6 +65,7 @@ class CsvService {
         e.tomorrowImprove,
         e.stepGoal,
         e.flow,
+        jsonEncode(e.notificationsLog.map((n) => n.toMap()).toList()),
         e.highlights,
         e.raw,
       ]);
@@ -120,6 +124,11 @@ class CsvService {
         tomorrowImprove: m['tomorrowImprove']?.toString() ?? '',
         stepGoal: m['stepGoal']?.toString() ?? '',
         flow: m['flow']?.toString() ?? '',
+        notificationsLog: (m['notificationsLog'] != null && m['notificationsLog'].toString().isNotEmpty)
+            ? List<Map<String, dynamic>>.from(jsonDecode(m['notificationsLog']))
+            .map((n) => NotificationLogItem.fromMap(n))
+            .toList()
+            : [],
         highlights: m['highlights']?.toString() ?? '',
         raw: m['raw']?.toString() ?? '',
       ));

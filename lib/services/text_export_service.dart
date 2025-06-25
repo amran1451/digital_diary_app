@@ -1,7 +1,8 @@
 import '../models/entry_data.dart';
 
 class TextExportService {
-  static String buildEntryText(EntryData e) => '''
+  static String buildEntryText(EntryData e) {
+    final buffer = StringBuffer('''
 📖 ДНЕВНИК | за ${e.date}
 ⏰ Создано: ${e.createdAtFormatted}
 📊 Оценка: ${e.rating} – ${e.ratingReason}
@@ -29,8 +30,31 @@ class TextExportService {
 🎯 Шаг к цели: ${e.stepGoal}
 
 💬 Поток мысли:
-${e.flow}
-''';
+${e.flow}''');
+
+    if (e.notificationsLog.isNotEmpty) {
+      buffer.writeln('\n\n📌 Что происходило в течение дня');
+      for (final n in e.notificationsLog) {
+        final label = _typeLabel(n.type);
+        buffer.writeln('— $label в ${n.time}: ${n.text}');
+      }
+    }
+
+    return buffer.toString();
+  }
+
+  static String _typeLabel(String type) {
+    switch (type) {
+      case 'thought':
+        return 'мысль';
+      case 'activity':
+        return 'действие';
+      case 'emotion':
+        return 'эмоция';
+      default:
+        return 'заметка';
+    }
+  }
 
   static String buildEntriesText(List<EntryData> entries) {
     return entries.map(buildEntryText).join('\n\n-----\n\n');

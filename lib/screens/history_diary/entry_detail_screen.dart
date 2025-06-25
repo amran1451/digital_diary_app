@@ -168,9 +168,35 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               style: Theme.of(ctx).textTheme.titleMedium,
             ),
             Text(entry.flow),
+            if (entry.notificationsLog.isNotEmpty) ...[
+              const Divider(),
+              ExpansionTile(
+                title: const Text('📌 Что происходило в течение дня'),
+                children: entry.notificationsLog
+                    .map((n) => ListTile(
+                  leading: Text(_iconForType(n.type)),
+                  title: Text(n.text),
+                  subtitle: Text(n.time),
+                ))
+                    .toList(),
+              ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  String _iconForType(String type) {
+    switch (type) {
+      case 'thought':
+        return '🧠';
+      case 'activity':
+        return '🏃';
+      case 'emotion':
+        return '🎭';
+      default:
+        return '📌';
+    }
   }
 }

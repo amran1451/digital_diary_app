@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'notification_log_item.dart';
+
 class EntryData {
   /// ID документа в Firestore (не используем в этом варианте)
   final String? id;
@@ -36,6 +40,8 @@ class EntryData {
   String highlights;
   /// Нужно ли ещё отправить в Telegram
   bool needsSync;
+  /// Ответы на уведомления в течение дня
+  List<NotificationLogItem> notificationsLog;
 
   EntryData({
     this.id,
@@ -68,7 +74,9 @@ class EntryData {
     this.raw = '',
     this.needsSync = true,
     this.highlights = '',
-  }) : createdAt = createdAt ?? DateTime.now();
+    List<NotificationLogItem>? notificationsLog,
+  })  : notificationsLog = notificationsLog ?? [],
+        createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() => {
         'date': date,
@@ -99,6 +107,7 @@ class EntryData {
         'highlights': highlights,
         'raw': raw,
         'needsSync': needsSync ? 1 : 0,
+        'notificationsLog': jsonEncode(notificationsLog.map((e) => e.toMap()).toList()),
       };
 
   factory EntryData.fromMap(Map<String, dynamic> m, {String? id}) {
@@ -158,6 +167,11 @@ class EntryData {
       flow: m['flow'] ?? '',
       needsSync: (m['needsSync'] as int? ?? 1) == 1,
       highlights: m['highlights'] ?? '',
+      notificationsLog: (m['notificationsLog'] != null && m['notificationsLog'].toString().isNotEmpty)
+          ? List<Map<String, dynamic>>.from(jsonDecode(m['notificationsLog']))
+          .map((n) => NotificationLogItem.fromMap(n))
+          .toList()
+          : [],
     );
   }
 
