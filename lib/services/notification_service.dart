@@ -1,5 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 import '../models/entry_data.dart';
 import 'local_db.dart';
 import '../models/notification_log_item.dart';
@@ -8,6 +10,7 @@ class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
 
   static Future<void> init() async {
+    tz.initializeTimeZones();
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const ios = DarwinInitializationSettings();
     const settings = InitializationSettings(android: android, iOS: ios);
@@ -26,16 +29,30 @@ class NotificationService {
     int id = 0;
     for (final entry in questions.entries) {
       final hour = 9 + id * 3; // 9, 12, 15, 18
-      await _plugin.showDailyAtTime(
+      await _plugin.zonedSchedule(
         id++,
         'Дневник',
         entry.value,
-        Time(hour, 0, 0),
+        _nextInstanceOfHour(hour),
         const NotificationDetails(
             android: AndroidNotificationDetails('diary', 'Diary')),
+        uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time,
         payload: entry.key,
       );
     }
+  }
+
+  static tz.TZDateTime _nextInstanceOfHour(int hour) {
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduled =
+    tz.TZDateTime(tz.local, now.year, now.month, now.day, hour);
+    if (scheduled.isBefore(now)) {
+      scheduled = scheduled.add(const Duration(days: 1));
+    }
+    return scheduled;
   }
 
   static Future<void> _onNotificationResponse(
