@@ -311,50 +311,62 @@ class _InfluenceAnalyticsScreenState extends State<InfluenceAnalyticsScreen>
       return const Center(child: Text('Нет доступных данных для выбранного периода'));
     }
     final reasons = _reasonCounts.keys.toList()..sort();
-    return Column(
-      children: [
-        Wrap(
-          spacing: 8,
-          children: reasons.map((r) {
-            final selected = _selectedReasons.contains(r);
-            return FilterChip(
-              label: Text(r),
-              selected: selected,
-              onSelected: (v) {
-                setState(() {
-                  if (v) {
-                    if (_selectedReasons.length < 3) _selectedReasons.add(r);
-                  } else {
-                    _selectedReasons.remove(r);
-                  }
-                });
-              },
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: _emotions.map((e) {
-            final selected = _selectedEmotions.contains(e);
-            return FilterChip(
-              label: Text(e),
-              selected: selected,
-              onSelected: (v) {
-                setState(() {
-                  if (v) {
-                    if (_selectedEmotions.length < 3) _selectedEmotions.add(e);
-                  } else {
-                    _selectedEmotions.remove(e);
-                  }
-                });
-              },
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 8),
-        Expanded(child: _buildLineChart()),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              children: [
+                Wrap(
+                  spacing: 8,
+                  children: reasons.map((r) {
+                    final selected = _selectedReasons.contains(r);
+                    return FilterChip(
+                      label: Text(r),
+                      selected: selected,
+                      onSelected: (v) {
+                        setState(() {
+                          if (v) {
+                            if (_selectedReasons.length < 3) _selectedReasons.add(r);
+                          } else {
+                            _selectedReasons.remove(r);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: _emotions.map((e) {
+                    final selected = _selectedEmotions.contains(e);
+                    return FilterChip(
+                      label: Text(e),
+                      selected: selected,
+                      onSelected: (v) {
+                        setState(() {
+                          if (v) {
+                            if (_selectedEmotions.length < 3) _selectedEmotions.add(e);
+                          } else {
+                            _selectedEmotions.remove(e);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: max(constraints.maxHeight - 120, 200),
+                  child: _buildLineChart(),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -386,6 +398,7 @@ class _InfluenceAnalyticsScreenState extends State<InfluenceAnalyticsScreen>
       return const Center(child: Text('Нет доступных данных для выбранного периода'));
     }
     return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       child: DataTable(
         columns: const [
           DataColumn(label: Text('Дата')),
