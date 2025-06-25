@@ -24,6 +24,7 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
   List<EntryData> _entries = [];
   _Period _period = _Period.week;
   Map<String, int> _counts = {};
+  int _touchedIndex = -1;
 
   @override
   void initState() {
@@ -185,17 +186,34 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
     final entries = _counts.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     final total = entries.fold<int>(0, (sum, e) => sum + e.value);
-    const palette = Colors.primaries;
-    final sections = List.generate(entries.length, (i) {
-      final entry = entries[i];
+    const threshold = 0.05;
+    final List<MapEntry<String, int>> displayEntries = [];
+    var otherCount = 0;
+    for (final e in entries) {
+      final perc = total == 0 ? 0 : e.value / total;
+      if (perc < threshold) {
+        otherCount += e.value;
+      } else {
+        displayEntries.add(e);
+      }
+    }
+    if (otherCount > 0) {
+      displayEntries.add(MapEntry('прочие', otherCount));
+    }
+
+    final palette = Colors.primaries;
+    final screenW = MediaQuery.of(context).size.width;
+    final showTitles = screenW > 350;
+    final sections = List.generate(displayEntries.length, (i) {
+      final entry = displayEntries[i];
       final color = palette[i % palette.length];
       final value = entry.value.toDouble();
       final percent = total == 0 ? 0 : (value / total * 100).round();
       return PieChartSectionData(
         value: value,
         color: color,
-        title: percent > 0 ? '$percent%' : '',
-        radius: 60,
+        title: showTitles && percent > 0 ? '$percent%' : '',
+        radius: 80,
         titleStyle: const TextStyle(
           color: Colors.white,
           fontSize: 12,
@@ -208,14 +226,46 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
-          height: 220,
-          child: PieChart(
-            PieChartData(
-              sections: sections,
-              sectionsSpace: 2,
-              centerSpaceRadius: 0,
-              borderData: FlBorderData(show: false),
-            ),
+          height: 280,
+          child: Stack(
+            children: [
+              PieChart(
+                PieChartData(
+                  sections: sections,
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 0,
+                  borderData: FlBorderData(show: false),
+                  pieTouchData: PieTouchData(
+                    touchCallback: (event, response) {
+                      if (!event.isInterestedForInteractions || response == null) {
+                        setState(() => _touchedIndex = -1);
+                        return;
+                      }
+                      setState(() => _touchedIndex =
+                          response.touchedSection!.touchedSectionIndex);
+                    },
+                  ),
+                ),
+              ),
+              if (_touchedIndex >= 0 && _touchedIndex < displayEntries.length)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '${_capitalize(displayEntries[_touchedIndex].key)}: ${displayEntries[_touchedIndex].value}',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
         const SizedBox(height: 12),
@@ -223,8 +273,8 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
           spacing: 8,
           runSpacing: 4,
           alignment: WrapAlignment.center,
-          children: List.generate(entries.length, (i) {
-            final entry = entries[i];
+          children: List.generate(displayEntries.length, (i) {
+            final entry = displayEntries[i];
             final color = palette[i % palette.length];
             return Row(
               mainAxisSize: MainAxisSize.min,
