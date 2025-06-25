@@ -10,6 +10,8 @@ import 'correlations_screen.dart';
 import 'highlights_screen.dart';
 import 'manual_highlights_screen.dart';
 import 'monthly_summary_screen.dart';
+import 'activity_analytics_screen.dart';
+import 'influence_analytics_screen.dart';
 
 class AnalyticsMenuScreen extends StatelessWidget {
   static const routeName = '/analytics';
@@ -59,6 +61,18 @@ class AnalyticsMenuScreen extends StatelessWidget {
               label: 'Эмоции',
               color: Colors.teal,
               onTap: () => Navigator.pushNamed(ctx, EmotionAnalyticsScreen.routeName),
+            ),
+            _Tile(
+              icon: Icons.local_activity,
+              label: 'Активность',
+              color: Colors.orangeAccent,
+              onTap: () => Navigator.pushNamed(ctx, ActivityAnalyticsScreen.routeName),
+            ),
+            _Tile(
+              icon: Icons.tips_and_updates,
+              label: 'Что повлияло',
+              color: Colors.green,
+              onTap: () => Navigator.pushNamed(ctx, InfluenceAnalyticsScreen.routeName),
             ),
             _Tile(
               icon: Icons.auto_awesome,
