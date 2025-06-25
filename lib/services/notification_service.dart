@@ -10,6 +10,7 @@ import '../models/entry_data.dart';
 import '../models/notification_log_item.dart';
 import '../models/notification_settings.dart';
 import 'local_db.dart';
+import 'draft_service.dart';
 
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
@@ -126,6 +127,13 @@ class NotificationService {
 
     final dateStr = _dateStr(sent);
     var entry = await LocalDb.getByDate(dateStr);
+
+    // Try to use draft if it matches today's entry
+    final draft = await DraftService.loadDraft();
+    if (draft != null && draft.date == dateStr) {
+      entry = draft;
+    }
+
     entry ??= EntryData(date: dateStr, time: _timeStr(sent));
     for (final n in entry.notificationsLog) {
       if (n.type == cat && n.sentTime == _timeStr(sent)) {
@@ -137,15 +145,27 @@ class NotificationService {
       type: cat,
       sentTime: _timeStr(sent),
       answerTime: _nowStr(),
-      text: '',
+      text: response.input ?? '',
     ));
-    await LocalDb.saveOrUpdate(entry);
+
+    if (draft != null && draft.date == dateStr) {
+      DraftService.currentDraft = entry;
+      await DraftService.saveDraft();
+    } else {
+      await LocalDb.saveOrUpdate(entry);
+    }
     await _scheduleNext(cat, _questions.keys.toList().indexOf(cat));
   }
 
   static Future<void> _logSent(String cat, tz.TZDateTime when) async {
     final dateStr = _dateStr(when);
     var entry = await LocalDb.getByDate(dateStr);
+
+    final draft = await DraftService.loadDraft();
+    if (draft != null && draft.date == dateStr) {
+      entry = draft;
+    }
+
     entry ??= EntryData(date: dateStr, time: _timeStr(when));
     entry.notificationsLog.add(NotificationLogItem(
       type: cat,
@@ -153,7 +173,12 @@ class NotificationService {
       answerTime: '',
       text: '',
     ));
-    await LocalDb.saveOrUpdate(entry);
+    if (draft != null && draft.date == dateStr) {
+      DraftService.currentDraft = entry;
+      await DraftService.saveDraft();
+    } else {
+      await LocalDb.saveOrUpdate(entry);
+    }
   }
 
   static Future<void> _restorePending() async {
