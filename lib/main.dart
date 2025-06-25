@@ -16,7 +16,6 @@ import 'screens/flow_diary/development_screen.dart';
 import 'screens/flow_diary/emotion_screen.dart';
 import 'screens/flow_diary/focus_screen.dart';
 import 'screens/flow_diary/state_screen.dart';
-import 'screens/flow_diary/activity_screen.dart';
 
 // history_diary - analytics
 import 'screens/history_diary/analytics/analytics_menu_screen.dart';
@@ -124,7 +123,6 @@ class _MyAppState extends State<MyApp> {
       routes: {
         DateTimeScreen.routeName:      (_) => const DateTimeScreen(),
         StateScreen.routeName:         (_) => const StateScreen(),
-        ActivityScreen.routeName:      (_) => const ActivityScreen(),
         EmotionScreen.routeName:       (_) => const EmotionScreen(),
         AchievementsScreen.routeName:  (_) => const AchievementsScreen(),
         DevelopmentScreen.routeName:   (_) => const DevelopmentScreen(),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
 import '../../main.dart';
-import 'activity_screen.dart';
 import 'emotion_screen.dart';
 import '../history_diary/entries_screen.dart';
 
@@ -22,7 +21,16 @@ class _StateScreenState extends State<StateScreen> {
   late TextEditingController wakeCtrl;
   late TextEditingController durationCtrl;
   late TextEditingController stepsCtrl;
-  late TextEditingController activityCtrl;
+  final Map<String, TextEditingController> _activityDurationCtrls = {};
+  final Set<String> _selectedActivities = <String>{};
+  final List<String> _allActivities = [
+    'Ходьба',
+    'Секс',
+    'Тренировка',
+    'Бег',
+    'Растяжка',
+    'Домашние дела',
+  ];
 
   int _energy = 5;
   late String _energyDesc;
@@ -42,6 +50,87 @@ class _StateScreenState extends State<StateScreen> {
 
   bool _init = false;
 
+  void _parseExistingActivities() {
+    final regex = RegExp(r'^\\s*(.*?)\\s+(\\d+.*)\$');
+    for (final part in entry.activity.split(',')) {
+      final item = part.trim();
+      if (item.isEmpty) continue;
+      final match = regex.firstMatch(item);
+      String name;
+      String duration;
+      if (match != null) {
+        name = match.group(1)!.trim();
+        duration = match.group(2)!.trim();
+      } else {
+        name = item;
+        duration = '';
+      }
+      _selectedActivities.add(name);
+      _activityDurationCtrls[name] = TextEditingController(text: duration);
+      if (!_allActivities.contains(name)) _allActivities.add(name);
+    }
+  }
+
+  Future<void> _updateActivityString() async {
+    final parts = <String>[];
+    for (final act in _selectedActivities) {
+      final dur = _activityDurationCtrls[act]?.text.trim() ?? '';
+      if (dur.isNotEmpty) {
+        parts.add('$act $dur');
+      } else {
+        parts.add(act);
+      }
+    }
+    setState(() => entry.activity = parts.join(', '));
+    DraftService.currentDraft = entry;
+    await DraftService.saveDraft();
+  }
+
+  Future<void> _addCustomActivity() async {
+    final nameCtrl = TextEditingController();
+    final durCtrl = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Новая активность'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameCtrl,
+              decoration: const InputDecoration(labelText: 'Название'),
+            ),
+            TextField(
+              controller: durCtrl,
+              decoration: const InputDecoration(labelText: 'Длительность'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Отмена'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final name = nameCtrl.text.trim();
+              if (name.isEmpty) return;
+              setState(() {
+                _allActivities.add(name);
+                _selectedActivities.add(name);
+                _activityDurationCtrls[name] =
+                    TextEditingController(text: durCtrl.text.trim());
+              });
+              _updateActivityString();
+              Navigator.pop(ctx);
+            },
+            child: const Text('Добавить'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -56,8 +145,7 @@ class _StateScreenState extends State<StateScreen> {
           TextEditingController(text: entry.sleepDuration);
       stepsCtrl =
           TextEditingController(text: entry.steps);
-      activityCtrl =
-          TextEditingController(text: entry.activity);
+      _parseExistingActivities();
 
       _energy = int.tryParse(entry.energy) ?? 5;
       _energyDesc = _energyLabels[_energy]!;
@@ -78,13 +166,14 @@ class _StateScreenState extends State<StateScreen> {
     wakeCtrl.dispose();
     durationCtrl.dispose();
     stepsCtrl.dispose();
-    activityCtrl.dispose();
+    for (final c in _activityDurationCtrls.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext ctx) {
-    final appState = MyApp.of(ctx);
 
     return Scaffold(
       appBar: AppBar(
@@ -180,22 +269,71 @@ class _StateScreenState extends State<StateScreen> {
               },
             ),
             const SizedBox(height: 8),
-            TextField(
-              controller: activityCtrl,
-              decoration: InputDecoration(
-                labelText: '🔥 Активность',
-                suffixIcon: Tooltip(
-                  message:
-                      'Пример: тренировка 40 мин, прогулка 30 мин.',
-                  child: const Icon(Icons.info_outline),
-                ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                children: [
+                  Text('🔥 Активность',
+                      style: Theme.of(ctx).textTheme.titleMedium),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    tooltip: 'Добавить свою активность',
+                    onPressed: _addCustomActivity,
+                  ),
+                ],
               ),
-              onChanged: (v) async {
-                entry.activity = v;
-                DraftService.currentDraft = entry;
-                await DraftService.saveDraft();
-              },
             ),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 8,
+              children: _allActivities.map((act) {
+                final selected = _selectedActivities.contains(act);
+                return FilterChip(
+                  label: Text(act),
+                  selected: selected,
+                  onSelected: (v) async {
+                    setState(() {
+                      if (v) {
+                        _selectedActivities.add(act);
+                        _activityDurationCtrls.putIfAbsent(
+                            act, () => TextEditingController());
+                      } else {
+                        _selectedActivities.remove(act);
+                        _activityDurationCtrls.remove(act)?.dispose();
+                      }
+                    });
+                    await _updateActivityString();
+                  },
+                );
+              }).toList(),
+            ),
+            if (_selectedActivities.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Column(
+                children: _selectedActivities.map((act) {
+                  final ctrl = _activityDurationCtrls
+                      .putIfAbsent(act, () => TextEditingController());
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(act)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 2,
+                          child: TextField(
+                            controller: ctrl,
+                            decoration:
+                            const InputDecoration(hintText: 'Длительность'),
+                            onChanged: (_) => _updateActivityString(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
             const SizedBox(height: 16),
             Text('⚡️ Энергия: $_energy',
                 style: Theme.of(ctx).textTheme.titleMedium),
@@ -229,13 +367,14 @@ class _StateScreenState extends State<StateScreen> {
                   onPressed: () async {
                     DraftService.currentDraft = entry;
                     await DraftService.saveDraft();
+                    await _updateActivityString();
                     Navigator.pushNamed(
                       ctx,
-                      ActivityScreen.routeName,
+                      EmotionScreen.routeName,
                       arguments: entry,
                     );
                   },
-                  child: const Text('→ Далее: Активность'),
+                  child: const Text('→ Далее: Настроение'),
                 ),
               ],
             ),
