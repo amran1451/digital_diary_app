@@ -9,12 +9,12 @@ class MyScreen extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
-      appBar: AppBar(title: Text('Заголовок', style: theme.textTheme.headline6)),
+      appBar: AppBar(title: Text('Заголовок', style: theme.textTheme.titleLarge)),
       body: Center(
         child: ElevatedButton(
           style: theme.elevatedButtonTheme.style,
           onPressed: () {},
-          child: Text('Кнопка', style: theme.textTheme.button),
+          child: Text('Кнопка', style: theme.textTheme.labelLarge),
         ),
       ),
     );

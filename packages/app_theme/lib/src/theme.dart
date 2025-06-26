@@ -6,17 +6,17 @@ class AppTheme {
 
   static const _baseTextStyle = TextStyle(fontFamily: 'NotoSans');
 
-  static TextTheme get _textTheme => const TextTheme(
-    headline1: _baseTextStyle.copyWith(fontSize: 32, fontWeight: FontWeight.bold),
-    headline2: _baseTextStyle.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
-    headline3: _baseTextStyle.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
-    headline4: _baseTextStyle.copyWith(fontSize: 20, fontWeight: FontWeight.w600),
-    headline5: _baseTextStyle.copyWith(fontSize: 18, fontWeight: FontWeight.w600),
-    headline6: _baseTextStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
-    bodyText1: _baseTextStyle.copyWith(fontSize: 14),
-    bodyText2: _baseTextStyle.copyWith(fontSize: 12),
-    button: _baseTextStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w600),
-    caption: _baseTextStyle.copyWith(fontSize: 12, color: Colors.grey),
+  static final TextTheme _textTheme = TextTheme(
+    displayLarge: _baseTextStyle.copyWith(fontSize: 32, fontWeight: FontWeight.bold),
+    displayMedium: _baseTextStyle.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
+    displaySmall: _baseTextStyle.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
+    headlineMedium: _baseTextStyle.copyWith(fontSize: 20, fontWeight: FontWeight.w600),
+    headlineSmall: _baseTextStyle.copyWith(fontSize: 18, fontWeight: FontWeight.w600),
+    titleLarge: _baseTextStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+    bodyLarge: _baseTextStyle.copyWith(fontSize: 14),
+    bodyMedium: _baseTextStyle.copyWith(fontSize: 12),
+    labelLarge: _baseTextStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w600),
+    labelSmall: _baseTextStyle.copyWith(fontSize: 12, color: Colors.grey),
   );
 
   static final ColorScheme _lightColors = const ColorScheme.light(
@@ -44,23 +44,23 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        textStyle: _textTheme.button,
+        textStyle: _textTheme.labelLarge,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(textStyle: _textTheme.button),
+      style: TextButton.styleFrom(textStyle: _textTheme.labelLarge),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        textStyle: _textTheme.button,
+        textStyle: _textTheme.labelLarge,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 2,
     ),
@@ -78,23 +78,23 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        textStyle: _textTheme.button,
+        textStyle: _textTheme.labelLarge,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(textStyle: _textTheme.button),
+      style: TextButton.styleFrom(textStyle: _textTheme.labelLarge),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        textStyle: _textTheme.button,
+        textStyle: _textTheme.labelLarge,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 2,
     ),
