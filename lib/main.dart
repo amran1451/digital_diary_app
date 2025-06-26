@@ -3,6 +3,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';  // ← анонимная аутентификация
 import 'package:flutter/material.dart';
+import 'package:app_theme/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/finance_tracker_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -58,6 +59,7 @@ import 'package:nutrition_tracker/providers/product_provider.dart';
 import 'package:nutrition_tracker/app.dart';
 
 import 'screens/planner_app_screen.dart';
+import 'screens/theme_example_screen.dart';
 import 'screens/notification_settings_screen.dart';
 import 'services/permission_service.dart';
 import 'services/notification_service.dart';
@@ -124,8 +126,8 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Дневник',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       initialRoute: HomeMenuScreen.routeName,
       routes: {
@@ -156,6 +158,7 @@ class _MyAppState extends State<MyApp> {
         NotificationSettingsScreen.routeName: (_) => const NotificationSettingsScreen(),
         WorkoutAppScreen.routeName: (_) => const WorkoutAppScreen(),
         FinanceTrackerScreen.routeName: (_) => const FinanceTrackerScreen(),
+        MyScreen.routeName: (_) => const MyScreen(),
         NutritionScreen.routeName: (_) => MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (_) => ThemeProvider(false)),
