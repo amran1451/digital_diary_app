@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:finance_tracker/models/transaction.dart';
 import 'package:finance_tracker/models/limit.dart';
 import 'package:finance_tracker/main.dart' as finance_app;
+import 'package:finance_tracker/theme_notifier.dart';
 
 class FinanceTrackerScreen extends StatefulWidget {
   static const routeName = '/expenses';  // ← ключ для Navigator.pushNamed
@@ -13,13 +14,14 @@ class FinanceTrackerScreen extends StatefulWidget {
 }
 
 class _FinanceTrackerScreenState extends State<FinanceTrackerScreen> {
-  late Future<void> _initFuture;
-  final ValueNotifier<ThemeMode> _themeNotifier =
+  late final ThemeNotifier _themeNotifier;
+
   ValueNotifier(ThemeMode.system);
 
   @override
   void initState() {
     super.initState();
+    _themeNotifier = ThemeNotifier();
     _initFuture = _initializeFinance();
   }
 
