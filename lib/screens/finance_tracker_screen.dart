@@ -14,6 +14,8 @@ class FinanceTrackerScreen extends StatefulWidget {
 
 class _FinanceTrackerScreenState extends State<FinanceTrackerScreen> {
   late Future<void> _initFuture;
+  final ValueNotifier<ThemeMode> _themeNotifier =
+  ValueNotifier(ThemeMode.system);
 
   @override
   void initState() {
@@ -39,8 +41,16 @@ class _FinanceTrackerScreenState extends State<FinanceTrackerScreen> {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        return const finance_app.MyApp();  // корень finance_tracker
+        return finance_app.MyApp(
+          themeNotifier: _themeNotifier,
+        ); // корень finance_tracker // корень finance_tracker
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _themeNotifier.dispose();
+    super.dispose();
   }
 }
