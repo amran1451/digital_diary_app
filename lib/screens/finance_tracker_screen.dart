@@ -16,7 +16,9 @@ class FinanceTrackerScreen extends StatefulWidget {
 class _FinanceTrackerScreenState extends State<FinanceTrackerScreen> {
   late final ThemeNotifier _themeNotifier;
 
-  ValueNotifier(ThemeMode.system);
+  late Future<void> _initFuture;
+
+  final ValueNotifier<ThemeMode> _themeMode = ValueNotifier(ThemeMode.system);
 
   @override
   void initState() {
