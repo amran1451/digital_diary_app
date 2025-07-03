@@ -50,6 +50,8 @@ class PdfService {
                 ),
                 pw.SizedBox(height: 4),
                 pw.Text('Создано: ${e.createdAtFormatted}', style: pw.TextStyle(fontSize: 12)),
+                if (e.place.isNotEmpty)
+                  pw.Text('Место: ${e.place}', style: pw.TextStyle(fontSize: 12)),
                 pw.Divider(),
 
                 pw.Text('Оценка дня: ${e.rating} — ${e.ratingReason}'),

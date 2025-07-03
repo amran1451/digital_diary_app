@@ -5,6 +5,7 @@ class TextExportService {
     final buffer = StringBuffer('''
 📖 ДНЕВНИК | за ${e.date}
 ⏰ Создано: ${e.createdAtFormatted}
+📍 Место: ${e.place}
 📊 Оценка: ${e.rating} – ${e.ratingReason}
 
 😴 Сон: ${e.bedTime} → ${e.wakeTime} (${e.sleepDuration})

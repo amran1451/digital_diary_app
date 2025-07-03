@@ -108,6 +108,8 @@ class PreviewScreen extends StatelessWidget {
                     '🕗 Создано: ${entry.createdAtFormatted}',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
+                  if (entry.place.isNotEmpty)
+                    Text('📍 Место: ${entry.place}'),
                   const Divider(),
                   ..._buildDetailLines(entry),
                 ],

@@ -63,6 +63,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     final buffer = StringBuffer()
       ..writeln('📅 Дата записи: ${entry.date}')
       ..writeln('📝 Создано: ${entry.createdAtFormatted}')
+      ..writeln('📍 Место: ${entry.place}')
       ..writeln()
       ..writeln('📊 Оценка дня: ${entry.rating} – ${entry.ratingReason}')
       ..writeln()
@@ -136,6 +137,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               '📝 Создано: ${entry.createdAtFormatted}',
               style: Theme.of(ctx).textTheme.bodySmall,
             ),
+            if (entry.place.isNotEmpty)
+              Text('📍 Место: ${entry.place}'),
             const Divider(),
             Text('📊 Оценка дня: ${entry.rating} – ${entry.ratingReason}'),
             const SizedBox(height: 8),

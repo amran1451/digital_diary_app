@@ -9,13 +9,14 @@ class LocalDb {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       join(dbPath, 'diary.db'),
-      version: 6,
+      version: 7,
       onCreate: (db, v) async {
         await db.execute('''
           CREATE TABLE entries(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT,
             time TEXT,
+            place TEXT,
             createdAt TEXT,
             rating TEXT,
             ratingReason TEXT,
@@ -66,6 +67,9 @@ class LocalDb {
         }
         if (oldVersion < 6) {
           await db.execute('ALTER TABLE entries ADD COLUMN wellBeing TEXT');
+        }
+        if (oldVersion < 7) {
+          await db.execute('ALTER TABLE entries ADD COLUMN place TEXT');
         }
       },
     );
@@ -128,7 +132,7 @@ class LocalDb {
     if (search != null && search.trim().isNotEmpty) {
       final pat = '%${search.trim()}%';
       const cols = [
-        'date','time','rating','ratingReason','bedTime','wakeTime','sleepDuration',
+        'date','time','place','rating','ratingReason','bedTime','wakeTime','sleepDuration',
         'steps','activity','energy','mood','mainEmotions','influence','important',
         'wellBeing','tasks','notDone','thought','development','qualities','growthImprove',
         'pleasant','tomorrowImprove','stepGoal','flow'

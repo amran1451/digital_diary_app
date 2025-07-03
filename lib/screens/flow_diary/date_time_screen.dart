@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
 import '../../services/local_db.dart';
+import '../../services/place_history_service.dart';
 import '../../main.dart';
 import 'state_screen.dart';
 import '../history_diary/entries_screen.dart';
@@ -21,8 +22,10 @@ class DateTimeScreen extends StatefulWidget {
 class _DateTimeScreenState extends State<DateTimeScreen> {
   EntryData? entry;
   late TextEditingController reasonCtrl;
+  late TextEditingController placeCtrl;
   int _rating = 5;
   late String _ratingDesc;
+  List<String> _placeHistory = [];
 
   static const _ratingLabels = <int, String>{
     0: 'Худший день. Всё было плохо, максимум стресса.',
@@ -42,6 +45,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   void initState() {
     super.initState();
     reasonCtrl = TextEditingController();
+    placeCtrl = TextEditingController();
     _ratingDesc = _ratingLabels[_rating]!;
 
     // Откладываем вызов _initEntry на первый кадр, чтобы контекст был готов.
@@ -51,6 +55,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   }
 
   Future<void> _initEntry() async {
+    _placeHistory = await PlaceHistoryService.loadHistory();
     final draft = await DraftService.loadDraft();
     if (draft != null) {
       // Проверяем, заполнил ли пользователь что-то кроме даты/времени
@@ -122,6 +127,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     _rating = int.tryParse(entry!.rating) ?? 5;
     _ratingDesc = _ratingLabels[_rating]!;
     reasonCtrl.text = entry!.ratingReason;
+    placeCtrl.text = entry!.place;
 
     DraftService.currentDraft = entry!;
     await DraftService.saveDraft();
@@ -157,6 +163,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     final e = EntryData(
       date: dateStr,
       time: timeStr,
+      place: '',
       createdAt: createdAt,
     );
     e.rating = '$_rating'; // дефолтная оценка
@@ -166,6 +173,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   @override
   void dispose() {
     reasonCtrl.dispose();
+    placeCtrl.dispose();
     super.dispose();
   }
 
@@ -262,6 +270,46 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               ),
               Text('Время: ${entry!.time}'),
             ]),
+            const SizedBox(height: 8),
+            Autocomplete<String>(
+              initialValue: TextEditingValue(text: placeCtrl.text),
+              optionsBuilder: (text) {
+                if (text.text.isEmpty) return _placeHistory;
+                return _placeHistory.where((p) =>
+                    p.toLowerCase().contains(text.text.toLowerCase()));
+              },
+              onSelected: (selection) async {
+                placeCtrl.text = selection;
+                entry!.place = selection;
+                DraftService.currentDraft = entry!;
+                await DraftService.saveDraft();
+                await PlaceHistoryService.addPlace(selection);
+                _placeHistory = await PlaceHistoryService.loadHistory();
+              },
+              fieldViewBuilder:
+                  (context, controller, focusNode, onFieldSubmitted) {
+                placeCtrl = controller;
+                return TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  decoration: const InputDecoration(
+                    prefixText: '📍 ',
+                    hintText: 'Город или локация',
+                    isDense: true,
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (v) async {
+                    entry!.place = v;
+                    DraftService.currentDraft = entry!;
+                    await DraftService.saveDraft();
+                    if (v.trim().isNotEmpty) {
+                      await PlaceHistoryService.addPlace(v.trim());
+                      _placeHistory = await PlaceHistoryService.loadHistory();
+                    }
+                  },
+                );
+              },
+            ),
             const SizedBox(height: 24),
             Text(
               '📊 Оценка дня: $_rating',

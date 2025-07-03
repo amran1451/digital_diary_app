@@ -10,6 +10,8 @@ class EntryData {
 
   String date;
   String time;
+  /// Место, где была сделана запись
+  String place;
   final DateTime createdAt;
 
   String rating;
@@ -49,6 +51,7 @@ class EntryData {
     this.localId,
     required this.date,
     required this.time,
+    this.place = '',
     DateTime? createdAt,
     this.rating = '',
     this.ratingReason = '',
@@ -83,6 +86,7 @@ class EntryData {
   Map<String, dynamic> toMap() => {
         'date': date,
         'time': time,
+        'place': place,
         'createdAt': createdAt.toIso8601String(),
         'rating': rating,
         'ratingReason': ratingReason,
@@ -144,6 +148,7 @@ class EntryData {
       localId: m['id'] as int?,
       date: m['date'] ?? '',
       time: m['time'] ?? '',
+      place: m['place'] ?? '',
       createdAt: createdAt,
       raw: m['raw'] ?? '',
       rating: m['rating'] ?? '',

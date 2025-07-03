@@ -8,6 +8,7 @@ class CsvService {
   static const headers = [
     'date',
     'time',
+    'place',
     'createdAt',
     'rating',
     'ratingReason',
@@ -43,6 +44,7 @@ class CsvService {
       rows.add([
         e.date,
         e.time,
+        e.place,
         e.createdAt.toIso8601String(),
         e.rating,
         e.ratingReason,
@@ -98,6 +100,7 @@ class CsvService {
       entries.add(EntryData(
         date: m['date']?.toString() ?? '',
         time: m['time']?.toString() ?? '',
+        place: m['place']?.toString() ?? '',
         createdAt: DateTime.tryParse(m['createdAt']?.toString() ?? '')
             ?.toLocal() ??
             DateTime.now(),
