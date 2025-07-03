@@ -4,6 +4,8 @@ import '../../services/draft_service.dart';
 import '../../main.dart';
 import 'development_screen.dart';
 import '../history_diary/entries_screen.dart';
+import '../../services/quick_note_service.dart';
+import '../../utils/draft_note_helper.dart';
 
 enum _DateMenu { entries, toggleTheme }
 
@@ -22,6 +24,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   late TextEditingController notDoneCtrl;
   late TextEditingController thoughtCtrl;
   bool _initialized = false;
+  Map<String, String> _notes = {};
 
   @override
   void didChangeDependencies() {
@@ -40,6 +43,9 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
 
       DraftService.currentDraft = entry;
       DraftService.saveDraft();
+      QuickNoteService.getNotesForDate(entry.date).then((n) {
+        setState(() => _notes = n);
+      });
 
       _initialized = true;
     }
@@ -52,6 +58,23 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
     notDoneCtrl.dispose();
     thoughtCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _editNote(String field) async {
+    final res = await DraftNoteHelper.editNote(
+        context, entry.date, field, _notes[field] ?? '');
+    if (res != null) setState(() => _notes[field] = res);
+  }
+
+  Future<void> _applyNote(String field, TextEditingController ctrl) async {
+    final note = _notes[field];
+    if (note == null || note.isEmpty) return;
+    final text = ctrl.text.trim();
+    ctrl.text = text.isEmpty ? note : '$text\n$note';
+    await QuickNoteService.deleteNote(entry.date, field);
+    setState(() => _notes.remove(field));
+    DraftService.currentDraft = entry;
+    await DraftService.saveDraft();
   }
 
   @override
@@ -162,10 +185,18 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
               controller: thoughtCtrl,
               decoration: InputDecoration(
                 labelText: '💡 Мысль дня',
-                suffixIcon: Tooltip(
-                  message:
-                      'Краткая фраза — главный вывод.',
-                  child: const Icon(Icons.info_outline),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Tooltip(
+                      message: 'Краткая фраза — главный вывод.',
+                      child: const Icon(Icons.info_outline),
+                    ),
+                    IconButton(
+                      icon: const Text('🗒'),
+                      onPressed: () => _editNote('thought'),
+                    ),
+                  ],
                 ),
               ),
               onChanged: (v) async {
@@ -173,6 +204,10 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 DraftService.currentDraft = entry;
                 await DraftService.saveDraft();
               },
+            ),
+            DraftNoteHelper.buildBanner(
+              note: _notes['thought'],
+              onApply: () => _applyNote('thought', thoughtCtrl),
             ),
             const Spacer(),
             Row(

@@ -5,6 +5,7 @@ import '../../models/entry_data.dart';
 import '../../services/local_db.dart';
 import '../../services/telegram_service.dart';
 import '../../services/draft_service.dart';
+import '../../services/quick_note_service.dart';
 import '../../main.dart';
 import '../flow_diary/date_time_screen.dart';
 import '../history_diary/entries_screen.dart';
@@ -43,6 +44,7 @@ class PreviewScreen extends StatelessWidget {
 
     // 5) Очистить черновик
     await DraftService.clearDraft();
+    await QuickNoteService.clearForDate(e.date);
   }
 
   @override
