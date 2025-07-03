@@ -9,6 +9,9 @@ import '../models/entry_data.dart';
 class PdfService {
   /// Каждая запись — на своей странице, шрифт кириллицы + эмоджи.
   static Future<Uint8List> generatePdf(List<EntryData> entries) async {
+    // Сортируем записи по дате создания от ранних к поздним
+    final sortedEntries = entries.toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     // Шрифты из assets/fonts/
     final fontRegular = pw.Font.ttf(
       await rootBundle.load('assets/fonts/NotoSans-Regular.ttf'),
@@ -32,7 +35,7 @@ class PdfService {
       ),
     );
 
-    for (final e in entries) {
+    for (final e in sortedEntries) {
       pdf.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4,
