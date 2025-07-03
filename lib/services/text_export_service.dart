@@ -11,6 +11,7 @@ class TextExportService {
 🚶 Шаги: ${e.steps}
 🔥 Активность: ${e.activity}
 ⚡️ Энергия: ${e.energy}
+🤒 Самочувствие: ${e.wellBeing == 'OK' || e.wellBeing.isEmpty ? 'Всё хорошо' : e.wellBeing}
 
 😊 Настроение: ${e.mood}
 🎭 Эмоции: ${e.mainEmotions}

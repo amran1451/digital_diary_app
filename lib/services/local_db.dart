@@ -9,7 +9,7 @@ class LocalDb {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       join(dbPath, 'diary.db'),
-      version: 5,
+      version: 6,
       onCreate: (db, v) async {
         await db.execute('''
           CREATE TABLE entries(
@@ -25,6 +25,7 @@ class LocalDb {
             steps TEXT,
             activity TEXT,
             energy TEXT,
+            wellBeing TEXT,
             mood TEXT,
             mainEmotions TEXT,
             influence TEXT,
@@ -62,6 +63,9 @@ class LocalDb {
         }
         if (oldVersion < 5) {
           await db.execute('ALTER TABLE entries ADD COLUMN notificationsLog TEXT');
+        }
+        if (oldVersion < 6) {
+          await db.execute('ALTER TABLE entries ADD COLUMN wellBeing TEXT');
         }
       },
     );
@@ -126,7 +130,7 @@ class LocalDb {
       const cols = [
         'date','time','rating','ratingReason','bedTime','wakeTime','sleepDuration',
         'steps','activity','energy','mood','mainEmotions','influence','important',
-        'tasks','notDone','thought','development','qualities','growthImprove',
+        'wellBeing','tasks','notDone','thought','development','qualities','growthImprove',
         'pleasant','tomorrowImprove','stepGoal','flow'
       ];
       final clause = cols.map((c) => '$c LIKE ?').join(' OR ');

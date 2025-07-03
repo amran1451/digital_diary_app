@@ -135,6 +135,7 @@ class _ImportScreenState extends State<ImportScreen> {
           'rating': '', 'ratingReason': '',
           'bedTime': '', 'wakeTime': '', 'sleepDuration': '',
           'steps': '', 'activity': '', 'energy': '',
+          'wellBeing': '',
           'mood': '', 'mainEmotions': '', 'influence': '',
           'important': '', 'tasks': '', 'notDone': '',
           'thought': '', 'development': '', 'qualities': '',
@@ -186,6 +187,11 @@ class _ImportScreenState extends State<ImportScreen> {
 
       if (line.startsWith('🔥 Активность:')) {
         current['activity'] = line.substring(14).trim();
+        continue;
+      }
+
+      if (line.startsWith('🤒 Самочувствие:')) {
+        current['wellBeing'] = line.substring(line.indexOf(':') + 1).trim();
         continue;
       }
 
@@ -446,6 +452,7 @@ class _ImportScreenState extends State<ImportScreen> {
           'rating': '', 'ratingReason': '',
           'bedTime': '', 'wakeTime': '', 'sleepDuration': '',
           'steps': '', 'activity': '', 'energy': '',
+          'wellBeing': '',
           'mood': '', 'mainEmotions': '', 'influence': '',
           'important': '', 'tasks': '', 'notDone': '',
           'thought': '', 'development': '', 'qualities': '',
@@ -502,6 +509,10 @@ class _ImportScreenState extends State<ImportScreen> {
         final val = line.substring(line.indexOf(':') + 1).trim();
         current['energy'] =
             ParseUtils.parseDouble(val).toInt().toString();
+        continue;
+      }
+      if (line.startsWith('🤒 Самочувствие:')) {
+        current['wellBeing'] = line.substring(line.indexOf(':') + 1).trim();
         continue;
       }
       if (line.startsWith('😊 Настроение:')) {
@@ -591,6 +602,7 @@ class _ImportScreenState extends State<ImportScreen> {
     steps: m['steps'] as String,
     activity: m['activity'] as String,
     energy: m['energy'] as String,
+    wellBeing: m['wellBeing'] as String? ?? '',
     mood: m['mood'] as String,
     mainEmotions: m['mainEmotions'] as String,
     influence: m['influence'] as String,

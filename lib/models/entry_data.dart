@@ -20,6 +20,7 @@ class EntryData {
   String steps;
   String activity;
   String energy;
+  String wellBeing;
   String mood;
   String mainEmotions;
   String influence;
@@ -57,6 +58,7 @@ class EntryData {
     this.steps = '',
     this.activity = '',
     this.energy = '',
+    this.wellBeing = '',
     this.mood = '',
     this.mainEmotions = '',
     this.influence = '',
@@ -90,6 +92,7 @@ class EntryData {
         'steps': steps,
         'activity': activity,
         'energy': energy,
+        'wellBeing': wellBeing,
         'mood': mood,
         'mainEmotions': mainEmotions,
         'influence': influence,
@@ -151,6 +154,7 @@ class EntryData {
       steps: m['steps'] ?? '',
       activity: m['activity'] ?? '',
       energy: m['energy'] ?? '',
+      wellBeing: m['wellBeing'] ?? '',
       mood: m['mood'] ?? '',
       mainEmotions: m['mainEmotions'] ?? '',
       influence: m['influence'] ?? '',

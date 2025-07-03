@@ -58,6 +58,7 @@ class PdfService {
                 pw.Text('Шаги: ${e.steps}'),
                 pw.Text('Активность: ${e.activity}'),
                 pw.Text('Энергия: ${e.energy}'),
+                pw.Text('Самочувствие: ${e.wellBeing == 'OK' || e.wellBeing.isEmpty ? 'Всё хорошо' : e.wellBeing}'),
                 pw.Divider(),
 
                 pw.Text('Настроение и эмоции',

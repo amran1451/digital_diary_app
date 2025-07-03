@@ -17,6 +17,7 @@ class CsvService {
     'steps',
     'activity',
     'energy',
+    'wellBeing',
     'mood',
     'mainEmotions',
     'influence',
@@ -51,6 +52,7 @@ class CsvService {
         e.steps,
         e.activity,
         e.energy,
+        e.wellBeing,
         e.mood,
         e.mainEmotions,
         e.influence,
@@ -110,6 +112,7 @@ class CsvService {
             .parseDouble(m['energy']?.toString() ?? '')
             .toInt()
             .toString(),
+        wellBeing: m['wellBeing']?.toString() ?? '',
         mood: m['mood']?.toString() ?? '',
         mainEmotions: m['mainEmotions']?.toString() ?? '',
         influence: m['influence']?.toString() ?? '',

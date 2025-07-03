@@ -49,6 +49,8 @@ class _StateScreenState extends State<StateScreen> {
   };
 
   bool _init = false;
+  bool _allGood = true;
+  late TextEditingController wellCtrl;
 
   void _parseExistingActivities() {
     final regex = RegExp(r'^\\s*(.*?)\\s+(\\d+.*)\$');
@@ -145,6 +147,10 @@ class _StateScreenState extends State<StateScreen> {
           TextEditingController(text: entry.sleepDuration);
       stepsCtrl =
           TextEditingController(text: entry.steps);
+      wellCtrl = TextEditingController(
+        text: entry.wellBeing == 'OK' ? '' : entry.wellBeing,
+      );
+      _allGood = entry.wellBeing.isEmpty || entry.wellBeing == 'OK';
       _parseExistingActivities();
 
       _energy = int.tryParse(entry.energy) ?? 5;
@@ -166,6 +172,7 @@ class _StateScreenState extends State<StateScreen> {
     wakeCtrl.dispose();
     durationCtrl.dispose();
     stepsCtrl.dispose();
+    wellCtrl.dispose();
     for (final c in _activityDurationCtrls.values) {
       c.dispose();
     }
@@ -356,7 +363,41 @@ class _StateScreenState extends State<StateScreen> {
             Text(_energyDesc,
                 style: Theme.of(ctx).textTheme.bodyMedium,
                 textAlign: TextAlign.center),
-                const SizedBox(height: 16),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text('🤒 Самочувствие',
+                    style: Theme.of(ctx).textTheme.titleMedium),
+              ),
+              SwitchListTile(
+                title: const Text('Всё хорошо'),
+                value: _allGood,
+                onChanged: (v) async {
+                  setState(() => _allGood = v);
+                  entry.wellBeing = v ? 'OK' : wellCtrl.text;
+                  DraftService.currentDraft = entry;
+                  await DraftService.saveDraft();
+                },
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 200),
+                child: _allGood
+                    ? const SizedBox.shrink()
+                    : TextField(
+                  controller: wellCtrl,
+                  minLines: 2,
+                  maxLines: null,
+                  decoration: const InputDecoration(
+                    hintText: 'Опишите, что беспокоит',
+                  ),
+                  onChanged: (v) async {
+                    entry.wellBeing = v;
+                    DraftService.currentDraft = entry;
+                    await DraftService.saveDraft();
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

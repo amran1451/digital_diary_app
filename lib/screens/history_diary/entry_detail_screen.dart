@@ -73,6 +73,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       ..writeln('🚶 Шаги: ${entry.steps}')
       ..writeln('🔥 Активность: ${entry.activity}')
       ..writeln('⚡️ Энергия: ${entry.energy}')
+      ..writeln('🤒 Самочувствие: ${entry.wellBeing == 'OK' || entry.wellBeing.isEmpty ? 'Всё хорошо' : entry.wellBeing}')
       ..writeln()
       ..writeln('😊 Настроение: ${entry.mood}')
       ..writeln('🎭 Главные эмоции: ${entry.mainEmotions}')
@@ -145,6 +146,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             Text('🚶 Шаги: ${entry.steps}'),
             Text('🔥 Активность: ${entry.activity}'),
             Text('⚡️ Энергия: ${entry.energy}'),
+            Text('🤒 Самочувствие: ${entry.wellBeing == 'OK' || entry.wellBeing.isEmpty ? 'Всё хорошо' : entry.wellBeing}'),
             const Divider(),
             Text('😊 Настроение: ${entry.mood}'),
             Text('🎭 Главные эмоции: ${entry.mainEmotions}'),
