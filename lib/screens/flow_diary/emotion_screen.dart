@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
+import '../../services/quick_note_service.dart';
+import '../../utils/draft_note_helper.dart';
 import '../../main.dart';
 import 'achievements_screen.dart';
 import '../history_diary/entries_screen.dart';
@@ -21,6 +23,7 @@ class _EmotionScreenState extends State<EmotionScreen> {
   final Map<String, TextEditingController> _influenceCtrls = {};
   final Set<String> _selectedEmotions = <String>{};
   int? _expandedCategoryIndex;
+  Map<String, List<QuickNote>> _notes = {};
 
   static const Map<String, List<String>> _emotionCategories = {
     '😄 Радость': [
@@ -177,6 +180,9 @@ class _EmotionScreenState extends State<EmotionScreen> {
 
       DraftService.currentDraft = entry;
       DraftService.saveDraft();
+      QuickNoteService.getNotesForDate(entry.date).then((n) {
+        setState(() => _notes = n);
+      });
 
       _inited = true;
     }
@@ -189,6 +195,30 @@ class _EmotionScreenState extends State<EmotionScreen> {
       c.dispose();
     }
     super.dispose();
+  }
+
+  Future<void> _addNote() async {
+    final note = await DraftNoteHelper.addNote(context, entry.date, 'influence');
+    if (note != null) {
+      setState(() => _notes.putIfAbsent('influence', () => []).add(note));
+    }
+  }
+
+  Future<void> _applyNote(int index) async {
+    final list = _notes['influence'];
+    if (list == null || index >= list.length) return;
+    final note = list[index];
+    final text = entry.influence.trim();
+    entry.influence = text.isEmpty ? note.text : '$text\n${note.text}';
+    await QuickNoteService.deleteNote(entry.date, 'influence', index);
+    setState(() => _notes['influence']?.removeAt(index));
+    DraftService.currentDraft = entry;
+    await DraftService.saveDraft();
+  }
+
+  Future<void> _deleteNote(int index) async {
+    await QuickNoteService.deleteNote(entry.date, 'influence', index);
+    setState(() => _notes['influence']?.removeAt(index));
   }
 
   Future<void> _updateInfluenceString({bool save = true}) async {
@@ -263,10 +293,19 @@ class _EmotionScreenState extends State<EmotionScreen> {
                 controller: moodCtrl,
                 decoration: InputDecoration(
                   labelText: '😊 Общее настроение',
-                    suffixIcon: Tooltip(
-                      message:
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Tooltip(
+                        message:
                         'Одним словом, например: "спокойный день".',
-                      child: const Icon(Icons.info_outline),
+                        child: const Icon(Icons.info_outline),
+                      ),
+                      IconButton(
+                        icon: const Text('🗒'),
+                        onPressed: _addNote,
+                      ),
+                    ],
                     ),
                 ),
                 onChanged: (v) async {
@@ -274,6 +313,11 @@ class _EmotionScreenState extends State<EmotionScreen> {
                   DraftService.currentDraft = entry;
                   await DraftService.saveDraft();
                 },
+              ),
+              DraftNoteHelper.buildNotesList(
+                notes: _notes['influence'] ?? [],
+                onApply: _applyNote,
+                onDelete: _deleteNote,
               ),
               const SizedBox(height: 8),
               Align(

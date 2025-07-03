@@ -134,10 +134,18 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
               controller: importantCtrl,
               decoration: InputDecoration(
                 labelText: '✅ Что сделал важного?',
-                suffixIcon: Tooltip(
-                  message:
-                      'Один‑два пункта ценных дел.',
-                  child: const Icon(Icons.info_outline),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Tooltip(
+                      message: 'Один‑два пункта ценных дел.',
+                      child: const Icon(Icons.info_outline),
+                    ),
+                    IconButton(
+                      icon: const Text('🗒'),
+                      onPressed: () => _addNote('important'),
+                    ),
+                  ],
                 ),
               ),
               onChanged: (v) async {
@@ -146,15 +154,28 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 await DraftService.saveDraft();
               },
             ),
+            DraftNoteHelper.buildNotesList(
+              notes: _notes['important'] ?? [],
+              onApply: (i) => _applyNote('important', importantCtrl, i),
+              onDelete: (i) => _deleteNote('important', i),
+            ),
             const SizedBox(height: 8),
             TextField(
               controller: tasksCtrl,
               decoration: InputDecoration(
                 labelText: '📌 Задачи',
-                suffixIcon: Tooltip(
-                  message:
-                      'Что из планов сделано?',
-                  child: const Icon(Icons.info_outline),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Tooltip(
+                      message: 'Что из планов сделано?',
+                      child: const Icon(Icons.info_outline),
+                    ),
+                    IconButton(
+                      icon: const Text('🗒'),
+                      onPressed: () => _addNote('tasks'),
+                    ),
+                  ],
                 ),
               ),
               onChanged: (v) async {
@@ -162,6 +183,11 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 DraftService.currentDraft = entry;
                 await DraftService.saveDraft();
               },
+            ),
+            DraftNoteHelper.buildNotesList(
+              notes: _notes['tasks'] ?? [],
+              onApply: (i) => _applyNote('tasks', tasksCtrl, i),
+              onDelete: (i) => _deleteNote('tasks', i),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -205,9 +231,10 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 await DraftService.saveDraft();
               },
             ),
-            DraftNoteHelper.buildBanner(
-              note: _notes['thought'],
-              onApply: () => _applyNote('thought', thoughtCtrl),
+            DraftNoteHelper.buildNotesList(
+              notes: _notes['thought'] ?? [],
+              onApply: (i) => _applyNote('thought', thoughtCtrl, i),
+              onDelete: (i) => _deleteNote('thought', i),
             ),
             const Spacer(),
             Row(

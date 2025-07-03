@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import '../services/quick_note_service.dart';
 
 class DraftNoteHelper {
-  static Future<String?> editNote(
-      BuildContext context, String date, String field, String initial) async {
-    final ctrl = TextEditingController(text: initial);
+  static Future<QuickNote?> addNote(
+      BuildContext context, String date, String field) async {
+    final ctrl = TextEditingController();
     final result = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -26,26 +26,42 @@ class DraftNoteHelper {
         ],
       ),
     );
-    if (result != null) {
-      await QuickNoteService.saveNote(date, field, result);
-      return result;
+    if (result != null && result.trim().isNotEmpty) {
+      return await QuickNoteService.addNote(date, field, result.trim());
     }
     return null;
   }
 
-  static Widget buildBanner(
-      {required String? note,
-        required VoidCallback onApply,
-        EdgeInsetsGeometry? padding}) {
-    if (note == null || note.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: padding ?? const EdgeInsets.only(top: 4, bottom: 4),
-      child: Row(
-        children: [
-          Expanded(child: Text(note)),
-          TextButton(onPressed: onApply, child: const Text('Перенести')),
-        ],
-      ),
+  static Widget buildNotesList({
+    required List<QuickNote> notes,
+    required void Function(int) onApply,
+    required void Function(int) onDelete,
+  }) {
+    if (notes.isEmpty) return const SizedBox.shrink();
+    return Column(
+      children: [
+        for (int i = 0; i < notes.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(top: 4, bottom: 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text('— ${notes[i].time}: ${notes[i].text}'),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.copy),
+                  tooltip: 'Перенести',
+                  onPressed: () => onApply(i),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () => onDelete(i),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

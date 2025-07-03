@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
+import '../../services/quick_note_service.dart';
+import '../../utils/draft_note_helper.dart';
 import '../../main.dart';
 import '../send_diary/preview_screen.dart';
 import '../history_diary/entries_screen.dart';
@@ -22,6 +24,7 @@ class _FocusScreenState extends State<FocusScreen> {
   late TextEditingController stepCtrl;
   late TextEditingController flowCtrl;
   bool _init = false;
+  Map<String, List<QuickNote>> _notes = {};
 
   @override
   void didChangeDependencies() {
@@ -40,6 +43,9 @@ class _FocusScreenState extends State<FocusScreen> {
 
       DraftService.currentDraft = entry;
       DraftService.saveDraft();
+      QuickNoteService.getNotesForDate(entry.date).then((n) {
+        setState(() => _notes = n);
+      });
 
       _init = true;
     }
@@ -52,6 +58,31 @@ class _FocusScreenState extends State<FocusScreen> {
     stepCtrl.dispose();
     flowCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _addNote(String field) async {
+    final note = await DraftNoteHelper.addNote(context, entry.date, field);
+    if (note != null) {
+      setState(() => _notes.putIfAbsent(field, () => []).add(note));
+    }
+  }
+
+  Future<void> _applyNote(
+      String field, TextEditingController ctrl, int index) async {
+    final list = _notes[field];
+    if (list == null || index >= list.length) return;
+    final note = list[index];
+    final text = ctrl.text.trim();
+    ctrl.text = text.isEmpty ? note.text : '$text\n${note.text}';
+    await QuickNoteService.deleteNote(entry.date, field, index);
+    setState(() => _notes[field]?.removeAt(index));
+    DraftService.currentDraft = entry;
+    await DraftService.saveDraft();
+  }
+
+  Future<void> _deleteNote(String field, int index) async {
+    await QuickNoteService.deleteNote(entry.date, field, index);
+    setState(() => _notes[field]?.removeAt(index));
   }
 
   @override
@@ -110,9 +141,18 @@ class _FocusScreenState extends State<FocusScreen> {
               controller: pleasantCtrl,
               decoration: InputDecoration(
                 labelText: '🌟 Приятный момент',
-                suffixIcon: Tooltip(
-                  message: 'Что вызвало улыбку?',
-                  child: const Icon(Icons.info_outline),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Tooltip(
+                      message: 'Что вызвало улыбку?',
+                      child: const Icon(Icons.info_outline),
+                    ),
+                    IconButton(
+                      icon: const Text('🗒'),
+                      onPressed: () => _addNote('pleasant'),
+                    ),
+                  ],
                 ),
               ),
               onChanged: (v) async {
@@ -121,14 +161,28 @@ class _FocusScreenState extends State<FocusScreen> {
                 await DraftService.saveDraft();
               },
             ),
+            DraftNoteHelper.buildNotesList(
+              notes: _notes['pleasant'] ?? [],
+              onApply: (i) => _applyNote('pleasant', pleasantCtrl, i),
+              onDelete: (i) => _deleteNote('pleasant', i),
+            ),
             const SizedBox(height: 8),
             TextField(
               controller: tomorrowCtrl,
               decoration: InputDecoration(
                 labelText: '🚀 Улучшить завтра',
-                suffixIcon: Tooltip(
-                  message: 'Что бы сделал иначе?',
-                  child: const Icon(Icons.info_outline),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Tooltip(
+                      message: 'Что бы сделал иначе?',
+                      child: const Icon(Icons.info_outline),
+                    ),
+                    IconButton(
+                      icon: const Text('🗒'),
+                      onPressed: () => _addNote('tomorrowImprove'),
+                    ),
+                  ],
                 ),
               ),
               onChanged: (v) async {
@@ -137,14 +191,28 @@ class _FocusScreenState extends State<FocusScreen> {
                 await DraftService.saveDraft();
               },
             ),
+            DraftNoteHelper.buildNotesList(
+              notes: _notes['tomorrowImprove'] ?? [],
+              onApply: (i) => _applyNote('tomorrowImprove', tomorrowCtrl, i),
+              onDelete: (i) => _deleteNote('tomorrowImprove', i),
+            ),
             const SizedBox(height: 8),
             TextField(
               controller: stepCtrl,
               decoration: InputDecoration(
                 labelText: '🎯 Шаг к цели',
-                suffixIcon: Tooltip(
-                  message: 'Конкретный шаг вперед.',
-                  child: const Icon(Icons.info_outline),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Tooltip(
+                      message: 'Конкретный шаг вперед.',
+                      child: const Icon(Icons.info_outline),
+                    ),
+                    IconButton(
+                      icon: const Text('🗒'),
+                      onPressed: () => _addNote('stepGoal'),
+                    ),
+                  ],
                 ),
               ),
               onChanged: (v) async {
@@ -153,16 +221,29 @@ class _FocusScreenState extends State<FocusScreen> {
                 await DraftService.saveDraft();
               },
             ),
+            DraftNoteHelper.buildNotesList(
+              notes: _notes['stepGoal'] ?? [],
+              onApply: (i) => _applyNote('stepGoal', stepCtrl, i),
+              onDelete: (i) => _deleteNote('stepGoal', i),
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: flowCtrl,
               maxLines: 4,
               decoration: InputDecoration(
                 labelText: '💬 Поток мысли',
-                suffixIcon: Tooltip(
-                  message:
-                      'Свободное поле для размышлений.',
-                  child: const Icon(Icons.info_outline),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Tooltip(
+                      message: 'Свободное поле для размышлений.',
+                      child: const Icon(Icons.info_outline),
+                    ),
+                    IconButton(
+                      icon: const Text('🗒'),
+                      onPressed: () => _addNote('flow'),
+                    ),
+                  ],
                 ),
               ),
               onChanged: (v) async {
@@ -170,6 +251,11 @@ class _FocusScreenState extends State<FocusScreen> {
                 DraftService.currentDraft = entry;
                 await DraftService.saveDraft();
               },
+            ),
+            DraftNoteHelper.buildNotesList(
+              notes: _notes['flow'] ?? [],
+              onApply: (i) => _applyNote('flow', flowCtrl, i),
+              onDelete: (i) => _deleteNote('flow', i),
             ),
             const Spacer(),
             Row(

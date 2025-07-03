@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
+import '../../services/quick_note_service.dart';
+import '../../utils/draft_note_helper.dart';
 import '../../main.dart';
 import 'emotion_screen.dart';
 import '../history_diary/entries_screen.dart';
@@ -47,6 +49,7 @@ class _StateScreenState extends State<StateScreen> {
     9: 'Почти максимум. Хочется делать.',
     10: 'Пик формы. Энергия прет. Супер состояние.',
   };
+  Map<String, List<QuickNote>> _notes = {};
 
   bool _init = false;
   bool _allGood = true;
@@ -161,6 +164,9 @@ class _StateScreenState extends State<StateScreen> {
       }
       DraftService.currentDraft = entry;
       DraftService.saveDraft();
+      QuickNoteService.getNotesForDate(entry.date).then((n) {
+        setState(() => _notes = n);
+      });
 
       _init = true;
     }
@@ -177,6 +183,31 @@ class _StateScreenState extends State<StateScreen> {
       c.dispose();
     }
     super.dispose();
+  }
+
+  Future<void> _addNote() async {
+    final note = await DraftNoteHelper.addNote(context, entry.date, 'wellBeing');
+    if (note != null) {
+      setState(() => _notes.putIfAbsent('wellBeing', () => []).add(note));
+    }
+  }
+
+  Future<void> _applyNote(int index) async {
+    final list = _notes['wellBeing'];
+    if (list == null || index >= list.length) return;
+    final note = list[index];
+    final text = wellCtrl.text.trim();
+    wellCtrl.text = text.isEmpty ? note.text : '$text\n${note.text}';
+    _allGood = false;
+    await QuickNoteService.deleteNote(entry.date, 'wellBeing', index);
+    setState(() => _notes['wellBeing']?.removeAt(index));
+    DraftService.currentDraft = entry;
+    await DraftService.saveDraft();
+  }
+
+  Future<void> _deleteNote(int index) async {
+    await QuickNoteService.deleteNote(entry.date, 'wellBeing', index);
+    setState(() => _notes['wellBeing']?.removeAt(index));
   }
 
   @override
@@ -364,10 +395,17 @@ class _StateScreenState extends State<StateScreen> {
                 style: Theme.of(ctx).textTheme.bodyMedium,
                 textAlign: TextAlign.center),
               const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text('🤒 Самочувствие',
-                    style: Theme.of(ctx).textTheme.titleMedium),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text('🤒 Самочувствие',
+                        style: Theme.of(ctx).textTheme.titleMedium),
+                  ),
+                  IconButton(
+                    icon: const Text('🗒'),
+                    onPressed: _addNote,
+                  ),
+                ],
               ),
               SwitchListTile(
                 title: const Text('Всё хорошо'),
@@ -378,6 +416,11 @@ class _StateScreenState extends State<StateScreen> {
                   DraftService.currentDraft = entry;
                   await DraftService.saveDraft();
                 },
+              ),
+              DraftNoteHelper.buildNotesList(
+                notes: _notes['wellBeing'] ?? [],
+                onApply: _applyNote,
+                onDelete: _deleteNote,
               ),
               AnimatedSize(
                 duration: const Duration(milliseconds: 200),
