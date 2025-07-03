@@ -24,7 +24,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   late TextEditingController notDoneCtrl;
   late TextEditingController thoughtCtrl;
   bool _initialized = false;
-  Map<String, String> _notes = {};
+  Map<String, List<QuickNote>> _notes = {};
 
   @override
   void didChangeDependencies() {
@@ -60,21 +60,29 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
     super.dispose();
   }
 
-  Future<void> _editNote(String field) async {
-    final res = await DraftNoteHelper.editNote(
-        context, entry.date, field, _notes[field] ?? '');
-    if (res != null) setState(() => _notes[field] = res);
+  Future<void> _addNote(String field) async {
+    final note = await DraftNoteHelper.addNote(context, entry.date, field);
+    if (note != null) {
+      setState(() => _notes.putIfAbsent(field, () => []).add(note));
+    }
   }
 
-  Future<void> _applyNote(String field, TextEditingController ctrl) async {
-    final note = _notes[field];
-    if (note == null || note.isEmpty) return;
+  Future<void> _applyNote(
+      String field, TextEditingController ctrl, int index) async {
+    final list = _notes[field];
+    if (list == null || index >= list.length) return;
+    final note = list[index];
     final text = ctrl.text.trim();
-    ctrl.text = text.isEmpty ? note : '$text\n$note';
-    await QuickNoteService.deleteNote(entry.date, field);
-    setState(() => _notes.remove(field));
+    ctrl.text = text.isEmpty ? note.text : '$text\n${note.text}';
+    await QuickNoteService.deleteNote(entry.date, field, index);
+    setState(() => _notes[field]?.removeAt(index));
     DraftService.currentDraft = entry;
     await DraftService.saveDraft();
+  }
+
+  Future<void> _deleteNote(String field, int index) async {
+    await QuickNoteService.deleteNote(entry.date, field, index);
+    setState(() => _notes[field]?.removeAt(index));
   }
 
   @override
@@ -220,7 +228,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                     ),
                     IconButton(
                       icon: const Text('🗒'),
-                      onPressed: () => _editNote('thought'),
+                      onPressed: () => _addNote('thought'),
                     ),
                   ],
                 ),
