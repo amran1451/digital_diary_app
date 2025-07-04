@@ -56,8 +56,18 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   }
 
   Future<void> _initEntry() async {
+    debugPrint('== Startup: _initEntry start');
     _placeHistory = await PlaceHistoryService.loadHistory();
+    debugPrint('== Startup: place history: $_placeHistory');
     final draft = await DraftService.loadDraft();
+    debugPrint('== Startup: loaded draft entry: ${draft?.toMap()}');
+    if (draft != null) {
+      debugPrint('  date: ${draft.date}');
+      debugPrint('  time: ${draft.time}');
+      debugPrint('  rating: ${draft.rating}');
+      final notes = await QuickNoteService.getNotesForDate(draft.date);
+      debugPrint('  draftNotes: $notes');
+    }
     if (draft != null) {
       // Проверяем, заполнил ли пользователь что-то кроме даты/времени
       const defaultRating = '5';
@@ -87,8 +97,10 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
       final hasEntryData =
           ratingTouched || fields.any((f) => f.trim().isNotEmpty);
       final notesExist = await QuickNoteService.hasNotes(draft.date);
+      debugPrint('== Startup: hasEntryData=$hasEntryData, notesExist=$notesExist');
 
       if (hasEntryData) {
+        debugPrint('== Startup: about to showRestoreDialog');
         // Предложить продолжить черновик или начать новый
         final resume = await showDialog<bool>(
           context: context,
@@ -127,6 +139,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
       // Черновиков нет вообще — новая запись
       entry = await _createNewEntry();
     }
+    debugPrint('== Startup state entry: ${entry?.toMap()}');
 
     // Подготовка UI
     _rating = int.tryParse(entry!.rating) ?? 5;
@@ -172,6 +185,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
       createdAt: createdAt,
     );
     e.rating = '$_rating'; // дефолтная оценка
+    debugPrint('== Startup: _createNewEntry -> ${e.toMap()}');
     return e;
   } 
 
