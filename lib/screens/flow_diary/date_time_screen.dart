@@ -72,14 +72,19 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     if (draft != null) {
       // Проверяем, заполнил ли пользователь что-то кроме даты/времени
       const defaultRating = '5';
-      final ratingTouched = draft.rating != defaultRating;
+      const defaultEnergy = '5';
+      final ratingTouched = draft.rating.trim().isNotEmpty &&
+          draft.rating != defaultRating;
+      final energyTouched = draft.energy.trim().isNotEmpty &&
+          draft.energy != defaultEnergy;
+      final wellBeingTouched = draft.wellBeing.trim().isNotEmpty &&
+          draft.wellBeing != 'OK';
       final fields = [
         draft.bedTime,
         draft.wakeTime,
         draft.sleepDuration,
         draft.steps,
         draft.activity,
-        draft.energy,
         draft.mood,
         draft.mainEmotions,
         draft.influence,
@@ -95,8 +100,10 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
         draft.stepGoal,
         draft.flow,
       ];
-      final hasEntryData =
-          ratingTouched || fields.any((f) => f.trim().isNotEmpty);
+      final hasEntryData = ratingTouched ||
+          energyTouched ||
+          wellBeingTouched ||
+          fields.any((f) => f.trim().isNotEmpty);
       final notesExist = await QuickNoteService.hasNotes(draft.date);
       final hasDraftLog = draft.notificationsLog.isNotEmpty;
       debugPrint(
