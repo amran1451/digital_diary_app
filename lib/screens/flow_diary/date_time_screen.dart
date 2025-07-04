@@ -59,6 +59,19 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     debugPrint('== Startup: _initEntry start');
     _placeHistory = await PlaceHistoryService.loadHistory();
     debugPrint('== Startup: place history: $_placeHistory');
+
+    final arg = ModalRoute.of(context)?.settings.arguments;
+    if (arg is EntryData) {
+      entry = arg;
+      _rating = int.tryParse(entry!.rating) ?? 5;
+      _ratingDesc = _ratingLabels[_rating]!;
+      reasonCtrl.text = entry!.ratingReason;
+      placeCtrl.text = entry!.place;
+      DraftService.currentDraft = entry!;
+      await DraftService.saveDraft();
+      setState(() {});
+      return;
+    }
     final draft = await DraftService.loadDraft();
     debugPrint('== Startup: loaded draft entry: ${draft?.toMap()}');
     if (draft != null) {
@@ -77,7 +90,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
           draft.rating != defaultRating;
       final energyTouched = draft.energy.trim().isNotEmpty &&
           draft.energy != defaultEnergy;
-      final wellBeingTouched = draft.wellBeing.trim().isNotEmpty &&
+      final wellBeingTouched = (draft.wellBeing?.trim().isNotEmpty ?? false) &&
           draft.wellBeing != 'OK';
       final fields = [
         draft.bedTime,

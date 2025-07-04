@@ -9,7 +9,7 @@ class LocalDb {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       join(dbPath, 'diary.db'),
-      version: 7,
+      version: 8,
       onCreate: (db, v) async {
         await db.execute('''
           CREATE TABLE entries(
@@ -70,6 +70,9 @@ class LocalDb {
         }
         if (oldVersion < 7) {
           await db.execute('ALTER TABLE entries ADD COLUMN place TEXT');
+        }
+        if (oldVersion < 8) {
+          await db.execute('UPDATE entries SET wellBeing = NULL WHERE wellBeing = ? OR wellBeing = ?', ['OK', 'Всё хорошо']);
         }
       },
     );

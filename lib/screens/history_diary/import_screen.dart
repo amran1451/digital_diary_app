@@ -602,7 +602,7 @@ class _ImportScreenState extends State<ImportScreen> {
     steps: m['steps'] as String,
     activity: m['activity'] as String,
     energy: m['energy'] as String,
-    wellBeing: m['wellBeing'] as String? ?? '',
+    wellBeing: m['wellBeing'] as String?,
     mood: m['mood'] as String,
     mainEmotions: m['mainEmotions'] as String,
     influence: m['influence'] as String,

@@ -22,7 +22,7 @@ class EntryData {
   String steps;
   String activity;
   String energy;
-  String wellBeing;
+  String? wellBeing;
   String mood;
   String mainEmotions;
   String influence;
@@ -159,7 +159,7 @@ class EntryData {
       steps: m['steps'] ?? '',
       activity: m['activity'] ?? '',
       energy: m['energy'] ?? '',
-      wellBeing: m['wellBeing'] ?? '',
+      wellBeing: m['wellBeing'] as String?,
       mood: m['mood'] ?? '',
       mainEmotions: m['mainEmotions'] ?? '',
       influence: m['influence'] ?? '',

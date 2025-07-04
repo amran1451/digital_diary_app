@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import '../../models/entry_data.dart';
 import '../../services/local_db.dart';
 import '../../main.dart';
+import '../flow_diary/date_time_screen.dart';
 
 class EntryDetailScreen extends StatefulWidget {
   static const routeName = '/entry_detail';
@@ -74,7 +75,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       ..writeln('🚶 Шаги: ${entry.steps}')
       ..writeln('🔥 Активность: ${entry.activity}')
       ..writeln('⚡️ Энергия: ${entry.energy}')
-      ..writeln('🤒 Самочувствие: ${entry.wellBeing == 'OK' || entry.wellBeing.isEmpty ? 'Всё хорошо' : entry.wellBeing}')
+      ..writeln('🤒 Самочувствие: ${entry.wellBeing == null || entry.wellBeing == 'OK' || entry.wellBeing!.isEmpty ? 'Всё хорошо' : entry.wellBeing}')
       ..writeln()
       ..writeln('😊 Настроение: ${entry.mood}')
       ..writeln('🎭 Главные эмоции: ${entry.mainEmotions}')
@@ -120,6 +121,17 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             tooltip: 'Изменить дату записи',
             onPressed: _pickDate,
           ),
+          IconButton(
+            icon: const Icon(Icons.edit),
+            tooltip: 'Редактировать',
+            onPressed: () {
+              Navigator.pushNamed(
+                ctx,
+                DateTimeScreen.routeName,
+                arguments: entry,
+              );
+            },
+          ),
         ],
       ),
       body: Padding(
@@ -149,7 +161,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             Text('🚶 Шаги: ${entry.steps}'),
             Text('🔥 Активность: ${entry.activity}'),
             Text('⚡️ Энергия: ${entry.energy}'),
-            Text('🤒 Самочувствие: ${entry.wellBeing == 'OK' || entry.wellBeing.isEmpty ? 'Всё хорошо' : entry.wellBeing}'),
+            Text('🤒 Самочувствие: ${entry.wellBeing == null || entry.wellBeing == 'OK' || entry.wellBeing!.isEmpty ? 'Всё хорошо' : entry.wellBeing}'),
             const Divider(),
             Text('😊 Настроение: ${entry.mood}'),
             Text('🎭 Главные эмоции: ${entry.mainEmotions}'),

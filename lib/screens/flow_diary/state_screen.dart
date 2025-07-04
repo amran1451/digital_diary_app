@@ -151,9 +151,9 @@ class _StateScreenState extends State<StateScreen> {
       stepsCtrl =
           TextEditingController(text: entry.steps);
       wellCtrl = TextEditingController(
-        text: entry.wellBeing == 'OK' ? '' : entry.wellBeing,
+        text: entry.wellBeing == 'OK' ? '' : (entry.wellBeing ?? ''),
       );
-      _allGood = entry.wellBeing.isEmpty || entry.wellBeing == 'OK';
+      _allGood = entry.wellBeing == null || entry.wellBeing!.isEmpty || entry.wellBeing == 'OK';
       _parseExistingActivities();
 
       _energy = int.tryParse(entry.energy) ?? 5;
@@ -395,52 +395,54 @@ class _StateScreenState extends State<StateScreen> {
                 style: Theme.of(ctx).textTheme.bodyMedium,
                 textAlign: TextAlign.center),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text('🤒 Самочувствие',
-                        style: Theme.of(ctx).textTheme.titleMedium),
-                  ),
-                  IconButton(
-                    icon: const Text('🗒'),
-                    onPressed: _addNote,
-                  ),
-                ],
-              ),
-              SwitchListTile(
-                title: const Text('Всё хорошо'),
-                value: _allGood,
-                onChanged: (v) async {
-                  setState(() => _allGood = v);
-                  entry.wellBeing = v ? 'OK' : wellCtrl.text;
-                  DraftService.currentDraft = entry;
-                  await DraftService.saveDraft();
-                },
-              ),
-              DraftNoteHelper.buildNotesList(
-                notes: _notes['wellBeing'] ?? [],
-                onApply: _applyNote,
-                onDelete: _deleteNote,
-              ),
-              AnimatedSize(
-                duration: const Duration(milliseconds: 200),
-                child: _allGood
-                    ? const SizedBox.shrink()
-                    : TextField(
-                  controller: wellCtrl,
-                  minLines: 2,
-                  maxLines: null,
-                  decoration: const InputDecoration(
-                    hintText: 'Опишите, что беспокоит',
-                  ),
+    if (entry.wellBeing != null) ...[
+    Row(
+    children: [
+    Expanded(
+    child: Text('🤒 Самочувствие',
+    style: Theme.of(ctx).textTheme.titleMedium),
+    ),
+    IconButton(
+    icon: const Text('🗒'),
+    onPressed: _addNote,
+    ),
+    ],
+    ),
+    SwitchListTile(
+    title: const Text('Всё хорошо'),
+    value: _allGood,
                   onChanged: (v) async {
-                    entry.wellBeing = v;
+    setState(() => _allGood = v);
+    entry.wellBeing = v ? 'OK' : wellCtrl.text;
                     DraftService.currentDraft = entry;
                     await DraftService.saveDraft();
                   },
                 ),
-              ),
-              const SizedBox(height: 16),
+      DraftNoteHelper.buildNotesList(
+        notes: _notes['wellBeing'] ?? [],
+        onApply: _applyNote,
+        onDelete: _deleteNote,
+      ),
+      AnimatedSize(
+        duration: const Duration(milliseconds: 200),
+        child: _allGood
+            ? const SizedBox.shrink()
+            : TextField(
+          controller: wellCtrl,
+          minLines: 2,
+          maxLines: null,
+          decoration: const InputDecoration(
+            hintText: 'Опишите, что беспокоит',
+          ),
+          onChanged: (v) async {
+            entry.wellBeing = v;
+            DraftService.currentDraft = entry;
+            await DraftService.saveDraft();
+          },
+        ),
+      ),
+      const SizedBox(height: 16),
+    ],
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

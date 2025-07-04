@@ -9,6 +9,7 @@ import '../../services/quick_note_service.dart';
 import '../../main.dart';
 import '../flow_diary/date_time_screen.dart';
 import '../history_diary/entries_screen.dart';
+import '../history_diary/entry_detail_screen.dart';
 
 enum _DateMenu { entries, toggleTheme }
 
@@ -45,6 +46,20 @@ class PreviewScreen extends StatelessWidget {
     // 5) Очистить черновик
     await DraftService.clearDraft();
     await QuickNoteService.clearForDate(e.date);
+  }
+
+  Future<void> _save(EntryData e, BuildContext ctx) async {
+    await LocalDb.saveOrUpdate(e);
+    ScaffoldMessenger.of(ctx)
+        .showSnackBar(const SnackBar(content: Text('Изменения сохранены')));
+    await DraftService.clearDraft();
+    await QuickNoteService.clearForDate(e.date);
+    Navigator.pushNamedAndRemoveUntil(
+      ctx,
+      EntryDetailScreen.routeName,
+          (_) => false,
+      arguments: e,
+    );
   }
 
   @override
@@ -125,11 +140,18 @@ class PreviewScreen extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                   child: const Text('← Назад'),
                 ),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.send),
-                  label: const Text('Отправить'),
-                  onPressed: () => _send(entry, context),
-                ),
+                if (entry.localId == null)
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.send),
+                    label: const Text('Отправить'),
+                    onPressed: () => _send(entry, context),
+                  )
+                else
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.save),
+                    label: const Text('Сохранить'),
+                    onPressed: () => _save(entry, context),
+                  ),
               ],
             ),
           ],
@@ -146,7 +168,7 @@ class PreviewScreen extends StatelessWidget {
         Text('🚶 Шаги: ${e.steps}'),
         Text('🔥 Активность: ${e.activity}'),
         Text('⚡️ Энергия: ${e.energy}'),
-        Text('🤒 Самочувствие: ${e.wellBeing == 'OK' || e.wellBeing.isEmpty ? 'Всё хорошо' : e.wellBeing}'),
+    Text('🤒 Самочувствие: ${e.wellBeing == null || e.wellBeing == 'OK' || e.wellBeing!.isEmpty ? 'Всё хорошо' : e.wellBeing}'),
         const Divider(),
         Text('😊 Настроение: ${e.mood}'),
         Text('🎭 Эмоции: ${e.mainEmotions}'),
