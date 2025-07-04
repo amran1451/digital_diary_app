@@ -168,7 +168,7 @@ class PreviewScreen extends StatelessWidget {
         Text('🚶 Шаги: ${e.steps}'),
         Text('🔥 Активность: ${e.activity}'),
         Text('⚡️ Энергия: ${e.energy}'),
-    Text('🤒 Самочувствие: ${e.wellBeing == null || e.wellBeing == 'OK' || e.wellBeing!.isEmpty ? 'Всё хорошо' : e.wellBeing}'),
+        Text('🤒 Самочувствие: ${e.wellBeing == 'OK' ? 'Всё хорошо' : (e.wellBeing ?? '')}'),
         const Divider(),
         Text('😊 Настроение: ${e.mood}'),
         Text('🎭 Эмоции: ${e.mainEmotions}'),
