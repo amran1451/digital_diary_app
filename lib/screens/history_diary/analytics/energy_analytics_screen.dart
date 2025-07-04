@@ -122,7 +122,11 @@ class _EnergyAnalyticsScreenState extends State<EnergyAnalyticsScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Аналитика энергии'),
-        bottom: TabBar(controller:_tabController,tabs:const[
+        bottom: TabBar(
+            controller:_tabController,
+            labelColor: Colors.black,
+            unselectedLabelColor: Colors.white,
+            tabs:const[
           Tab(text:'График'),Tab(text:'Таблица'),Tab(text:'Календарь'),
         ]),
         actions:[

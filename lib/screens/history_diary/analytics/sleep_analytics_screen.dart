@@ -134,6 +134,8 @@ class _SleepAnalyticsScreenState extends State<SleepAnalyticsScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.white,
           tabs: const [
             Tab(text: 'График'),
             Tab(text: 'Таблица'),

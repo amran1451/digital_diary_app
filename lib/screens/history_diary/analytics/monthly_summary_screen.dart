@@ -131,8 +131,10 @@ class _MonthlySummaryScreenState extends State<MonthlySummaryScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Месячные сводки'),
-          bottom: const TabBar(
-            tabs: [
+          bottom: TabBar(
+            labelColor: Colors.black,
+            unselectedLabelColor: Colors.white,
+            tabs: const[
               Tab(text: 'Сводка'),
               Tab(text: 'Таблица'),
               Tab(text: 'Графики'),

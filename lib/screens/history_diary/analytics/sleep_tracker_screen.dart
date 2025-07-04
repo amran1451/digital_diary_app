@@ -615,6 +615,8 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen>
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.white,
           tabs: const [
             Tab(text: 'Трекер'),
             Tab(text: 'Статистика'),

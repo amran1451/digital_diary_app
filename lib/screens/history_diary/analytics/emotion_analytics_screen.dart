@@ -301,6 +301,8 @@ class _EmotionAnalyticsScreenState extends State<EmotionAnalyticsScreen>
         title: const Text('Аналитика эмоций'),
         centerTitle: true,
         bottom: TabBar(
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.white,
           controller: _tabController,
           tabs: const [
             Tab(text: 'Топ-5'),

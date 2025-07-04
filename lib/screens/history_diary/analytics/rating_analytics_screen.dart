@@ -136,6 +136,8 @@ class _RatingAnalyticsScreenState extends State<RatingAnalyticsScreen>
         title: const Text('Аналитика оценки'),
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.white,
           tabs: const [
             Tab(text: 'График'),
             Tab(text: 'Таблица'),

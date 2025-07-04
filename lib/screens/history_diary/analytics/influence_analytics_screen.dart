@@ -421,6 +421,8 @@ class _InfluenceAnalyticsScreenState extends State<InfluenceAnalyticsScreen>
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.white,
           tabs: const [
             Tab(text: 'Причины'),
             Tab(text: 'Динамика'),
