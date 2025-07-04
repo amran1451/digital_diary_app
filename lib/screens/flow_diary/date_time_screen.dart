@@ -5,6 +5,7 @@ import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
 import '../../services/local_db.dart';
 import '../../services/place_history_service.dart';
+import '../../services/quick_note_service.dart';
 import '../../main.dart';
 import 'state_screen.dart';
 import '../history_diary/entries_screen.dart';
@@ -93,11 +94,12 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
         draft.stepGoal,
         draft.flow,
       ];
-      final hasContentBeyondDateTime =
+      final hasEntryData =
           ratingTouched || fields.any((f) => f.trim().isNotEmpty);
-      debugPrint('== Startup: hasEntryData=$hasEntryData, notesExist=$notesExist');
+      final notesExist = await QuickNoteService.hasNotes(draft.date);
+      debugPrint('== Startup: hasContentBeyondDateTime=$hasContentBeyondDateTime');
 
-      if (hasContentBeyondDateTime) {
+      if (hasEntryData) {
         debugPrint('== Startup: about to showRestoreDialog');
         // Предложить продолжить черновик или начать новый
         final resume = await showDialog<bool>(
@@ -125,6 +127,9 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
           await DraftService.clearDraft();
           entry = await _createNewEntry();
         }
+      } else if (notesExist) {
+        // Были только черновые заметки — продолжаем без диалога
+        entry = draft;
       } else {
         // Если ни одной дополнительной метрики нет — сразу новая запись
         await DraftService.clearDraft();
