@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../models/entry_data.dart';
 import '../../../services/local_db.dart';
 import '../../../services/cloud_db.dart';
+import '../entry_detail_screen.dart';
 
 class ManualHighlightsScreen extends StatefulWidget {
   static const routeName = '/analytics/manual_highlights';
@@ -275,7 +276,7 @@ class _ManualHighlightsScreenState extends State<ManualHighlightsScreen> {
           ? const Center(child: Text('Записей нет'))
           : ListView.builder(
         itemCount: _entries.length,
-        itemBuilder: (_, i) {
+        itemBuilder: (ctx, i) {
           final e = _entries[i];
           final lines = e.highlights
               .split('\n')
@@ -292,6 +293,14 @@ class _ManualHighlightsScreenState extends State<ManualHighlightsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: lines.map((l) => Text(l)).toList(),
               ),
+              onTap: () async {
+                await Navigator.pushNamed(
+                  ctx,
+                  EntryDetailScreen.routeName,
+                  arguments: e,
+                );
+                await _load();
+              },
               trailing: IconButton(
                 icon: const Icon(Icons.edit),
                 onPressed: () => _editEntry(e),
