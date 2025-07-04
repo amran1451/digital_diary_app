@@ -67,6 +67,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
       debugPrint('  rating: ${draft.rating}');
       final notes = await QuickNoteService.getNotesForDate(draft.date);
       debugPrint('  draftNotes: $notes');
+      debugPrint('  notificationsLog: ${draft.notificationsLog}');
     }
     if (draft != null) {
       // Проверяем, заполнил ли пользователь что-то кроме даты/времени
@@ -97,9 +98,11 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
       final hasEntryData =
           ratingTouched || fields.any((f) => f.trim().isNotEmpty);
       final notesExist = await QuickNoteService.hasNotes(draft.date);
-      debugPrint('== Startup: hasContentBeyondDateTime=$hasContentBeyondDateTime');
+      final hasDraftLog = draft.notificationsLog.isNotEmpty;
+      debugPrint(
+          '== Startup: hasEntryData=$hasEntryData, notesExist=$notesExist, hasDraftLog=$hasDraftLog');
 
-      if (hasEntryData) {
+      if (!hasDraftLog && !notesExist && hasEntryData) {
         debugPrint('== Startup: about to showRestoreDialog');
         // Предложить продолжить черновик или начать новый
         final resume = await showDialog<bool>(
@@ -127,7 +130,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
           await DraftService.clearDraft();
           entry = await _createNewEntry();
         }
-      } else if (notesExist) {
+      } else if (notesExist || hasDraftLog) {
         // Были только черновые заметки — продолжаем без диалога
         entry = draft;
       } else {
