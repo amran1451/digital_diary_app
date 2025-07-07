@@ -14,3 +14,20 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Troubleshooting build errors
+
+If the Android build fails with messages about missing symbols and v1 embedding removal, update all plugins to their latest versions:
+
+```bash
+flutter pub upgrade
+```
+
+After upgrading packages, clean and rebuild the project:
+
+```bash
+flutter clean
+flutter build apk --release
+```
+
+If issues persist, verify that any local packages or plugins are compatible with Flutter's v2 embedding and update them if necessary.
