@@ -10,6 +10,7 @@ import 'finance_tracker_screen.dart';
 import 'planner_app_screen.dart';
 import 'notification_settings_screen.dart';
 import '../app_config.dart';
+import 'new_ui/evaluate_day_screen.dart';
 
 class HomeMenuScreen extends StatelessWidget {
   static const routeName = '/home';
@@ -57,6 +58,7 @@ class HomeMenuScreen extends StatelessWidget {
               _buildTile(c, Icons.book,   'Дневник',         DateTimeScreen.routeName),
               if (notificationsEnabled)
                 _buildTile(c, Icons.notifications, 'Уведомления', NotificationSettingsScreen.routeName),
+              _buildTile(c, Icons.book,   'Дневник new_ui',         EvaluateDayScreen.routeName),
             ],
           ),
         ),
