@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';  // ← анонимная аутентификация
 import 'package:flutter/material.dart';
 import 'package:app_theme/app_theme.dart';
+import 'theme/dark_diary_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/finance_tracker_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,6 +18,7 @@ import 'screens/flow_diary/development_screen.dart';
 import 'screens/flow_diary/emotion_screen.dart';
 import 'screens/flow_diary/focus_screen.dart';
 import 'screens/flow_diary/state_screen.dart';
+import 'screens/new_ui/evaluate_day_screen.dart';
 
 // history_diary - analytics
 import 'screens/history_diary/analytics/analytics_menu_screen.dart';
@@ -127,13 +129,14 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Дневник',
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      darkTheme: DarkDiaryTheme.theme,
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       initialRoute: HomeMenuScreen.routeName,
       routes: {
         DateTimeScreen.routeName:      (_) => const DateTimeScreen(),
         StateScreen.routeName:         (_) => const StateScreen(),
         EmotionScreen.routeName:       (_) => const EmotionScreen(),
+        EvaluateDayScreen.routeName:   (_) => const EvaluateDayScreen(),
         AchievementsScreen.routeName:  (_) => const AchievementsScreen(),
         DevelopmentScreen.routeName:   (_) => const DevelopmentScreen(),
         FocusScreen.routeName:         (_) => const FocusScreen(),
