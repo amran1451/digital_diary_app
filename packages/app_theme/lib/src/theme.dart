@@ -46,6 +46,10 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         textStyle: _textTheme.labelLarge,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        side: const BorderSide(color: Colors.white),
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
     ),
     textButtonTheme: TextButtonThemeData(
@@ -55,6 +59,8 @@ class AppTheme {
       style: OutlinedButton.styleFrom(
         textStyle: _textTheme.labelLarge,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        side: const BorderSide(color: Colors.white),
+        foregroundColor: Colors.white,
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
@@ -80,6 +86,10 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         textStyle: _textTheme.labelLarge,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        side: const BorderSide(color: Colors.white),
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
     ),
     textButtonTheme: TextButtonThemeData(
@@ -89,6 +99,8 @@ class AppTheme {
       style: OutlinedButton.styleFrom(
         textStyle: _textTheme.labelLarge,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        side: const BorderSide(color: Colors.white),
+        foregroundColor: Colors.white,
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
