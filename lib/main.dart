@@ -128,7 +128,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Дневник',
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.darkTheme,
       darkTheme: DarkDiaryTheme.theme,
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       initialRoute: HomeMenuScreen.routeName,
