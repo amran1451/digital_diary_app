@@ -42,7 +42,7 @@ class _EntriesScreenState extends State<EntriesScreen> {
 
   List<EntryData> _entries = [];
   late final Connectivity _connectivity;
-  late final StreamSubscription<ConnectivityResult> _connectivitySub;
+  late final StreamSubscription<List<ConnectivityResult>> _connectivitySub;
 
   @override
   void initState() {

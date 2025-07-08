@@ -123,9 +123,7 @@ class NotificationService {
       question,
       next,
       const NotificationDetails(android: AndroidNotificationDetails('diary', 'Diary')),
-      uiLocalNotificationDateInterpretation:
-      UILocalNotificationDateInterpretation.absoluteTime,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      scheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: jsonEncode({'cat': cat, 'time': next.toIso8601String()}),
     );
     await _setPending(cat, true);
