@@ -15,7 +15,7 @@ import '../../services/place_history_service.dart';
 import '../../services/quick_note_service.dart';
 import '../../theme/dark_diary_theme.dart';
 import '../../main.dart';
-import '../flow_diary/state_screen.dart';
+import 'state_screen.dart';
 import '../history_diary/entries_screen.dart';
 
 enum _DateMenu { history }
@@ -466,7 +466,7 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                         await DraftService.saveDraft();
                         Navigator.pushNamed(
                           context,
-                          StateScreen.routeName,
+                          StateScreenNew.routeName,
                           arguments: entry,
                         );
                       },
