@@ -348,10 +348,6 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                         Text('📅 ${entry!.date}  ${entry!.time}'),
                       const Spacer(),
                       TextButton(
-                        onPressed: _copyDateTime,
-                        child: const Text('Копировать'),
-                      ),
-                      TextButton(
                         onPressed: _pickDateTime,
                         child: const Text('Редактировать'),
                       ),
