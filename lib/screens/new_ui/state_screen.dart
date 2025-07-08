@@ -660,8 +660,9 @@ class _StateScreenNewState extends State<StateScreenNew> {
       ),
     );
   }
+}
 
-  class _EmojiThumb extends SliderComponentShape {
+class _EmojiThumb extends SliderComponentShape {
   final String emoji;
   const _EmojiThumb({required this.emoji});
 
@@ -670,26 +671,28 @@ class _StateScreenNewState extends State<StateScreenNew> {
 
   @override
   void paint(
-  PaintingContext context,
-  Offset center, {
-  required Animation<double> activationAnimation,
-  required Animation<double> enableAnimation,
-  required bool isDiscrete,
-  required TextPainter labelPainter,
-  required RenderBox parentBox,
-  required SliderThemeData sliderTheme,
-  required TextDirection textDirection,
-  required double value,
-  required double textScaleFactor,
-  required Size sizeWithOverflow,
+      PaintingContext context,
+      Offset center, {
+      required Animation<double> activationAnimation,
+      required Animation<double> enableAnimation,
+      required bool isDiscrete,
+      required TextPainter labelPainter,
+      required RenderBox parentBox,
+      required SliderThemeData sliderTheme,
+      required TextDirection textDirection,
+      required double value,
+      required double textScaleFactor,
+      required Size sizeWithOverflow,
   }) {
-  final canvas = context.canvas;
-  final text = TextSpan(text: emoji, style: const TextStyle(fontSize: 24));
-  final tp = TextPainter(
-  text: text,
-  textDirection: textDirection,
-  )..layout();
-  tp.paint(canvas, Offset(center.dx - tp.width / 2, center.dy - tp.height / 2));
-  }
+    final canvas = context.canvas;
+    final text = TextSpan(text: emoji, style: const TextStyle(fontSize: 24));
+    final tp = TextPainter(
+      text: text,
+      textDirection: textDirection,
+    )..layout();
+    tp.paint(
+      canvas,
+      Offset(center.dx - tp.width / 2, center.dy - tp.height / 2),
+    );
   }
 }
