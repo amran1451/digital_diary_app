@@ -24,9 +24,17 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
   List<String> _history = [];
 
   static const _ratingLabels = <int, String>{
-    1: 'Very bad day',
-    5: 'Neutral: no strong feelings',
-    10: 'Great day!',
+    0: 'Худший день.',
+    1: 'Очень тяжёлый день.',
+    2: 'Плохой день.',
+    3: 'Ниже среднего.',
+    4: 'Так себе.',
+    5: 'Нейтрально.',
+    6: 'Немного лучше обычного.',
+    7: 'Хороший день.',
+    8: 'Очень хороший.',
+    9: 'Отличный.',
+    10: 'Идеальный.',
   };
 
   @override
