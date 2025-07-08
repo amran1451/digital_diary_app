@@ -400,10 +400,12 @@ class _StateScreenNewState extends State<StateScreenNew> {
                   for (final act in _allActivities)
                     Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(act),
-                        selected: _selectedActivities.contains(act),
-                        onSelected: (v) async {
+            child: GestureDetector(
+              onLongPress: () => _showActivityPreset(act),
+              child: FilterChip(
+                label: Text(act),
+                selected: _selectedActivities.contains(act),
+                onSelected: (v) async {
                           setState(() {
                             if (v) {
                               _selectedActivities.add(act);
@@ -416,7 +418,7 @@ class _StateScreenNewState extends State<StateScreenNew> {
                           });
                           await _updateActivityString();
                         },
-                        onLongPress: () => _showActivityPreset(act),
+              ),
                       ),
                     ),
                 ],
@@ -470,7 +472,7 @@ class _StateScreenNewState extends State<StateScreenNew> {
                 Text('Энергия $_energy / 10', style: theme.textTheme.headlineSmall),
                 const Spacer(),
                 if (_energy <= 3)
-                  AssistChip(
+                  ActionChip(
                     label: const Text('Добавить кофе? ☕'),
                     onPressed: () {},
                   ),
