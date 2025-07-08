@@ -1,10 +1,24 @@
+// Migrated from date_time_screen.dart: contains full logic for starting a diary
+// entry with draft handling, location suggestions and theme switching.
+
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' hide TextDirection;
 import 'package:flutter/services.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import '../../theme/dark_diary_theme.dart';
+
+import '../../models/entry_data.dart';
+import '../../services/draft_service.dart';
+import '../../services/local_db.dart';
 import '../../services/place_history_service.dart';
+import '../../services/quick_note_service.dart';
+import '../../theme/dark_diary_theme.dart';
+import '../../main.dart';
+import '../flow_diary/state_screen.dart';
+import '../history_diary/entries_screen.dart';
+
+enum _DateMenu { history }
 
 class EvaluateDayScreen extends StatefulWidget {
   static const routeName = '/evaluate-day';
@@ -15,13 +29,12 @@ class EvaluateDayScreen extends StatefulWidget {
 }
 
 class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
-  late String _date;
-  late String _time;
-  int _rating = 5;
-  late String _ratingDesc;
+  EntryData? entry;
   late TextEditingController _reasonCtrl;
   late TextEditingController _placeCtrl;
   List<String> _history = [];
+  int _rating = 5;
+  late String _ratingDesc;
 
   static const _ratingLabels = <int, String>{
     0: 'Худший день.',
@@ -37,17 +50,144 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
     10: 'Идеальный.',
   };
 
+  Future<void> _initEntry() async {
+    _history = await PlaceHistoryService.loadHistory();
+
+    final arg = ModalRoute.of(context)?.settings.arguments;
+    if (arg is EntryData) {
+      entry = arg;
+    } else {
+      final draft = await DraftService.loadDraft();
+      if (draft != null) {
+        const defaultRating = '5';
+        const defaultEnergy = '5';
+        final ratingTouched =
+            draft.rating.trim().isNotEmpty && draft.rating != defaultRating;
+        final energyTouched =
+            draft.energy.trim().isNotEmpty && draft.energy != defaultEnergy;
+        final wellBeingTouched =
+            (draft.wellBeing?.trim().isNotEmpty ?? false) &&
+                draft.wellBeing != 'OK';
+        final fields = [
+          draft.bedTime,
+          draft.wakeTime,
+          draft.sleepDuration,
+          draft.steps,
+          draft.activity,
+          draft.mood,
+          draft.mainEmotions,
+          draft.influence,
+          draft.important,
+          draft.tasks,
+          draft.notDone,
+          draft.thought,
+          draft.development,
+          draft.qualities,
+          draft.growthImprove,
+          draft.pleasant,
+          draft.tomorrowImprove,
+          draft.stepGoal,
+          draft.flow,
+        ];
+        final hasEntryData = ratingTouched ||
+            energyTouched ||
+            wellBeingTouched ||
+            fields.any((f) => f.trim().isNotEmpty);
+        final notesExist = await QuickNoteService.hasNotes(draft.date);
+        final hasDraftLog = draft.notificationsLog.isNotEmpty;
+
+        if (!hasDraftLog && !notesExist && hasEntryData) {
+          final resume = await showDialog<bool>(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Есть незавершённый черновик'),
+              content: const Text(
+                  'Хотите продолжить заполнение черновика или начать новую запись?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Новая запись'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Продолжить черновик'),
+                ),
+              ],
+            ),
+          );
+          if (resume == true) {
+            entry = draft;
+          } else {
+            await DraftService.clearDraft();
+            entry = await _createNewEntry();
+          }
+        } else if (notesExist || hasDraftLog) {
+          entry = draft;
+        } else {
+          await DraftService.clearDraft();
+          entry = await _createNewEntry();
+        }
+      } else {
+        entry = await _createNewEntry();
+      }
+    }
+
+    _rating = int.tryParse(entry!.rating) ?? 5;
+    _ratingDesc = _ratingLabels[_rating]!;
+    _reasonCtrl.text = entry!.ratingReason;
+    _placeCtrl.text = entry!.place;
+
+    DraftService.currentDraft = entry!;
+    await DraftService.saveDraft();
+
+    if (_placeCtrl.text.isEmpty) {
+      await _autoFillLocation();
+      if (_placeCtrl.text.isNotEmpty) {
+        entry!.place = _placeCtrl.text;
+        DraftService.currentDraft = entry!;
+        await DraftService.saveDraft();
+      }
+    }
+
+    if (_history.length > 3) _history = _history.take(3).toList();
+
+    setState(() {});
+  }
+
+  Future<EntryData> _createNewEntry() async {
+    final all = await LocalDb.fetchAll();
+    DateTime baseDate;
+    if (all.isNotEmpty) {
+      final fmt = DateFormat('dd-MM-yyyy');
+      final dates = all.map((e) => fmt.parse(e.date)).toList()..sort();
+      baseDate = dates.last.add(const Duration(days: 1));
+    } else {
+      baseDate = DateTime.now();
+    }
+    final now = DateTime.now();
+    String two(int v) => v.toString().padLeft(2, '0');
+    final timeStr = '${two(now.hour)}:${two(now.minute)}';
+    final dateStr = '${two(baseDate.day)}-${two(baseDate.month)}-${baseDate.year}';
+    final e = EntryData(
+      date: dateStr,
+      time: timeStr,
+      place: '',
+      createdAt: now,
+    );
+    e.rating = '$_rating';
+    return e;
+  }
+
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
-    _date = DateFormat('dd-MM-yyyy').format(now);
-    _time = DateFormat('HH:mm').format(now);
     _reasonCtrl = TextEditingController();
     _placeCtrl = TextEditingController();
-    _ratingDesc = _ratingLabels[5]!;
-    _loadHistory();
-    _autoFillLocation();
+    _ratingDesc = _ratingLabels[_rating]!;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _initEntry();
+    });
   }
 
   Future<void> _loadHistory() async {
@@ -67,6 +207,11 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
         final city = marks.first.locality ?? '';
         if (city.isNotEmpty && mounted) {
           _placeCtrl.text = city;
+          if (entry != null && (entry!.place.isEmpty)) {
+            entry!.place = city;
+            DraftService.currentDraft = entry!;
+            await DraftService.saveDraft();
+          }
         }
       }
     } catch (_) {
@@ -95,28 +240,45 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
   }
 
   Future<void> _pickDateTime() async {
-    final now = DateTime.now();
+    if (entry == null) return;
+    final parts = entry!.date.split('-');
+    final initialDate = DateTime(
+      int.parse(parts[2]),
+      int.parse(parts[1]),
+      int.parse(parts[0]),
+    );
     final pickedDate = await showDatePicker(
       context: context,
-      initialDate: now,
-      firstDate: now.subtract(const Duration(days: 30)),
-      lastDate: now,
+      initialDate: initialDate,
+      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+      lastDate: DateTime.now(),
     );
     if (pickedDate != null) {
-      _date = DateFormat('dd-MM-yyyy').format(pickedDate);
+      entry!.date = DateFormat('dd-MM-yyyy').format(pickedDate);
     }
+
+    final timeParts = entry!.time.split(':');
+    final initialTime = TimeOfDay(
+      hour: int.parse(timeParts[0]),
+      minute: int.parse(timeParts[1]),
+    );
     final pickedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.fromDateTime(now),
+      initialTime: initialTime,
     );
     if (pickedTime != null) {
-      _time = pickedTime.format(context);
+      String two(int v) => v.toString().padLeft(2, '0');
+      entry!.time = '${two(pickedTime.hour)}:${two(pickedTime.minute)}';
     }
+
+    DraftService.currentDraft = entry!;
+    await DraftService.saveDraft();
     setState(() {});
   }
 
   void _copyDateTime() {
-    final txt = '$_date $_time';
+    if (entry == null) return;
+    final txt = '${entry!.date} ${entry!.time}';
     Clipboard.setData(ClipboardData(text: txt));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Date/time copied')),
@@ -134,8 +296,36 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
           title: const Text('Дневник'),
           actions: [
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.more_vert),
+              tooltip: MyApp.of(context).isDark
+                  ? 'Светлая тема'
+                  : 'Тёмная тема',
+              icon: Icon(
+                MyApp.of(context).isDark
+                    ? Icons.sunny
+                    : Icons.nightlight_round,
+              ),
+              onPressed: () {
+                final appState = MyApp.of(context);
+                appState.toggleTheme(!appState.isDark);
+              },
+            ),
+            PopupMenuButton<_DateMenu>(
+              onSelected: (item) {
+                switch (item) {
+                  case _DateMenu.history:
+                    Navigator.pushNamed(context, EntriesScreen.routeName);
+                    break;
+                }
+              },
+              itemBuilder: (_) => const [
+                PopupMenuItem(
+                  value: _DateMenu.history,
+                  child: ListTile(
+                    leading: Icon(Icons.list),
+                    title: Text('Мои записи'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -154,7 +344,8 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                   ),
                   child: Row(
                     children: [
-                      Text('📅 $_date  $_time'),
+                      if (entry != null)
+                        Text('📅 ${entry!.date}  ${entry!.time}'),
                       const Spacer(),
                       TextButton(
                         onPressed: _copyDateTime,
@@ -185,10 +376,26 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                         hintText: 'Где ты сегодня был?',
                         prefixIcon: Icon(Icons.location_on_outlined),
                       ),
+                      onChanged: (v) async {
+                        if (entry == null) return;
+                        entry!.place = v;
+                        DraftService.currentDraft = entry!;
+                        await DraftService.saveDraft();
+                        if (v.trim().isNotEmpty) {
+                          await PlaceHistoryService.addPlace(v.trim());
+                          await _loadHistory();
+                        }
+                      },
                     );
                   },
                   onSelected: (v) async {
+                    if (entry == null) return;
+                    _placeCtrl.text = v;
+                    entry!.place = v;
+                    DraftService.currentDraft = entry!;
+                    await DraftService.saveDraft();
                     await PlaceHistoryService.addPlace(v);
+                    await _loadHistory();
                   },
                 ),
                 const SizedBox(height: 24),
@@ -216,10 +423,17 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                             min: 1,
                             max: 10,
                             divisions: 9,
-                            onChanged: (v) => setState(() {
+                              onChanged: (v) async {
                               _rating = v.round();
-                              _ratingDesc = _ratingLabels[_rating] ?? _ratingDesc;
-                            }),
+                              if (entry != null) {
+                                entry!.rating = '$_rating';
+                                DraftService.currentDraft = entry!;
+                                await DraftService.saveDraft();
+                              }
+                              setState(() {
+                                _ratingDesc = _ratingLabels[_rating] ?? _ratingDesc;
+                              });
+                              },
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -237,6 +451,12 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                     hintText: 'Опиши причину (необязательно)',
                     border: UnderlineInputBorder(),
                   ),
+                  onChanged: (v) async {
+                    if (entry == null) return;
+                    entry!.ratingReason = v;
+                    DraftService.currentDraft = entry!;
+                    await DraftService.saveDraft();
+                  },
                 ),
                 const Spacer(),
                 SafeArea(
@@ -244,7 +464,16 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                   child: SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        if (entry == null) return;
+                        DraftService.currentDraft = entry!;
+                        await DraftService.saveDraft();
+                        Navigator.pushNamed(
+                          context,
+                          StateScreen.routeName,
+                          arguments: entry,
+                        );
+                      },
                       child: const Text('Далее: Состояние'),
                     ),
                   ),
