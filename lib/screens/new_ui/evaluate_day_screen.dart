@@ -395,7 +395,7 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-                Text('1/6', style: theme.textTheme.labelMedium),
+                Center(child: Text('1/6', style: theme.textTheme.labelMedium)),
                 const SizedBox(height: 8),
                 Card(
                   elevation: 3,
