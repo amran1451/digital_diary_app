@@ -47,6 +47,19 @@ class _StateScreenNewState extends State<StateScreenNew> {
     10: 'Пик формы. Энергия прет. Супер состояние.',
   };
 
+  String get _energyEmoji {
+    if (_energy <= 3) return '😖';
+    if (_energy <= 7) return '😐';
+    return '😄';
+  }
+
+  Color get _energyColor {
+    const start = Color(0xFFFF4B4B);
+    const end = Color(0xFF4CAF50);
+    final t = _energy / 10.0;
+    return Color.lerp(start, end, t)!;
+  }
+
   Map<String, List<QuickNote>> _notes = {};
 
   bool _init = false;
@@ -299,6 +312,8 @@ class _StateScreenNewState extends State<StateScreenNew> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text('😴 Сон', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
@@ -330,7 +345,12 @@ class _StateScreenNewState extends State<StateScreenNew> {
       elevation: 1,
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Wrap(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('🚶 Шаги', style: theme.textTheme.titleMedium),
+        const SizedBox(height: 8),
+        Wrap(
           spacing: 8,
           children: [
             ActionChip(
@@ -362,6 +382,8 @@ class _StateScreenNewState extends State<StateScreenNew> {
                   await _saveFields();
                 }
               },
+            ),
+          ],
             ),
           ],
         ),
@@ -470,14 +492,9 @@ class _StateScreenNewState extends State<StateScreenNew> {
                 Text('⚡', style: theme.textTheme.headlineSmall),
                 const SizedBox(width: 8),
                 Text('Энергия $_energy / 10', style: theme.textTheme.headlineSmall),
-                const Spacer(),
-                if (_energy <= 3)
-                  ActionChip(
-                    label: const Text('Добавить кофе? ☕'),
-                    onPressed: () {},
-                  ),
               ],
             ),
+            const SizedBox(height: 8),
             GestureDetector(
               onDoubleTap: () async {
                 setState(() => _energy = 5);
@@ -485,21 +502,29 @@ class _StateScreenNewState extends State<StateScreenNew> {
                 _energyDesc = _energyLabels[_energy]!;
                 await DraftService.saveDraft();
               },
-              child: Slider(
-                value: _energy.toDouble(),
-                min: 0,
-                max: 10,
-                divisions: 10,
-                label: '$_energy',
-                onChanged: (v) async {
-                  setState(() {
-                    _energy = v.round();
-                    _energyDesc = _energyLabels[_energy]!;
-                  });
-                  entry.energy = '$_energy';
-                  DraftService.currentDraft = entry;
-                  await DraftService.saveDraft();
-                },
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: _energyColor,
+                  thumbColor: _energyColor,
+                  overlayColor: _energyColor.withOpacity(0.2),
+                  thumbShape: _EmojiThumb(emoji: _energyEmoji),
+                ),
+                child: Slider(
+                  value: _energy.toDouble(),
+                  min: 0,
+                  max: 10,
+                  divisions: 10,
+                  label: '$_energy',
+                  onChanged: (v) async {
+                    setState(() {
+                      _energy = v.round();
+                      _energyDesc = _energyLabels[_energy]!;
+                    });
+                    entry.energy = '$_energy';
+                    DraftService.currentDraft = entry;
+                    await DraftService.saveDraft();
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 4),
@@ -586,6 +611,8 @@ class _StateScreenNewState extends State<StateScreenNew> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
+                Center(child: Text('2/6', style: theme.textTheme.labelMedium)),
+                const SizedBox(height: 8),
                 _sleepCard(),
                 const SizedBox(height: 8),
                 _stepsCard(),
@@ -632,5 +659,37 @@ class _StateScreenNewState extends State<StateScreenNew> {
         ),
       ),
     );
+  }
+
+  class _EmojiThumb extends SliderComponentShape {
+  final String emoji;
+  const _EmojiThumb({required this.emoji});
+
+  @override
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) => const Size(40, 40);
+
+  @override
+  void paint(
+  PaintingContext context,
+  Offset center, {
+  required Animation<double> activationAnimation,
+  required Animation<double> enableAnimation,
+  required bool isDiscrete,
+  required TextPainter labelPainter,
+  required RenderBox parentBox,
+  required SliderThemeData sliderTheme,
+  required TextDirection textDirection,
+  required double value,
+  required double textScaleFactor,
+  required Size sizeWithOverflow,
+  }) {
+  final canvas = context.canvas;
+  final text = TextSpan(text: emoji, style: const TextStyle(fontSize: 24));
+  final tp = TextPainter(
+  text: text,
+  textDirection: textDirection,
+  )..layout();
+  tp.paint(canvas, Offset(center.dx - tp.width / 2, center.dy - tp.height / 2));
+  }
   }
 }
