@@ -7,6 +7,26 @@ import '../../services/local_db.dart';
 import '../../main.dart';
 import '../flow_diary/date_time_screen.dart';
 
+const _moodLabels = <int, String>{
+  1: 'Ужасно',
+  2: 'Подавлен',
+  3: 'Грусть',
+  4: 'Грусть немного',
+  5: 'Нейтрально',
+  6: 'Чуть лучше',
+  7: 'Классно',
+  8: 'Отлично',
+  9: 'Восторг',
+  10: 'Великолепно',
+};
+
+String _formatMood(String mood) {
+  final rating = int.tryParse(mood);
+  if (rating == null) return mood;
+  final label = _moodLabels[rating];
+  return label != null ? '$rating – $label' : mood;
+}
+
 class EntryDetailScreen extends StatefulWidget {
   static const routeName = '/entry_detail';
   const EntryDetailScreen({Key? key}) : super(key: key);
@@ -77,7 +97,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       ..writeln('⚡️ Энергия: ${entry.energy}')
       ..writeln('🤒 Самочувствие: ${entry.wellBeing == 'OK' ? 'Всё хорошо' : (entry.wellBeing ?? '')}')
       ..writeln()
-      ..writeln('😊 Настроение: ${entry.mood}')
+      ..writeln('😊 Настроение: ${_formatMood(entry.mood)}')
       ..writeln('🎭 Главные эмоции: ${entry.mainEmotions}')
       ..writeln('💭 Что повлияло на настроение: ${entry.influence}')
       ..writeln()
@@ -163,7 +183,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             Text('⚡️ Энергия: ${entry.energy}'),
             Text('🤒 Самочувствие: ${entry.wellBeing == 'OK' ? 'Всё хорошо' : (entry.wellBeing ?? '')}'),
             const Divider(),
-            Text('😊 Настроение: ${entry.mood}'),
+            Text('😊 Настроение: ${_formatMood(entry.mood)}'),
             Text('🎭 Главные эмоции: ${entry.mainEmotions}'),
             Text('💭 Что повлияло на настроение: ${entry.influence}'),
             const Divider(),

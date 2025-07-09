@@ -19,6 +19,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
   String _emoji = '😐';
   int? _expanded;
   final Set<String> _selected = <String>{};
+  late TextEditingController _moodCtrl;
 
   static const _emojiCycle = ['😩', '😐', '🤩'];
   static const _emojiOptions = ['😩', '😔', '😐', '😊', '🤩'];
@@ -34,7 +35,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
     3: 'Грусть',
     4: 'Грусть',
     5: 'Нейтрально',
-    6: 'Нейтрально',
+    6: 'Чуть лучше',
     7: 'Классно',
     8: 'Классно',
     9: 'Восторг',
@@ -113,8 +114,14 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
     super.didChangeDependencies();
     if (!_inited) {
       entry = ModalRoute.of(context)!.settings.arguments as EntryData;
-      _rating = int.tryParse(entry.mood) ?? 5;
-      _rating = _rating.clamp(1, 10);
+      final parsed = int.tryParse(entry.mood);
+            if (parsed != null) {
+              _rating = parsed.clamp(1, 10);
+              _moodCtrl = TextEditingController();
+            } else {
+              _rating = 5;
+              _moodCtrl = TextEditingController(text: entry.mood);
+            }
       _emoji = _emojiFromRating(_rating);
       _selected.addAll(entry.mainEmotions
           .split(RegExp(r'[;,\n]+'))
@@ -125,7 +132,8 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
   }
 
   Future<void> _save() async {
-    entry.mood = '$_rating';
+    final text = _moodCtrl.text.trim();
+    entry.mood = text.isNotEmpty ? text : '$_rating';
     entry.mainEmotions = _selected.join(', ');
     DraftService.currentDraft = entry;
     await DraftService.saveDraft();
@@ -155,6 +163,12 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
       ),
     );
     if (selected != null) setState(() => _emoji = selected);
+  }
+
+  @override
+  void dispose() {
+    _moodCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -233,6 +247,14 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
                   _ratingLabels[_rating]!,
                   style: theme.textTheme.bodyLarge,
                 ),
+                const SizedBox(height: 8),
+                                TextField(
+                                  controller: _moodCtrl,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Своё описание настроения',
+                                  ),
+                                  onChanged: (_) async => await _save(),
+                                ),
                 const SizedBox(height: 24),
                 if (_selected.isEmpty)
                   MaterialBanner(

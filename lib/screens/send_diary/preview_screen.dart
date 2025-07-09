@@ -13,6 +13,26 @@ import '../history_diary/entry_detail_screen.dart';
 
 enum _DateMenu { entries, toggleTheme }
 
+const _moodLabels = <int, String>{
+  1: 'Ужасно',
+  2: 'Ужасно',
+  3: 'Грусть',
+  4: 'Грусть',
+  5: 'Нейтрально',
+  6: 'Чуть лучше',
+  7: 'Классно',
+  8: 'Классно',
+  9: 'Восторг',
+  10: 'Восторг',
+};
+
+String _formatMood(String mood) {
+  final rating = int.tryParse(mood);
+  if (rating == null) return mood;
+  final label = _moodLabels[rating];
+  return label != null ? '$rating – $label' : mood;
+}
+
 class PreviewScreen extends StatelessWidget {
   static const routeName = '/preview';
   const PreviewScreen({Key? key}) : super(key: key);
@@ -170,7 +190,7 @@ class PreviewScreen extends StatelessWidget {
         Text('⚡️ Энергия: ${e.energy}'),
         Text('🤒 Самочувствие: ${e.wellBeing == 'OK' ? 'Всё хорошо' : (e.wellBeing ?? '')}'),
         const Divider(),
-        Text('😊 Настроение: ${e.mood}'),
+        Text('😊 Настроение: ${_formatMood(e.mood)}'),
         Text('🎭 Эмоции: ${e.mainEmotions}'),
         Text('💭 Влияние: ${e.influence}'),
         const Divider(),
