@@ -22,6 +22,12 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
 
   static const _emojiCycle = ['😩', '😐', '🤩'];
   static const _emojiOptions = ['😩', '😔', '😐', '😊', '🤩'];
+
+  String _emojiFromRating(int rating) {
+      if (rating <= 3) return '😩';
+      if (rating <= 7) return '😐';
+      return '🤩';
+    }
   static const Map<int, String> _ratingLabels = {
     1: 'Ужасно',
     2: 'Ужасно',
@@ -109,7 +115,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
       entry = ModalRoute.of(context)!.settings.arguments as EntryData;
       _rating = int.tryParse(entry.mood) ?? 5;
       _rating = _rating.clamp(1, 10);
-      _emoji = _emojiCycle[((_rating - 1) ~/ 4).clamp(0, 2)];
+      _emoji = _emojiFromRating(_rating);
       _selected.addAll(entry.mainEmotions
           .split(RegExp(r'[;,\n]+'))
           .map((e) => e.trim())
@@ -161,10 +167,17 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
         appBar: AppBar(
           title: const Text('Настроение'),
           actions: [
-            Tooltip(
-              message:
-                  'Не запаривайся: выбери 2-3 эмоции, больше не нужно',
-              child: const Icon(Icons.info_outline),
+           IconButton(
+                         icon: const Icon(Icons.info_outline),
+                         onPressed: () {
+                           showDialog(
+                             context: context,
+                             builder: (ctx) => const AlertDialog(
+                               content: Text(
+                                   'Не запаривайся: выбери 2-3 эмоции, больше не нужно'),
+                             ),
+                           );
+                         },
             ),
             const SizedBox(width: 8),
             const Icon(Icons.calendar_today_outlined),
@@ -207,7 +220,10 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
                     divisions: 9,
                     label: '$_rating',
                     onChanged: (v) async {
-                      setState(() => _rating = v.round());
+                      setState(() {
+                                              _rating = v.round();
+                                              _emoji = _emojiFromRating(_rating);
+                                            });
                       await _save();
                     },
                   ),
@@ -240,7 +256,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
                     color: const Color(0xFF211C2A),
                     elevation: 1,
                     child: ExpansionTile(
-                      key: ValueKey(index),
+                      key: ValueKey('tile_${index}_${_expanded ?? ""}'),
                       tilePadding: const EdgeInsets.symmetric(horizontal: 16),
                       childrenPadding: const EdgeInsets.all(24),
                       collapsedShape: const RoundedRectangleBorder(),
