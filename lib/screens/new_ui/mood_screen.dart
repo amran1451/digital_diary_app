@@ -356,7 +356,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
                       arguments: entry,
                     );
                   },
-                  child: const Text('Достижения'),
+                  child: const Text('Далее: Достижения'),
                 ),
               ],
             ),
