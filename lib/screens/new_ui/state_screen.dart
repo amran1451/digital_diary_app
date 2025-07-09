@@ -328,9 +328,12 @@ class _StateScreenNewState extends State<StateScreenNew> {
               ],
             ),
             const SizedBox(height: 8),
-            ActionChip(
-              label: Text('⏳ ${durationCtrl.text}'),
-              onPressed: () => _pickDuration(durationCtrl),
+            Align(
+                          alignment: Alignment.center,
+                          child: ActionChip(
+                            label: Text('⏳ ${durationCtrl.text}'),
+                            onPressed: () => _pickDuration(durationCtrl),
+                          ),
             ),
           ],
         ),
@@ -613,9 +616,16 @@ class _StateScreenNewState extends State<StateScreenNew> {
               children: [
                 Center(child: Text('2/6', style: theme.textTheme.labelMedium)),
                 const SizedBox(height: 8),
-                _sleepCard(),
-                const SizedBox(height: 8),
-                _stepsCard(),
+                IntrinsicHeight(
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      Expanded(child: _sleepCard()),
+                                      const SizedBox(width: 8),
+                                      Expanded(child: _stepsCard()),
+                                    ],
+                                  ),
+                                ),
                 const SizedBox(height: 8),
                 _activityCard(),
                 const SizedBox(height: 8),
