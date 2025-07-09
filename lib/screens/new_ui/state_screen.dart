@@ -4,7 +4,7 @@ import '../../services/draft_service.dart';
 import '../../services/quick_note_service.dart';
 import '../../utils/draft_note_helper.dart';
 import '../../theme/dark_diary_theme.dart';
-import '../flow_diary/emotion_screen.dart';
+import 'mood_screen.dart';
 
 class StateScreenNew extends StatefulWidget {
   static const routeName = '/state-new';
@@ -657,7 +657,7 @@ class _StateScreenNewState extends State<StateScreenNew> {
                     await DraftService.saveDraft();
                     Navigator.pushNamed(
                       context,
-                      EmotionScreen.routeName,
+                      MoodScreenNew.routeName,
                       arguments: entry,
                     );
                   },
