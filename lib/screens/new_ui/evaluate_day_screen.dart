@@ -336,6 +336,8 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(child: Text('1/6', style: theme.textTheme.labelMedium)),
+                const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -395,8 +397,6 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-                Center(child: Text('1/6', style: theme.textTheme.labelMedium)),
-                const SizedBox(height: 8),
                 Card(
                   elevation: 3,
                   color: DarkDiaryTheme.surface,
