@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
 import '../../services/quick_note_service.dart';
@@ -318,11 +319,19 @@ class _StateScreenNewState extends State<StateScreenNew> {
               spacing: 8,
               children: [
                 ActionChip(
-                  label: Text('🛌 ${bedCtrl.text}'),
+                  label: AutoSizeText(
+                                      '🛌 ${bedCtrl.text}',
+                                      maxLines: 1,
+                                      minFontSize: 12,
+                                    ),
                   onPressed: () => _pickTime(bedCtrl),
                 ),
                 ActionChip(
-                  label: Text('⏰ ${wakeCtrl.text}'),
+                 label: AutoSizeText(
+                                     '⏰ ${wakeCtrl.text}',
+                                     maxLines: 1,
+                                     minFontSize: 12,
+                                   ),
                   onPressed: () => _pickTime(wakeCtrl),
                 ),
               ],
@@ -331,7 +340,11 @@ class _StateScreenNewState extends State<StateScreenNew> {
             Align(
                           alignment: Alignment.center,
                           child: ActionChip(
-                            label: Text('⏳ ${durationCtrl.text}'),
+                            label: AutoSizeText(
+                                                          '⏳ ${durationCtrl.text}',
+                                                          maxLines: 1,
+                                                          minFontSize: 12,
+                                                        ),
                             onPressed: () => _pickDuration(durationCtrl),
                           ),
             ),
@@ -357,7 +370,11 @@ class _StateScreenNewState extends State<StateScreenNew> {
           spacing: 8,
           children: [
             ActionChip(
-              label: Text('🚶 ${stepsCtrl.text.isEmpty ? '0' : stepsCtrl.text} шагов'),
+              label: AutoSizeText(
+                              '🚶 ${stepsCtrl.text.isEmpty ? '0' : stepsCtrl.text} шагов',
+                              maxLines: 1,
+                              minFontSize: 12,
+                            ),шагов'),
               onPressed: () async {
                 final ctrl = TextEditingController(text: stepsCtrl.text);
                 final res = await showDialog<String>(
