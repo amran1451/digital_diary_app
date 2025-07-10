@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
+import '../../services/quick_note_service.dart';
 import '../../theme/dark_diary_theme.dart';
 import 'achievements_screen_new.dart';
 
@@ -20,6 +21,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
   int? _expanded;
   final Set<String> _selected = <String>{};
   late TextEditingController _moodCtrl;
+  Map<String, List<QuickNote>> _notes = {};
 
   static const _emojiCycle = ['😩', '😐', '🤩'];
   static const _emojiOptions = ['😩', '😔', '😐', '😊', '🤩'];
@@ -128,6 +130,11 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
           .map((e) => e.trim())
           .where((e) => e.isNotEmpty));
       _inited = true;
+      DraftService.currentDraft = entry;
+      DraftService.saveDraft();
+      QuickNoteService.getNotesForDate(entry.date).then((n) {
+        setState(() => _notes = n);
+      });
     }
   }
 
@@ -165,6 +172,53 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
     if (selected != null) setState(() => _emoji = selected);
   }
 
+Future<void> _editDraftNote() async {
+    final existing = _notes['mood']?.isNotEmpty == true ? _notes['mood']![0] : null;
+    final ctrl = TextEditingController(text: existing?.text ?? '');
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 16,
+          bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: ctrl,
+              minLines: 3,
+              maxLines: null,
+              autofocus: true,
+              decoration: const InputDecoration(hintText: 'Черновая заметка'),
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+              child: const Text('Сохранить'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (result != null && result.trim().isNotEmpty) {
+      if (existing != null) {
+        await QuickNoteService.deleteNote(entry.date, 'mood', 0);
+        _notes['mood']!.removeAt(0);
+      }
+      final note = await QuickNoteService.addNote(entry.date, 'mood', result.trim());
+      setState(() => _notes.putIfAbsent('mood', () => []).insert(0, note));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Черновик сохранён')),
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     _moodCtrl.dispose();
@@ -182,13 +236,17 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
           title: const Text('Настроение'),
           actions: [
            IconButton(
+                         icon: const Icon(Icons.note_add_outlined),
+                         tooltip: 'Черновик',
+                         onPressed: _editDraftNote,
+                       ),
+                       IconButton(
                          icon: const Icon(Icons.info_outline),
                          onPressed: () {
                            showDialog(
                              context: context,
                              builder: (ctx) => const AlertDialog(
-                               content: Text(
-                                   'Не запаривайся: выбери 2-3 эмоции, больше не нужно'),
+                               content: Text('Не запаривайся: выбери 2-3 эмоции, больше не нужно'),
                              ),
                            );
                          },
