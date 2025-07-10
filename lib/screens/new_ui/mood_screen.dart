@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
 import '../../theme/dark_diary_theme.dart';
-import '../flow_diary/achievements_screen.dart';
+import 'achievements_screen_new.dart';
 
 class MoodScreenNew extends StatefulWidget {
   static const routeName = '/mood-new';
@@ -352,7 +352,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
                     await _save();
                     Navigator.pushNamed(
                       context,
-                      AchievementsScreen.routeName,
+                      AchievementsScreenNew.routeName,
                       arguments: entry,
                     );
                   },
