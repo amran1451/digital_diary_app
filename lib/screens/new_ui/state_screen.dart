@@ -365,45 +365,46 @@ class _StateScreenNewState extends State<StateScreenNew> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('🚶 Шаги', style: theme.textTheme.titleMedium),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: [
-            ActionChip(
-              label: AutoSizeText(
-                '🚶 ${stepsCtrl.text.isEmpty ? '0' : stepsCtrl.text} шагов',
-                maxLines: 1,
-                minFontSize: 12,
-              ),
-              onPressed: () async {
-                final ctrl = TextEditingController(text: stepsCtrl.text);
-                final res = await showDialog<String>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Шаги'),
-                    content: TextField(
-                      controller: ctrl,
-                      keyboardType: TextInputType.number,
+             const SizedBox(height: 8),
+             Wrap(
+                spacing: 8,
+                children: [
+                    ActionChip(
+                        label: AutoSizeText(
+                            '🚶 ${stepsCtrl.text.isEmpty ? '0' : stepsCtrl.text} шагов',
+                            maxLines: 1,
+                            minFontSize: 12,
+                        ),
+                        onPressed: () async {
+                            final ctrl = TextEditingController(text: stepsCtrl.text);
+                            final res = await showDialog<String>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                    title: const Text('Шаги'),
+                                    content: TextField(
+                                        controller: ctrl,
+                                        keyboardType: TextInputType.number,
+                                    ),
+                                    actions: [
+                                        TextButton(
+                                            onPressed: () => Navigator.pop(ctx),
+                                            child: const Text('Отмена'),
+                                        ),
+                                        FilledButton(
+                                            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+                                            child: const Text('OK'),
+                                        ),
+                                    ],
+                                ),
+                            );
+                            if (res != null) {
+                                stepsCtrl.text = res;
+                                await _saveFields();
+                            }
+                        },
                     ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: const Text('Отмена'),
-                      ),
-                      FilledButton(
-                        onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  ),
-                );
-                if (res != null) {
-                  stepsCtrl.text = res;
-                  await _saveFields();
-                }
-              },
-            ),
-          ],
+                ],
+             ),
           ],
         ),
       ),
