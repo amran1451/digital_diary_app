@@ -5,6 +5,7 @@ import '../../services/quick_note_service.dart';
 import '../../utils/draft_note_helper.dart';
 import '../../theme/dark_diary_theme.dart';
 import 'focus_screen_new.dart';
+import '../../widgets/diary_menu_button.dart';
 
 class DevelopmentScreenNew extends StatefulWidget {
   static const routeName = '/development-new';
@@ -148,7 +149,10 @@ class _DevelopmentScreenNewState extends State<DevelopmentScreenNew> {
       data: theme,
       child: Scaffold(
         backgroundColor: DarkDiaryTheme.background,
-        appBar: AppBar(title: const Text('Личностный рост')),
+        appBar: AppBar(
+                  title: const Text('Личностный рост'),
+                  actions: const [DiaryMenuButton()],
+                ),
         body: SafeArea(
           bottom: false,
           child: SingleChildScrollView(

@@ -4,6 +4,7 @@ import '../../services/draft_service.dart';
 import '../../services/quick_note_service.dart';
 import '../../theme/dark_diary_theme.dart';
 import 'achievements_screen_new.dart';
+import '../../widgets/diary_menu_button.dart';
 
 class MoodScreenNew extends StatefulWidget {
   static const routeName = '/mood-new';
@@ -236,7 +237,7 @@ Future<void> _editDraftNote() async {
         appBar: AppBar(
           title: const Text('Настроение'),
           actions: [
-           IconButton(
+            IconButton(
                          icon: const Icon(Icons.note_add_outlined),
                          tooltip: 'Черновик',
                          onPressed: _editDraftNote,
@@ -255,6 +256,7 @@ Future<void> _editDraftNote() async {
             const SizedBox(width: 8),
             const Icon(Icons.calendar_today_outlined),
             const SizedBox(width: 8),
+            const DiaryMenuButton(),
           ],
         ),
         body: SafeArea(

@@ -6,6 +6,7 @@ import '../../services/quick_note_service.dart';
 import '../../utils/draft_note_helper.dart';
 import '../../theme/dark_diary_theme.dart';
 import 'mood_screen.dart';
+import '../../widgets/diary_menu_button.dart';
 
 class StateScreenNew extends StatefulWidget {
   static const routeName = '/state-new';
@@ -624,6 +625,7 @@ class _StateScreenNewState extends State<StateScreenNew> {
         backgroundColor: DarkDiaryTheme.background,
         appBar: AppBar(
           title: const Text('Состояние'),
+          actions: const [DiaryMenuButton()],
         ),
         body: SafeArea(
           bottom: false,

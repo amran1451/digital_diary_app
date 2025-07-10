@@ -17,8 +17,7 @@ import '../../theme/dark_diary_theme.dart';
 import '../../main.dart';
 import 'state_screen.dart';
 import '../history_diary/entries_screen.dart';
-
-enum _DateMenu { history }
+import '../../widgets/diary_menu_button.dart';
 
 class EvaluateDayScreen extends StatefulWidget {
   static const routeName = '/evaluate-day';
@@ -309,24 +308,7 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                 appState.toggleTheme(!appState.isDark);
               },
             ),
-            PopupMenuButton<_DateMenu>(
-              onSelected: (item) {
-                switch (item) {
-                  case _DateMenu.history:
-                    Navigator.pushNamed(context, EntriesScreen.routeName);
-                    break;
-                }
-              },
-              itemBuilder: (_) => const [
-                PopupMenuItem(
-                  value: _DateMenu.history,
-                  child: ListTile(
-                    leading: Icon(Icons.list),
-                    title: Text('Мои записи'),
-                  ),
-                ),
-              ],
-            ),
+            const DiaryMenuButton(),
           ],
         ),
         body: SafeArea(

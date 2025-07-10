@@ -5,6 +5,7 @@ import '../../services/quick_note_service.dart';
 import '../../utils/draft_note_helper.dart';
 import '../../theme/dark_diary_theme.dart';
 import 'development_screen_new.dart';
+import '../../widgets/diary_menu_button.dart';
 
 class AchievementsScreenNew extends StatefulWidget {
   static const routeName = '/achievements-new';
@@ -154,7 +155,10 @@ class _AchievementsScreenNewState extends State<AchievementsScreenNew> {
       data: theme,
       child: Scaffold(
         backgroundColor: DarkDiaryTheme.background,
-        appBar: AppBar(title: const Text('Достижения')),
+        appBar: AppBar(
+                  title: const Text('Достижения'),
+                  actions: const [DiaryMenuButton()],
+                ),
         body: SafeArea(
           bottom: false,
           child: SingleChildScrollView(
