@@ -371,10 +371,10 @@ class _StateScreenNewState extends State<StateScreenNew> {
           children: [
             ActionChip(
               label: AutoSizeText(
-                              '🚶 ${stepsCtrl.text.isEmpty ? '0' : stepsCtrl.text} шагов',
-                              maxLines: 1,
-                              minFontSize: 12,
-                            ),шагов'),
+                '🚶 ${stepsCtrl.text.isEmpty ? '0' : stepsCtrl.text} шагов',
+                maxLines: 1,
+                minFontSize: 12,
+              ),
               onPressed: () async {
                 final ctrl = TextEditingController(text: stepsCtrl.text);
                 final res = await showDialog<String>(
@@ -404,7 +404,6 @@ class _StateScreenNewState extends State<StateScreenNew> {
               },
             ),
           ],
-            ),
           ],
         ),
       ),
