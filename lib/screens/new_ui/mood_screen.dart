@@ -32,16 +32,17 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
       return '🤩';
     }
   static const Map<int, String> _ratingLabels = {
-    1: 'Ужасно',
-    2: 'Ужасно',
-    3: 'Грусть',
-    4: 'Грусть',
+    0: 'Кризис',
+    1: 'Безнадёжность',
+    2: 'Уныние',
+    3: 'Тревога',
+    4: 'Напряжение',
     5: 'Нейтрально',
-    6: 'Чуть лучше',
-    7: 'Классно',
-    8: 'Классно',
-    9: 'Восторг',
-    10: 'Восторг',
+    6: 'Спокойствие',
+    7: 'Удовлетворение',
+    8: 'Оптимизм',
+    9: 'Воодушевление',
+    10: 'Эйфория',
   };
 
   static const Map<String, List<String>> _emotionCategories = {
@@ -118,12 +119,12 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
       entry = ModalRoute.of(context)!.settings.arguments as EntryData;
       final parsed = int.tryParse(entry.mood);
             if (parsed != null) {
-              _rating = parsed.clamp(1, 10);
-              _moodCtrl = TextEditingController();
-            } else {
-              _rating = 5;
-              _moodCtrl = TextEditingController(text: entry.mood);
-            }
+                    _rating = parsed.clamp(0, 10);
+                    _moodCtrl = TextEditingController();
+                  } else {
+                    _rating = 5;
+                    _moodCtrl = TextEditingController(text: entry.mood);
+                  }
       _emoji = _emojiFromRating(_rating);
       _selected.addAll(entry.mainEmotions
           .split(RegExp(r'[;,\n]+'))
@@ -287,9 +288,9 @@ Future<void> _editDraftNote() async {
                   ),
                   child: Slider(
                     value: _rating.toDouble(),
-                    min: 1,
+                    min: 0,
                     max: 10,
-                    divisions: 9,
+                    divisions: 10,
                     label: '$_rating',
                     onChanged: (v) async {
                       setState(() {
@@ -303,7 +304,9 @@ Future<void> _editDraftNote() async {
                 const SizedBox(height: 4),
                 Text(
                   _ratingLabels[_rating]!,
-                  style: theme.textTheme.bodyLarge,
+                  style: theme.textTheme.bodyLarge!.copyWith(
+                                      color: const Color(0xFFE6E1E5),
+                                    ),
                 ),
                 const SizedBox(height: 8),
                                 TextField(
