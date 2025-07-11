@@ -135,6 +135,36 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
           onPressed: () => _sharePdf(entry),
           child: const Icon(Icons.picture_as_pdf),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        bottomNavigationBar: SafeArea(
+          child: Container(
+            height: 72,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              boxShadow: kElevationToShadow[2],
+            ),
+            child: Row(
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('← Назад'),
+                ),
+                const Spacer(),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(120, 40),
+                    backgroundColor: DarkDiaryTheme.primary,
+                  ),
+                  onPressed: () => entry.localId == null
+                      ? _send(entry, context)
+                      : _save(entry, context),
+                  child: const Text('✈ Отправить'),
+                ),
+              ],
+            ),
+          ),
+        ),
         body: Stack(
           children: [
             Column(
@@ -206,16 +236,9 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
                                               style: f.value.isEmpty
                                                   ? theme.textTheme.bodyMedium!
                                                   .copyWith(
-                                                  color: theme
-                                                      .colorScheme
-                                                      .onSurface
-                                                      .withOpacity(
-                                                      0.5))
+                                                  color: theme.colorScheme.onSurface.withOpacity(0.5))
                                                   : theme.textTheme.labelLarge!
-                                                  .copyWith(
-                                                  fontWeight:
-                                                  FontWeight
-                                                      .w600),
+                                                  .copyWith(fontWeight: FontWeight.w600),
                                             ),
                                           ],
                                         ),
@@ -229,35 +252,6 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
                         ),
                       );
                     },
-                  ),
-                ),
-                SafeArea(
-                  child: Container(
-                    height: 72,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
-                      boxShadow: kElevationToShadow[2],
-                    ),
-                    child: Row(
-                      children: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('← Назад'),
-                        ),
-                        const Spacer(),
-                        FilledButton(
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size(120, 40),
-                            backgroundColor: DarkDiaryTheme.primary,
-                          ),
-                          onPressed: () => entry.localId == null
-                              ? _send(entry, context)
-                              : _save(entry, context),
-                          child: const Text('✈ Отправить'),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ],
