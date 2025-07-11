@@ -65,7 +65,7 @@ class _StateScreenNewState extends State<StateScreenNew> {
   Map<String, List<QuickNote>> _notes = {};
 
   bool _init = false;
-  bool _allGood = true;
+  bool _allGood = false;
   late TextEditingController wellCtrl;
 
   void _parseExistingActivities() {
@@ -248,7 +248,7 @@ class _StateScreenNewState extends State<StateScreenNew> {
       wellCtrl = TextEditingController(
         text: entry.wellBeing == 'OK' ? '' : (entry.wellBeing ?? ''),
       );
-      _allGood = entry.wellBeing == null || entry.wellBeing!.isEmpty || entry.wellBeing == 'OK';
+      _allGood = entry.wellBeing == 'OK';
       _parseExistingActivities();
 
       _energy = int.tryParse(entry.energy) ?? 5;
