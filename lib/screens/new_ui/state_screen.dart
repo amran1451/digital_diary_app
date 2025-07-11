@@ -320,34 +320,22 @@ class _StateScreenNewState extends State<StateScreenNew> {
               spacing: 8,
               children: [
                 ActionChip(
-                  label: AutoSizeText(
-                                      '🛌 ${bedCtrl.text}',
-                                      maxLines: 1,
-                                      minFontSize: 12,
-                                    ),
+                  label: Text('🛌 ${bedCtrl.text}'),
                   onPressed: () => _pickTime(bedCtrl),
                 ),
                 ActionChip(
-                 label: AutoSizeText(
-                                     '⏰ ${wakeCtrl.text}',
-                                     maxLines: 1,
-                                     minFontSize: 12,
-                                   ),
+                  label: Text('⏰ ${wakeCtrl.text}'),
                   onPressed: () => _pickTime(wakeCtrl),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             Align(
-                          alignment: Alignment.center,
-                          child: ActionChip(
-                            label: AutoSizeText(
-                                                          '⏳ ${durationCtrl.text}',
-                                                          maxLines: 1,
-                                                          minFontSize: 12,
-                                                        ),
-                            onPressed: () => _pickDuration(durationCtrl),
-                          ),
+              alignment: Alignment.center,
+              child: ActionChip(
+                label: Text('⏳ ${durationCtrl.text}'),
+                onPressed: () => _pickDuration(durationCtrl),
+              ),
             ),
           ],
         ),
@@ -371,11 +359,7 @@ class _StateScreenNewState extends State<StateScreenNew> {
                 spacing: 8,
                 children: [
                     ActionChip(
-                        label: AutoSizeText(
-                            '🚶 ${stepsCtrl.text.isEmpty ? '0' : stepsCtrl.text} шагов',
-                            maxLines: 1,
-                            minFontSize: 12,
-                        ),
+                      label: Text('🚶 ${stepsCtrl.text.isEmpty ? '0' : stepsCtrl.text} шагов'),
                         onPressed: () async {
                             final ctrl = TextEditingController(text: stepsCtrl.text);
                             final res = await showDialog<String>(
