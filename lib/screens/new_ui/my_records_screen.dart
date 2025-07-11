@@ -503,7 +503,8 @@ class _MyRecordsScreenState extends State<MyRecordsScreen> {
               );
             },
           ),
-          ],
+        ),
+            ],
         ),
         floatingActionButton: _showFab
             ? FloatingActionButton.extended(
