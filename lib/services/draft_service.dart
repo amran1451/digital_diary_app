@@ -39,11 +39,14 @@ class DraftService {
 
     const defaultRating = '5';
     const defaultEnergy = '5';
+    const defaultMood = '5';
 
     final ratingTouched =
         draft.rating.trim().isNotEmpty && draft.rating != defaultRating;
     final energyTouched =
         draft.energy.trim().isNotEmpty && draft.energy != defaultEnergy;
+    final moodTouched =
+        draft.mood.trim().isNotEmpty && draft.mood != defaultMood;
     final wellBeingTouched =
         (draft.wellBeing?.trim().isNotEmpty ?? false) &&
             draft.wellBeing != 'OK';
@@ -56,7 +59,6 @@ class DraftService {
       draft.sleepDuration,
       draft.steps,
       draft.activity,
-      draft.mood,
       draft.mainEmotions,
       draft.influence,
       draft.important,
@@ -77,6 +79,7 @@ class DraftService {
     final hasEntryData = ratingTouched ||
         energyTouched ||
         wellBeingTouched ||
+        moodTouched ||
         fields.any((f) => f.trim().isNotEmpty);
 
     // Показ диалога нужен только при наличии заполненных полей. Наличие
