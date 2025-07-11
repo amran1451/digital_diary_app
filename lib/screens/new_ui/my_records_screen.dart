@@ -126,8 +126,10 @@ class _MyRecordsScreenState extends State<MyRecordsScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx2, setModal) => Padding(
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx2).viewInsets.bottom,
-            left: 16, right: 16, top: 16,
+            bottom: MediaQuery.of(ctx2).viewInsets.bottom + 16,
+            left: 16,
+            right: 16,
+            top: 16,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -319,14 +321,8 @@ class _MyRecordsScreenState extends State<MyRecordsScreen> {
       child: Scaffold(
         backgroundColor: DarkDiaryTheme.background,
         appBar: AppBar(
-          centerTitle: true,
-          title: const Text('📖 Мои записи', style: TextStyle(fontSize: 16)),
+          title: const Text('Мои записи'),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.filter_list),
-              tooltip: 'Фильтры',
-              onPressed: _openFilterSheet,
-            ),
             PopupMenuButton<MyRecordsMenu>(
               onSelected: (item) async {
                 switch (item) {
