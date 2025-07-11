@@ -11,8 +11,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 
-final rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-
 // flow_diary
 import 'screens/flow_diary/achievements_screen.dart';
 import 'screens/flow_diary/date_time_screen.dart';
@@ -76,6 +74,9 @@ import 'screens/notification_settings_screen.dart';
 import 'services/permission_service.dart';
 import 'services/notification_service.dart';
 import 'app_config.dart';
+
+
+final rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
