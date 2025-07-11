@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import '../../models/entry_data.dart';
 import '../../services/local_db.dart';
 import '../../theme/dark_diary_theme.dart';
-import '../../main.dart';
 
 import '../../utils/rating_emoji.dart';
 
@@ -256,9 +255,14 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
     setState(() => _editing = false);
     if (!mounted) return;
     HapticFeedback.lightImpact();
-    rootScaffoldMessengerKey.currentState?.showSnackBar(
-      const SnackBar(content: Text('Изменения сохранены')),
-    );
+    // Showing the SnackBar right before popping this route can trigger
+    // "Looking up a deactivated widget's ancestor" assertions. Schedule it
+    // for the next frame so that the widget tree has settled.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      rootScaffoldMessengerKey.currentState?.showSnackBar(
+        const SnackBar(content: Text('Изменения сохранены')),
+      );
+    });
   }
 
   Widget _buildEditForm(ThemeData theme) {
@@ -401,12 +405,13 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
         child: Scaffold(
           backgroundColor: DarkDiaryTheme.background,
           appBar: AppBar(
+            leadingWidth: 88,
             leading: _editing
-            ? TextButton(
-              onPressed: _cancelEditing,
-              child: const Text('Отмена'),
-            )
-            : null,
+                ? TextButton(
+                  onPressed: _cancelEditing,
+                  child: const Text('Отмена'),
+                )
+              : null,
             title: const Text('Запись'),
             actions: _editing
             ? [
