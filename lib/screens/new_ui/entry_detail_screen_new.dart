@@ -98,6 +98,7 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
     for (final f in fields) {
       _ctrls[f] = TextEditingController(text: _getField(f));
     }
+    _ratingReasonCtrl = TextEditingController(text: entry.ratingReason);
   }
 
   void _disposeCtrls() {
