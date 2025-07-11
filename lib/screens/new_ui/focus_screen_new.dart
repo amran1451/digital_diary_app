@@ -6,6 +6,7 @@ import '../../utils/draft_note_helper.dart';
 import '../../theme/dark_diary_theme.dart';
 import '../send_diary/preview_screen.dart';
 import '../../widgets/diary_menu_button.dart';
+import 'preview_screen_new.dart';
 
 class FocusScreenNew extends StatefulWidget {
   static const routeName = '/focus-new';
@@ -229,7 +230,7 @@ class _FocusScreenNewState extends State<FocusScreenNew> {
                     await DraftService.saveDraft();
                     Navigator.pushNamed(
                       context,
-                      PreviewScreen.routeName,
+                      PreviewScreenNew.routeName,
                       arguments: entry,
                     );
                   },

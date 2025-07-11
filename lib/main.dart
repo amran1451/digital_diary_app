@@ -24,6 +24,7 @@ import 'screens/new_ui/mood_screen.dart';
 import 'screens/new_ui/achievements_screen_new.dart';
 import 'screens/new_ui/development_screen_new.dart';
 import 'screens/new_ui/focus_screen_new.dart';
+import 'screens/new_ui/preview_screen_new.dart';
 
 // history_diary - analytics
 import 'screens/history_diary/analytics/analytics_menu_screen.dart';
@@ -150,6 +151,7 @@ class _MyAppState extends State<MyApp> {
         AchievementsScreenNew.routeName: (_) => const AchievementsScreenNew(),
         DevelopmentScreenNew.routeName: (_) => const DevelopmentScreenNew(),
         FocusScreenNew.routeName:       (_) => const FocusScreenNew(),
+        PreviewScreenNew.routeName:    (_) => const PreviewScreenNew(),
         PreviewScreen.routeName:       (_) => const PreviewScreen(),
         EntriesScreen.routeName:       (_) => const EntriesScreen(),
         EntryDetailScreen.routeName:   (_) => const EntryDetailScreen(),
