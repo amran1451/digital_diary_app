@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
+// `ScrollDirection` is defined in the rendering library. Importing it
+// explicitly avoids "isn't a type" errors during compilation.
+import 'package:flutter/rendering.dart';
 
 import '../../main.dart';
 import '../../models/entry_data.dart';
