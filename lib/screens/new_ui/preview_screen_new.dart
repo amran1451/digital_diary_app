@@ -14,6 +14,7 @@ import '../../main.dart';
 import '../flow_diary/date_time_screen.dart';
 import '../history_diary/entries_screen.dart';
 import '../history_diary/entry_detail_screen.dart';
+import 'evaluate_day_screen.dart';
 
 class PreviewScreenNew extends StatefulWidget {
   static const routeName = '/preview-new';
@@ -44,7 +45,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
     if (!mounted) return;
     Navigator.pushNamedAndRemoveUntil(
       ctx,
-      DateTimeScreen.routeName,
+      EvaluateDayScreen.routeName,
           (_) => false,
     );
     await DraftService.clearDraft();
