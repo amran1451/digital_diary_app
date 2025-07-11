@@ -58,7 +58,7 @@ class HomeMenuScreen extends StatelessWidget {
               _buildTile(c, Icons.book,   'Дневник',         DateTimeScreen.routeName),
               if (notificationsEnabled)
                 _buildTile(c, Icons.notifications, 'Уведомления', NotificationSettingsScreen.routeName),
-              _buildTile(c, Icons.book,   'Дневник new_ui',         EvaluateDayScreen.routeName),
+              _buildTile(c, Icons.book,   'Дневник 2.0',         EvaluateDayScreen.routeName),
             ],
           ),
         ),

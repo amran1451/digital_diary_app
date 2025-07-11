@@ -42,6 +42,7 @@ import 'screens/history_diary/analytics/influence_analytics_screen.dart';
 
 // history_diary - entries
 import 'screens/history_diary/entries_screen.dart';
+import 'screens/new_ui/my_records_screen.dart';
 import 'screens/history_diary/entry_detail_screen.dart';
 import 'screens/history_diary/export_screen.dart';
 import 'screens/history_diary/import_screen.dart';
@@ -153,6 +154,7 @@ class _MyAppState extends State<MyApp> {
         FocusScreenNew.routeName:       (_) => const FocusScreenNew(),
         PreviewScreenNew.routeName:    (_) => const PreviewScreenNew(),
         PreviewScreen.routeName:       (_) => const PreviewScreen(),
+        MyRecordsScreen.routeName:       (_) => const MyRecordsScreen(),
         EntriesScreen.routeName:       (_) => const EntriesScreen(),
         EntryDetailScreen.routeName:   (_) => const EntryDetailScreen(),
         ExportScreen.routeName:        (_) => const ExportScreen(),

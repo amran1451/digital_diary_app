@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../screens/history_diary/entries_screen.dart';
+import '../screens/new_ui/my_records_screen.dart';
 
 enum DiaryMenuAction { entries }
 
@@ -13,7 +13,7 @@ class DiaryMenuButton extends StatelessWidget {
       onSelected: (action) {
         switch (action) {
           case DiaryMenuAction.entries:
-            Navigator.pushNamed(context, EntriesScreen.routeName);
+            Navigator.pushNamed(context, MyRecordsScreen.routeName);
             break;
         }
       },

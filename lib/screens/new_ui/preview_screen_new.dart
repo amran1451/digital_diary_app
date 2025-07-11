@@ -15,6 +15,7 @@ import '../flow_diary/date_time_screen.dart';
 import '../history_diary/entries_screen.dart';
 import '../history_diary/entry_detail_screen.dart';
 import 'evaluate_day_screen.dart';
+import 'my_records_screen.dart';
 
 class PreviewScreenNew extends StatefulWidget {
   static const routeName = '/preview-new';
@@ -100,7 +101,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
               onSelected: (item) {
                 switch (item) {
                   case _DateMenu.entries:
-                    Navigator.pushNamed(context, EntriesScreen.routeName);
+                    Navigator.pushNamed(context, MyRecordsScreen.routeName);
                     break;
                   case _DateMenu.toggleTheme:
                     appState.toggleTheme(!appState.isDark);
