@@ -18,11 +18,19 @@ class EntryDetailScreenNew extends StatefulWidget {
 class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
   late EntryData entry;
   final Map<int, bool> _expanded = {};
+  bool _editing = false;
+  EntryData? _snapshot;
+  final _formKey = GlobalKey<FormState>();
+  final Map<String, TextEditingController> _ctrls = {};
+  int _rating = 5;
+  late TextEditingController _ratingReasonCtrl;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     entry = ModalRoute.of(context)!.settings.arguments as EntryData;
+    _rating = int.tryParse(entry.rating) ?? 5;
+    _ratingReasonCtrl = TextEditingController(text: entry.ratingReason);
   }
 
   Future<void> _pickDate() async {
@@ -58,6 +66,252 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
 
   void _toggle(int i) {
     setState(() => _expanded[i] = !(_expanded[i] ?? false));
+  }
+
+  void _initCtrls() {
+    final fields = [
+      'place',
+      'bedTime',
+      'wakeTime',
+      'sleepDuration',
+      'steps',
+      'activity',
+      'energy',
+      'wellBeing',
+      'mood',
+      'mainEmotions',
+      'influence',
+      'important',
+      'tasks',
+      'notDone',
+      'thought',
+      'development',
+      'qualities',
+      'growthImprove',
+      'pleasant',
+      'tomorrowImprove',
+      'stepGoal',
+      'flow',
+    ];
+    for (final f in fields) {
+      _ctrls[f] = TextEditingController(text: _getField(f));
+    }
+  }
+
+  void _disposeCtrls() {
+    for (final c in _ctrls.values) {
+      c.dispose();
+    }
+    _ctrls.clear();
+    _ratingReasonCtrl.dispose();
+  }
+
+  String _getField(String name) {
+    switch (name) {
+      case 'place':
+        return entry.place;
+      case 'bedTime':
+        return entry.bedTime;
+      case 'wakeTime':
+        return entry.wakeTime;
+      case 'sleepDuration':
+        return entry.sleepDuration;
+      case 'steps':
+        return entry.steps;
+      case 'activity':
+        return entry.activity;
+      case 'energy':
+        return entry.energy;
+      case 'wellBeing':
+        return entry.wellBeing ?? '';
+      case 'mood':
+        return entry.mood;
+      case 'mainEmotions':
+        return entry.mainEmotions;
+      case 'influence':
+        return entry.influence;
+      case 'important':
+        return entry.important;
+      case 'tasks':
+        return entry.tasks;
+      case 'notDone':
+        return entry.notDone;
+      case 'thought':
+        return entry.thought;
+      case 'development':
+        return entry.development;
+      case 'qualities':
+        return entry.qualities;
+      case 'growthImprove':
+        return entry.growthImprove;
+      case 'pleasant':
+        return entry.pleasant;
+      case 'tomorrowImprove':
+        return entry.tomorrowImprove;
+      case 'stepGoal':
+        return entry.stepGoal;
+      case 'flow':
+        return entry.flow;
+    }
+    return '';
+  }
+
+  void _setField(String name, String value) {
+    switch (name) {
+      case 'place':
+        entry.place = value;
+        break;
+      case 'bedTime':
+        entry.bedTime = value;
+        break;
+      case 'wakeTime':
+        entry.wakeTime = value;
+        break;
+      case 'sleepDuration':
+        entry.sleepDuration = value;
+        break;
+      case 'steps':
+        entry.steps = value;
+        break;
+      case 'activity':
+        entry.activity = value;
+        break;
+      case 'energy':
+        entry.energy = value;
+        break;
+      case 'wellBeing':
+        entry.wellBeing = value.isEmpty ? null : value;
+        break;
+      case 'mood':
+        entry.mood = value;
+        break;
+      case 'mainEmotions':
+        entry.mainEmotions = value;
+        break;
+      case 'influence':
+        entry.influence = value;
+        break;
+      case 'important':
+        entry.important = value;
+        break;
+      case 'tasks':
+        entry.tasks = value;
+        break;
+      case 'notDone':
+        entry.notDone = value;
+        break;
+      case 'thought':
+        entry.thought = value;
+        break;
+      case 'development':
+        entry.development = value;
+        break;
+      case 'qualities':
+        entry.qualities = value;
+        break;
+      case 'growthImprove':
+        entry.growthImprove = value;
+        break;
+      case 'pleasant':
+        entry.pleasant = value;
+        break;
+      case 'tomorrowImprove':
+        entry.tomorrowImprove = value;
+        break;
+      case 'stepGoal':
+        entry.stepGoal = value;
+        break;
+      case 'flow':
+        entry.flow = value;
+        break;
+    }
+  }
+
+  void _startEditing() {
+    _snapshot = EntryData.fromMap(entry.toMap());
+    _initCtrls();
+    setState(() => _editing = true);
+  }
+
+  Future<void> _cancelEditing() async {
+    if (_snapshot != null) {
+      entry = EntryData.fromMap(_snapshot!.toMap());
+    }
+    _disposeCtrls();
+    setState(() => _editing = false);
+  }
+
+  Future<void> _saveEditing() async {
+    if (!_formKey.currentState!.validate()) return;
+    for (final e in _ctrls.entries) {
+      _setField(e.key, e.value.text);
+    }
+    entry.rating = '$_rating';
+    entry.ratingReason = _ratingReasonCtrl.text;
+    await LocalDb.saveOrUpdate(entry);
+    _disposeCtrls();
+    setState(() => _editing = false);
+    if (!mounted) return;
+    HapticFeedback.lightImpact();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Изменения сохранены')),
+    );
+  }
+
+  Widget _buildEditForm(ThemeData theme) {
+    return Form(
+      key: _formKey,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: TextEditingController(text: entry.date),
+                  readOnly: true,
+                  decoration: const InputDecoration(labelText: 'Дата'),
+                  onTap: _pickDate,
+                ),
+              ),
+              IconButton(onPressed: _pickDate, icon: const Icon(Icons.edit_calendar)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text('Создано: ${entry.createdAtFormatted}', style: theme.textTheme.bodyMedium),
+          TextFormField(
+            controller: _ctrls['place'],
+            decoration: const InputDecoration(labelText: 'Место'),
+          ),
+          const SizedBox(height: 16),
+          Text('Оценка дня $_rating', style: theme.textTheme.bodyMedium),
+          Slider(
+            value: _rating.toDouble(),
+            min: 0,
+            max: 10,
+            divisions: 10,
+            onChanged: (v) => setState(() => _rating = v.round()),
+          ),
+          TextFormField(
+            controller: _ratingReasonCtrl,
+            decoration: const InputDecoration(labelText: 'Причина оценки'),
+          ),
+          const SizedBox(height: 16),
+          ..._ctrls.entries.map((e) {
+            final isLong = e.key == 'flow';
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: TextFormField(
+                controller: e.value,
+                decoration: InputDecoration(labelText: e.key),
+                minLines: isLong ? 4 : 1,
+                maxLines: isLong ? null : 1,
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
   }
 
   @override
@@ -108,44 +362,85 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
 
     return Theme(
       data: theme,
-      child: Scaffold(
-        backgroundColor: DarkDiaryTheme.background,
+        child: WillPopScope(
+        onWillPop: () async {
+      if (_editing) {
+        final res = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Сохранить изменения?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Отмена'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Сохранить'),
+              ),
+            ],
+          ),
+        );
+        if (res == true) {
+          await _saveEditing();
+          return true;
+        } else if (res == false) {
+          await _cancelEditing();
+          return true;
+        }
+        return false;
+      }
+      return true;
+    },
+    child: Scaffold(
+    backgroundColor: DarkDiaryTheme.background,
         appBar: AppBar(
+        leading: _editing
+        ? TextButton(
+    onPressed: _cancelEditing,
+    child: const Text('Отмена'),
+    )
+        : null,
           title: const Text('Запись'),
-          actions: [
-            IconButton(
-              icon: Icon(appState.isDark ? Icons.sunny : Icons.nightlight_round),
-              onPressed: () => appState.toggleTheme(!appState.isDark),
-            ),
-            IconButton(
-              icon: const Icon(Icons.copy),
-              tooltip: 'Скопировать запись',
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: buffer.toString()));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Запись скопирована в буфер обмена')),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.edit_calendar),
-              tooltip: 'Изменить дату записи',
-              onPressed: _pickDate,
-            ),
-            IconButton(
-              icon: const Icon(Icons.edit),
-              tooltip: 'Редактировать',
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  DateTimeScreen.routeName,
-                  arguments: entry,
-                );
-              },
-            ),
-          ],
+    actions: _editing
+    ? [
+    TextButton(
+    onPressed: _saveEditing,
+    child: const Text('Сохранить'),
+    ),
+    ]
+        : [
+    IconButton(
+    icon:
+    Icon(appState.isDark ? Icons.sunny : Icons.nightlight_round),
+    onPressed: () => appState.toggleTheme(!appState.isDark),
+    ),
+    IconButton(
+    icon: const Icon(Icons.copy),
+    tooltip: 'Скопировать запись',
+    onPressed: () {
+    Clipboard.setData(ClipboardData(text: buffer.toString()));
+    ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+    content: Text('Запись скопирована в буфер обмена')),
+    );
+    },
+    ),
+    IconButton(
+    icon: const Icon(Icons.edit_calendar),
+    tooltip: 'Изменить дату записи',
+    onPressed: _pickDate,
+    ),
+    IconButton(
+    icon: const Icon(Icons.edit),
+    tooltip: 'Редактировать',
+    onPressed: _startEditing,
+    ),
+    ],
         ),
-        body: ListView.builder(
+    body: _editing
+    ? _buildEditForm(theme)
+        : ListView.builder(
           padding: const EdgeInsets.all(8),
           itemCount: sections.length + (entry.notificationsLog.isNotEmpty ? 1 : 0),
           itemBuilder: (ctx, i) {
