@@ -192,6 +192,7 @@ class _ImportScreenState extends State<ImportScreen> {
       }
 
       if (line.startsWith('🤒 Самочувствие:')) {
+        final wb = line.substring(line.indexOf(':') + 1).trim();
         current['wellBeing'] = WellBeingUtils.normalize(wb);
         continue;
       }
@@ -513,6 +514,7 @@ class _ImportScreenState extends State<ImportScreen> {
         continue;
       }
       if (line.startsWith('🤒 Самочувствие:')) {
+        final wb = line.substring(line.indexOf(':') + 1).trim();
         current['wellBeing'] = WellBeingUtils.normalize(wb);
         continue;
       }
