@@ -12,12 +12,12 @@ import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
 import '../../services/local_db.dart';
 import '../../services/place_history_service.dart';
-import '../../services/quick_note_service.dart';
 import '../../theme/dark_diary_theme.dart';
 import '../../main.dart';
 import 'state_screen.dart';
 import '../history_diary/entries_screen.dart';
 import '../../widgets/diary_menu_button.dart';
+import '../../widgets/unsaved_draft_dialog.dart';
 
 class EvaluateDayScreen extends StatefulWidget {
   static const routeName = '/evaluate-day';
@@ -57,76 +57,16 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
       entry = arg;
     } else {
       final draft = await DraftService.loadDraft();
-      if (draft != null) {
-        const defaultRating = '5';
-        const defaultEnergy = '5';
-        final ratingTouched =
-            draft.rating.trim().isNotEmpty && draft.rating != defaultRating;
-        final energyTouched =
-            draft.energy.trim().isNotEmpty && draft.energy != defaultEnergy;
-        final wellBeingTouched =
-            (draft.wellBeing?.trim().isNotEmpty ?? false) &&
-                draft.wellBeing != 'OK';
-        final fields = [
-          draft.bedTime,
-          draft.wakeTime,
-          draft.sleepDuration,
-          draft.steps,
-          draft.activity,
-          draft.mood,
-          draft.mainEmotions,
-          draft.influence,
-          draft.important,
-          draft.tasks,
-          draft.notDone,
-          draft.thought,
-          draft.development,
-          draft.qualities,
-          draft.growthImprove,
-          draft.pleasant,
-          draft.tomorrowImprove,
-          draft.stepGoal,
-          draft.flow,
-        ];
-        final hasEntryData = ratingTouched ||
-            energyTouched ||
-            wellBeingTouched ||
-            fields.any((f) => f.trim().isNotEmpty);
-        final notesExist = await QuickNoteService.hasNotes(draft.date);
-        final hasDraftLog = draft.notificationsLog.isNotEmpty;
-
-        if (!hasDraftLog && !notesExist && hasEntryData) {
-          final resume = await showDialog<bool>(
-            context: context,
-            barrierDismissible: false,
-            builder: (ctx) => AlertDialog(
-              title: const Text('Есть незавершённый черновик'),
-              content: const Text(
-                  'Хотите продолжить заполнение черновика или начать новую запись?'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('Новая запись'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(ctx, true),
-                  child: const Text('Продолжить черновик'),
-                ),
-              ],
-            ),
-          );
-          if (resume == true) {
-            entry = draft;
-          } else {
-            await DraftService.clearDraft();
-            entry = await _createNewEntry();
-          }
-        } else if (notesExist || hasDraftLog) {
+      if (draft != null && await DraftService.hasActiveDraft()) {
+        final resume = await showUnsavedDraftDialog(context) ?? false;
+        if (resume) {
           entry = draft;
         } else {
           await DraftService.clearDraft();
           entry = await _createNewEntry();
         }
+      } else if (draft != null) {
+        entry = draft;
       } else {
         entry = await _createNewEntry();
       }

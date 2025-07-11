@@ -5,10 +5,10 @@ import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
 import '../../services/local_db.dart';
 import '../../services/place_history_service.dart';
-import '../../services/quick_note_service.dart';
 import '../../main.dart';
 import 'state_screen.dart';
 import '../history_diary/entries_screen.dart';
+import '../../widgets/unsaved_draft_dialog.dart';
 
 enum _DateMenu { entries, toggleTheme }
 
@@ -78,90 +78,23 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
       debugPrint('  date: ${draft.date}');
       debugPrint('  time: ${draft.time}');
       debugPrint('  rating: ${draft.rating}');
-      final notes = await QuickNoteService.getNotesForDate(draft.date);
-      debugPrint('  draftNotes: $notes');
       debugPrint('  notificationsLog: ${draft.notificationsLog}');
     }
-    if (draft != null) {
-      // Проверяем, заполнил ли пользователь что-то кроме даты/времени
-      const defaultRating = '5';
-      const defaultEnergy = '5';
-      final ratingTouched = draft.rating.trim().isNotEmpty &&
-          draft.rating != defaultRating;
-      final energyTouched = draft.energy.trim().isNotEmpty &&
-          draft.energy != defaultEnergy;
-      final wellBeingTouched = (draft.wellBeing?.trim().isNotEmpty ?? false) &&
-          draft.wellBeing != 'OK';
-      final fields = [
-        draft.bedTime,
-        draft.wakeTime,
-        draft.sleepDuration,
-        draft.steps,
-        draft.activity,
-        draft.mood,
-        draft.mainEmotions,
-        draft.influence,
-        draft.important,
-        draft.tasks,
-        draft.notDone,
-        draft.thought,
-        draft.development,
-        draft.qualities,
-        draft.growthImprove,
-        draft.pleasant,
-        draft.tomorrowImprove,
-        draft.stepGoal,
-        draft.flow,
-      ];
-      final hasEntryData = ratingTouched ||
-          energyTouched ||
-          wellBeingTouched ||
-          fields.any((f) => f.trim().isNotEmpty);
-      final notesExist = await QuickNoteService.hasNotes(draft.date);
-      final hasDraftLog = draft.notificationsLog.isNotEmpty;
-      debugPrint(
-          '== Startup: hasEntryData=$hasEntryData, notesExist=$notesExist, hasDraftLog=$hasDraftLog');
-
-      if (!hasDraftLog && !notesExist && hasEntryData) {
-        debugPrint('== Startup: about to showRestoreDialog');
-        // Предложить продолжить черновик или начать новый
-        final resume = await showDialog<bool>(
-          context: context,
-          barrierDismissible: false,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Есть незавершённый черновик'),
-            content: const Text(
-                'Хотите продолжить заполнение черновика или начать новую запись?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Новая запись'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Продолжить черновик'),
-              ),
-            ],
-          ),
-        );
-        if (resume == true) {
-          entry = draft;
-        } else {
-          await DraftService.clearDraft();
-          entry = await _createNewEntry();
-        }
-      } else if (notesExist || hasDraftLog) {
-        // Были только черновые заметки — продолжаем без диалога
+    if (draft != null && await DraftService.hasActiveDraft()) {
+      debugPrint('== Startup: about to showRestoreDialog');
+      final resume = await showUnsavedDraftDialog(context) ?? false;
+      if (resume) {
         entry = draft;
       } else {
-        // Если ни одной дополнительной метрики нет — сразу новая запись
         await DraftService.clearDraft();
         entry = await _createNewEntry();
       }
+    } else if (draft != null) {
+      entry = draft;
     } else {
-      // Черновиков нет вообще — новая запись
       entry = await _createNewEntry();
     }
+
     debugPrint('== Startup state entry: ${entry?.toMap()}');
 
     // Подготовка UI
