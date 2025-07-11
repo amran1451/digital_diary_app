@@ -558,7 +558,12 @@ class _StateScreenNewState extends State<StateScreenNew> {
                     value: _allGood,
                     onChanged: (v) async {
                       setState(() => _allGood = v);
-                      entry.wellBeing = v ? 'OK' : wellCtrl.text;
+                      if (v) {
+                        wellCtrl.clear();
+                        entry.wellBeing = 'OK';
+                      } else {
+                        entry.wellBeing = wellCtrl.text;
+                      }
                       DraftService.currentDraft = entry;
                       await DraftService.saveDraft();
                     },
@@ -588,7 +593,14 @@ class _StateScreenNewState extends State<StateScreenNew> {
                   hintText: 'Опишите, что беспокоит',
                 ),
                 onChanged: (v) async {
-                  entry.wellBeing = v;
+                  final trimmed = v.trim();
+                  if (trimmed.isEmpty) {
+                    setState(() => _allGood = true);
+                    entry.wellBeing = 'OK';
+                  } else {
+                    setState(() => _allGood = false);
+                    entry.wellBeing = v;
+                  }
                   DraftService.currentDraft = entry;
                   await DraftService.saveDraft();
                 },
