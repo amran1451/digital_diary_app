@@ -11,7 +11,7 @@ import '../../models/entry_data.dart';
 import '../../services/local_db.dart';
 import '../../services/telegram_service.dart';
 import '../../theme/dark_diary_theme.dart';
-import '../history_diary/entry_detail_screen.dart';
+import 'entry_detail_screen_new.dart';
 import '../history_diary/export_screen.dart';
 import '../history_diary/import_screen.dart';
 import '../history_diary/analytics/analytics_menu_screen.dart';
@@ -493,7 +493,7 @@ class _MyRecordsScreenState extends State<MyRecordsScreen> {
                   onTap: () async {
                     await Navigator.pushNamed(
                       ctx,
-                      EntryDetailScreen.routeName,
+                      EntryDetailScreenNew.routeName,
                       arguments: e,
                     );
                     await _loadEntries();
