@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../main.dart';
 import 'package:flutter/services.dart';
 
 import '../../models/entry_data.dart';
@@ -254,7 +255,7 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
     setState(() => _editing = false);
     if (!mounted) return;
     HapticFeedback.lightImpact();
-    ScaffoldMessenger.of(context).showSnackBar(
+    rootScaffoldMessengerKey.currentState?.showSnackBar(
       const SnackBar(content: Text('Изменения сохранены')),
     );
   }

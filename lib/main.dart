@@ -11,6 +11,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 
+final rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 // flow_diary
 import 'screens/flow_diary/achievements_screen.dart';
 import 'screens/flow_diary/date_time_screen.dart';
@@ -136,6 +138,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Дневник',
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
       theme: AppTheme.darkTheme,
       darkTheme: DarkDiaryTheme.theme,
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
