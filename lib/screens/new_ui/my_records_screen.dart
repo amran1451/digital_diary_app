@@ -56,7 +56,8 @@ class _MyRecordsScreenState extends State<MyRecordsScreen> {
       setState(() {}); // обновляем иконки “отправить”
     });
     _scrollCtrl.addListener(() {
-      final dir = _scrollCtrl.position.userScrollDirection;
+      final ScrollDirection dir =
+          _scrollCtrl.position.userScrollDirection;
       if (dir == ScrollDirection.reverse && _showFab) {
         setState(() => _showFab = false);
       } else if (dir == ScrollDirection.forward && !_showFab) {
