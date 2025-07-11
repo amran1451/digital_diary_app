@@ -225,6 +225,7 @@ class _AchievementsScreenNewState extends State<AchievementsScreenNew> {
                   onPressed: () async {
                     DraftService.currentDraft = entry;
                     await DraftService.saveDraft();
+                    if (!mounted) return;
                     Navigator.pushNamed(
                       context,
                       DevelopmentScreenNew.routeName,

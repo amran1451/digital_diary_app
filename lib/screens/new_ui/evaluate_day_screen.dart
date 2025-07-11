@@ -446,6 +446,7 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                         if (entry == null) return;
                         DraftService.currentDraft = entry!;
                         await DraftService.saveDraft();
+                        if (!mounted) return;
                         Navigator.pushNamed(
                           context,
                           StateScreenNew.routeName,

@@ -210,6 +210,7 @@ class _DevelopmentScreenNewState extends State<DevelopmentScreenNew> {
                   onPressed: () async {
                     DraftService.currentDraft = entry;
                     await DraftService.saveDraft();
+                    if (!mounted) return;
                     Navigator.pushNamed(
                       context,
                       FocusScreenNew.routeName,

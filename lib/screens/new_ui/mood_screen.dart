@@ -413,6 +413,7 @@ Future<void> _editDraftNote() async {
                 FilledButton(
                   onPressed: () async {
                     await _save();
+                    if (!mounted) return;
                     Navigator.pushNamed(
                       context,
                       AchievementsScreenNew.routeName,

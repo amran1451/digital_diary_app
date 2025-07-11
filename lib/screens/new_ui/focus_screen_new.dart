@@ -228,6 +228,7 @@ class _FocusScreenNewState extends State<FocusScreenNew> {
                   onPressed: () async {
                     DraftService.currentDraft = entry;
                     await DraftService.saveDraft();
+                    if (!mounted) return;
                     Navigator.pushNamed(
                       context,
                       PreviewScreenNew.routeName,

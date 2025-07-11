@@ -41,13 +41,12 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
       const SnackBar(content: Text('Запись сохранена')),
     );
     await Future.delayed(const Duration(milliseconds: 300));
-    if (mounted) {
-      Navigator.pushNamedAndRemoveUntil(
-        ctx,
-        DateTimeScreen.routeName,
-            (_) => false,
-      );
-    }
+    if (!mounted) return;
+    Navigator.pushNamedAndRemoveUntil(
+      ctx,
+      DateTimeScreen.routeName,
+          (_) => false,
+    );
     await DraftService.clearDraft();
     await QuickNoteService.clearForDate(e.date);
   }

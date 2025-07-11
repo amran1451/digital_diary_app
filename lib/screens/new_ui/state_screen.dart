@@ -674,6 +674,7 @@ class _StateScreenNewState extends State<StateScreenNew> {
                     await _updateActivityString();
                     DraftService.currentDraft = entry;
                     await DraftService.saveDraft();
+                    if (!mounted) return;
                     Navigator.pushNamed(
                       context,
                       MoodScreenNew.routeName,
