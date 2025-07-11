@@ -364,82 +364,82 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
       data: theme,
         child: WillPopScope(
         onWillPop: () async {
-      if (_editing) {
-        final res = await showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Сохранить изменения?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Отмена'),
+          if (_editing) {
+            final res = await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: const Text('Сохранить изменения?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: const Text('Отмена'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: const Text('Сохранить'),
+                  ),
+                ],
               ),
+            );
+            if (res == true) {
+              await _saveEditing();
+              return true;
+            } else if (res == false) {
+                await _cancelEditing();
+                return true;
+            }
+            return false;
+          }
+          return true;
+        },
+        child: Scaffold(
+          backgroundColor: DarkDiaryTheme.background,
+          appBar: AppBar(
+            leading: _editing
+            ? TextButton(
+              onPressed: _cancelEditing,
+              child: const Text('Отмена'),
+            )
+            : null,
+            title: const Text('Запись'),
+            actions: _editing
+            ? [
               TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
+                onPressed: _saveEditing,
                 child: const Text('Сохранить'),
               ),
-            ],
-          ),
-        );
-        if (res == true) {
-          await _saveEditing();
-          return true;
-        } else if (res == false) {
-          await _cancelEditing();
-          return true;
-        }
-        return false;
-      }
-      return true;
-    },
-    child: Scaffold(
-    backgroundColor: DarkDiaryTheme.background,
-        appBar: AppBar(
-        leading: _editing
-        ? TextButton(
-    onPressed: _cancelEditing,
-    child: const Text('Отмена'),
-    )
-        : null,
-          title: const Text('Запись'),
-    actions: _editing
-    ? [
-    TextButton(
-    onPressed: _saveEditing,
-    child: const Text('Сохранить'),
-    ),
-    ]
-        : [
-    IconButton(
-    icon:
-    Icon(appState.isDark ? Icons.sunny : Icons.nightlight_round),
-    onPressed: () => appState.toggleTheme(!appState.isDark),
-    ),
-    IconButton(
-    icon: const Icon(Icons.copy),
-    tooltip: 'Скопировать запись',
-    onPressed: () {
-    Clipboard.setData(ClipboardData(text: buffer.toString()));
-    ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-    content: Text('Запись скопирована в буфер обмена')),
-    );
-    },
-    ),
-    IconButton(
-    icon: const Icon(Icons.edit_calendar),
-    tooltip: 'Изменить дату записи',
-    onPressed: _pickDate,
-    ),
-    IconButton(
-    icon: const Icon(Icons.edit),
-    tooltip: 'Редактировать',
-    onPressed: _startEditing,
-    ),
-    ],
+            ]
+            : [
+            IconButton(
+              icon:
+              Icon(appState.isDark ? Icons.sunny : Icons.nightlight_round),
+              onPressed: () => appState.toggleTheme(!appState.isDark),
+            ),
+            IconButton(
+              icon: const Icon(Icons.copy),
+              tooltip: 'Скопировать запись',
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: buffer.toString()));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Запись скопирована в буфер обмена')),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.edit_calendar),
+              tooltip: 'Изменить дату записи',
+              onPressed: _pickDate,
+            ),
+            IconButton(
+              icon: const Icon(Icons.edit),
+              tooltip: 'Редактировать',
+              onPressed: _startEditing,
+            ),
+          ],
         ),
-    body: _editing
-    ? _buildEditForm(theme)
+        body: _editing
+        ? _buildEditForm(theme)
         : ListView.builder(
           padding: const EdgeInsets.all(8),
           itemCount: sections.length + (entry.notificationsLog.isNotEmpty ? 1 : 0),
@@ -516,6 +516,7 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
           },
         ),
       ),
+        ),
     );
   }
 
