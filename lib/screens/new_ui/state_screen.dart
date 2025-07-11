@@ -635,16 +635,14 @@ class _StateScreenNewState extends State<StateScreenNew> {
               children: [
                 Center(child: Text('2/6', style: theme.textTheme.labelMedium)),
                 const SizedBox(height: 8),
-                IntrinsicHeight(
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      Expanded(child: _sleepCard()),
-                                      const SizedBox(width: 8),
-                                      Expanded(child: _stepsCard()),
-                                    ],
-                                  ),
-                                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: _sleepCard()),
+                    const SizedBox(width: 8),
+                    Expanded(child: _stepsCard()),
+                  ],
+                ),
                 const SizedBox(height: 8),
                 _activityCard(),
                 const SizedBox(height: 8),
