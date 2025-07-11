@@ -8,6 +8,7 @@ import '../../services/local_db.dart';
 import '../../services/quick_note_service.dart';
 import '../../services/telegram_service.dart';
 import '../../services/pdf_service.dart';
+import 'package:printing/printing.dart';
 import '../../theme/dark_diary_theme.dart';
 import '../../main.dart';
 import '../flow_diary/date_time_screen.dart';
@@ -380,16 +381,17 @@ class _Field {
 enum _DateMenu { entries, toggleTheme }
 
 const _moodLabels = <int, String>{
-  1: 'Ужасно',
-  2: 'Ужасно',
-  3: 'Грусть',
-  4: 'Грусть',
+  0: 'Кризис',
+  1: 'Безнадёжность',
+  2: 'Уныние',
+  3: 'Тревога',
+  4: 'Напряжение',
   5: 'Нейтрально',
-  6: 'Чуть лучше',
-  7: 'Классно',
-  8: 'Классно',
-  9: 'Восторг',
-  10: 'Восторг',
+  6: 'Спокойствие',
+  7: 'Удовлетворение',
+  8: 'Оптимизм',
+  9: 'Воодушевление',
+  10: 'Эйфория',
 };
 
 String _formatMood(String mood) {
