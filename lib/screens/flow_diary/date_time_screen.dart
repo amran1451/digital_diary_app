@@ -89,9 +89,10 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
         await DraftService.clearDraft();
         entry = await _createNewEntry();
       }
-    } else if (draft != null) {
-      entry = draft;
     } else {
+      if (draft != null) {
+        await DraftService.clearDraft();
+      }
       entry = await _createNewEntry();
     }
 

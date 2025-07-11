@@ -65,9 +65,10 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
           await DraftService.clearDraft();
           entry = await _createNewEntry();
         }
-      } else if (draft != null) {
-        entry = draft;
       } else {
+        if (draft != null) {
+          await DraftService.clearDraft();
+        }
         entry = await _createNewEntry();
       }
     }
