@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/entry_data.dart';
-import 'quick_note_service.dart';
 
 class DraftService {
   static const _key = 'draft_entry';
@@ -80,8 +79,9 @@ class DraftService {
         wellBeingTouched ||
         fields.any((f) => f.trim().isNotEmpty);
 
-    return hasEntryData ||
-        draft.notificationsLog.isNotEmpty ||
-        await QuickNoteService.hasNotes(draft.date);
+    // Показ диалога нужен только при наличии заполненных полей. Наличие
+    // черновых заметок или лога уведомлений само по себе не считается
+    // активным черновиком.
+    return hasEntryData;
   }
 }
