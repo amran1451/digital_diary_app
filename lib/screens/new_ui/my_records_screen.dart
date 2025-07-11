@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart' as widgets;
+import 'package:flutter/widgets.dart' show ScrollDirection;
 
 import '../../main.dart';
 import '../../models/entry_data.dart';
@@ -57,9 +57,9 @@ class _MyRecordsScreenState extends State<MyRecordsScreen> {
     });
     _scrollCtrl.addListener(() {
       final dir = _scrollCtrl.position.userScrollDirection;
-      if (dir == widgets.ScrollDirection.reverse && _showFab) {
+      if (dir == ScrollDirection.reverse && _showFab) {
         setState(() => _showFab = false);
-      } else if (dir == widgets.ScrollDirection.forward && !_showFab) {
+      } else if (dir == ScrollDirection.forward && !_showFab) {
         setState(() => _showFab = true);
       }
     });
