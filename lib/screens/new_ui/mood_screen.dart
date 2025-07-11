@@ -238,23 +238,10 @@ Future<void> _editDraftNote() async {
           title: const Text('Настроение'),
           actions: [
             IconButton(
-                         icon: const Icon(Icons.note_add_outlined),
-                         tooltip: 'Черновик',
-                         onPressed: _editDraftNote,
-                       ),
-                       IconButton(
-                         icon: const Icon(Icons.info_outline),
-                         onPressed: () {
-                           showDialog(
-                             context: context,
-                             builder: (ctx) => const AlertDialog(
-                               content: Text('Не запаривайся: выбери 2-3 эмоции, больше не нужно'),
-                             ),
-                           );
-                         },
+              icon: const Icon(Icons.note_add_outlined),
+              tooltip: 'Черновик',
+              onPressed: _editDraftNote,
             ),
-            const SizedBox(width: 8),
-            const Icon(Icons.calendar_today_outlined),
             const SizedBox(width: 8),
             const DiaryMenuButton(),
           ],
@@ -311,13 +298,25 @@ Future<void> _editDraftNote() async {
                                     ),
                 ),
                 const SizedBox(height: 8),
-                                TextField(
-                                  controller: _moodCtrl,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Своё описание настроения',
-                                  ),
-                                  onChanged: (_) async => await _save(),
-                                ),
+                TextField(
+                  controller: _moodCtrl,
+                  decoration: InputDecoration(
+                    hintText: 'Своё описание настроения',
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.info_outline),
+                      tooltip: 'Подсказка',
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => const AlertDialog(
+                            content: Text('Не запаривайся: выбери 2-3 эмоции, больше не нужно'),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  onChanged: (_) async => await _save(),
+                ),
                 const SizedBox(height: 24),
                 if (_selected.isEmpty)
                   MaterialBanner(
