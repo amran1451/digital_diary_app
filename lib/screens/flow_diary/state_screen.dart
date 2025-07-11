@@ -151,9 +151,8 @@ class _StateScreenState extends State<StateScreen> {
       stepsCtrl =
           TextEditingController(text: entry.steps);
       wellCtrl = TextEditingController(
-        text: entry.wellBeing == 'OK' ? '' : (entry.wellBeing ?? ''),
+        text: entry.wellBeing ?? '',
       );
-      _allGood = entry.wellBeing == 'OK';
       _parseExistingActivities();
 
       _energy = int.tryParse(entry.energy) ?? 5;
@@ -199,6 +198,7 @@ class _StateScreenState extends State<StateScreen> {
     final text = wellCtrl.text.trim();
     wellCtrl.text = text.isEmpty ? note.text : '$text\n${note.text}';
     _allGood = false;
+    entry.wellBeing = wellCtrl.text;
     await QuickNoteService.deleteNote(entry.date, 'wellBeing', index);
     setState(() => _notes['wellBeing']?.removeAt(index));
     DraftService.currentDraft = entry;
@@ -408,16 +408,14 @@ class _StateScreenState extends State<StateScreen> {
     ),
     ],
     ),
-    SwitchListTile(
+      SwitchListTile(
     title: const Text('Всё хорошо'),
     value: _allGood,
                   onChanged: (v) async {
     setState(() => _allGood = v);
     if (v) {
       wellCtrl.clear();
-      entry.wellBeing = 'OK';
-    } else {
-      entry.wellBeing = wellCtrl.text;
+      entry.wellBeing = '';
     }
                     DraftService.currentDraft = entry;
                     await DraftService.saveDraft();
@@ -443,7 +441,7 @@ class _StateScreenState extends State<StateScreen> {
             final trimmed = v.trim();
             if (trimmed.isEmpty) {
               setState(() => _allGood = true);
-              entry.wellBeing = 'OK';
+              entry.wellBeing = '';
             } else {
               setState(() => _allGood = false);
               entry.wellBeing = v;
