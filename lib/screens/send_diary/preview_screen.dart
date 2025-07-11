@@ -7,6 +7,7 @@ import '../../services/telegram_service.dart';
 import '../../services/draft_service.dart';
 import '../../services/quick_note_service.dart';
 import '../../main.dart';
+import '../../utils/wellbeing_utils.dart';
 import '../flow_diary/date_time_screen.dart';
 import '../history_diary/entries_screen.dart';
 import '../history_diary/entry_detail_screen.dart';
@@ -188,7 +189,7 @@ class PreviewScreen extends StatelessWidget {
         Text('🚶 Шаги: ${e.steps}'),
         Text('🔥 Активность: ${e.activity}'),
         Text('⚡️ Энергия: ${e.energy}'),
-        Text('🤒 Самочувствие: ${e.wellBeing == 'OK' ? 'Всё хорошо' : (e.wellBeing ?? '')}'),
+        Text('🤒 Самочувствие: ${WellBeingUtils.format(e.wellBeing)}'),
         const Divider(),
         Text('😊 Настроение: ${_formatMood(e.mood)}'),
         Text('🎭 Эмоции: ${e.mainEmotions}'),

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import '../../models/entry_data.dart';
 import '../../services/local_db.dart';
 import '../../main.dart';
+import '../../utils/wellbeing_utils.dart';
 import '../flow_diary/date_time_screen.dart';
 
 const _moodLabels = <int, String>{
@@ -95,7 +96,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       ..writeln('🚶 Шаги: ${entry.steps}')
       ..writeln('🔥 Активность: ${entry.activity}')
       ..writeln('⚡️ Энергия: ${entry.energy}')
-      ..writeln('🤒 Самочувствие: ${entry.wellBeing == 'OK' ? 'Всё хорошо' : (entry.wellBeing ?? '')}')
+      ..writeln('🤒 Самочувствие: ${WellBeingUtils.format(entry.wellBeing)}')
       ..writeln()
       ..writeln('😊 Настроение: ${_formatMood(entry.mood)}')
       ..writeln('🎭 Главные эмоции: ${entry.mainEmotions}')
@@ -181,7 +182,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             Text('🚶 Шаги: ${entry.steps}'),
             Text('🔥 Активность: ${entry.activity}'),
             Text('⚡️ Энергия: ${entry.energy}'),
-            Text('🤒 Самочувствие: ${entry.wellBeing == 'OK' ? 'Всё хорошо' : (entry.wellBeing ?? '')}'),
+            Text('🤒 Самочувствие: ${WellBeingUtils.format(entry.wellBeing)}'),
             const Divider(),
             Text('😊 Настроение: ${_formatMood(entry.mood)}'),
             Text('🎭 Главные эмоции: ${entry.mainEmotions}'),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import '../models/entry_data.dart';
+import '../utils/wellbeing_utils.dart';
 
 class CloudDb {
   /// Обычный дамп в Firestore (используется при первой отправке из PreviewScreen).
@@ -49,7 +50,7 @@ class CloudDb {
 🚶 Шаги: ${e.steps}
 🔥 Активность: ${e.activity}
 ⚡️ Энергия: ${e.energy}
-🤒 Самочувствие: ${e.wellBeing == 'OK' ? 'Всё хорошо' : (e.wellBeing ?? '')}
+🤒 Самочувствие: ${WellBeingUtils.format(e.wellBeing)}
 
 🔹 Настроение и эмоции
 😊 Настроение: ${e.mood}

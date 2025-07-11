@@ -2,6 +2,7 @@ import 'package:csv/csv.dart';
 import '../models/entry_data.dart';
 import '../models/notification_log_item.dart';
 import '../utils/parse_utils.dart';
+import '../utils/wellbeing_utils.dart';
 import 'dart:convert';
 
 class CsvService {
@@ -54,7 +55,7 @@ class CsvService {
         e.steps,
         e.activity,
         e.energy,
-        e.wellBeing ?? '',
+        WellBeingUtils.format(e.wellBeing),
         e.mood,
         e.mainEmotions,
         e.influence,
@@ -115,7 +116,9 @@ class CsvService {
             .parseDouble(m['energy']?.toString() ?? '')
             .toInt()
             .toString(),
-        wellBeing: m['wellBeing']?.toString(),
+        wellBeing: m['wellBeing'] == null
+            ? null
+            : WellBeingUtils.normalize(m['wellBeing'].toString()),
         mood: m['mood']?.toString() ?? '',
         mainEmotions: m['mainEmotions']?.toString() ?? '',
         influence: m['influence']?.toString() ?? '',

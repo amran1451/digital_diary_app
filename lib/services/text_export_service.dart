@@ -1,4 +1,5 @@
 import '../models/entry_data.dart';
+import '../utils/wellbeing_utils.dart';
 
 class TextExportService {
   static String buildEntryText(EntryData e) {
@@ -12,7 +13,7 @@ class TextExportService {
 🚶 Шаги: ${e.steps}
 🔥 Активность: ${e.activity}
 ⚡️ Энергия: ${e.energy}
-🤒 Самочувствие: ${e.wellBeing == 'OK' ? 'Всё хорошо' : (e.wellBeing ?? '')}
+🤒 Самочувствие: ${WellBeingUtils.format(e.wellBeing)}
 
 😊 Настроение: ${e.mood}
 🎭 Эмоции: ${e.mainEmotions}

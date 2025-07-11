@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import '../../models/entry_data.dart';
 import '../../services/csv_service.dart';
 import '../../utils/parse_utils.dart';
+import '../../utils/wellbeing_utils.dart';
 import 'import_preview_screen.dart';
 
 class ImportScreen extends StatefulWidget {
@@ -191,7 +192,7 @@ class _ImportScreenState extends State<ImportScreen> {
       }
 
       if (line.startsWith('🤒 Самочувствие:')) {
-        current['wellBeing'] = line.substring(line.indexOf(':') + 1).trim();
+        current['wellBeing'] = WellBeingUtils.normalize(wb);
         continue;
       }
 
@@ -512,7 +513,7 @@ class _ImportScreenState extends State<ImportScreen> {
         continue;
       }
       if (line.startsWith('🤒 Самочувствие:')) {
-        current['wellBeing'] = line.substring(line.indexOf(':') + 1).trim();
+        current['wellBeing'] = WellBeingUtils.normalize(wb);
         continue;
       }
       if (line.startsWith('😊 Настроение:')) {

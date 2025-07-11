@@ -5,6 +5,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import '../models/entry_data.dart';
+import '../utils/wellbeing_utils.dart';
 
 class PdfService {
   /// Каждая запись — на своей странице, шрифт кириллицы + эмоджи.
@@ -63,7 +64,7 @@ class PdfService {
                 pw.Text('Шаги: ${e.steps}'),
                 pw.Text('Активность: ${e.activity}'),
                 pw.Text('Энергия: ${e.energy}'),
-                pw.Text('Самочувствие: ${e.wellBeing == 'OK' ? 'Всё хорошо' : (e.wellBeing ?? '')}'),
+                pw.Text('Самочувствие: ${WellBeingUtils.format(e.wellBeing)}'),
                 pw.Divider(),
 
                 pw.Text('Настроение и эмоции',

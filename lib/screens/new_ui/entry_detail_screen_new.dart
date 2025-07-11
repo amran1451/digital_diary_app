@@ -7,6 +7,7 @@ import '../../services/local_db.dart';
 import '../../theme/dark_diary_theme.dart';
 
 import '../../utils/rating_emoji.dart';
+import '../../utils/wellbeing_utils.dart';
 
 class EntryDetailScreenNew extends StatefulWidget {
   static const routeName = '/entry_detail_new';
@@ -348,7 +349,7 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
       ..writeln('🚶 Шаги: ${entry.steps}')
       ..writeln('🔥 Активность: ${entry.activity}')
       ..writeln('⚡️ Энергия: ${entry.energy}')
-      ..writeln('🤒 Самочувствие: ${entry.wellBeing == 'OK' ? 'Всё хорошо' : (entry.wellBeing ?? '')}')
+      ..writeln('🤒 Самочувствие: ${WellBeingUtils.format(entry.wellBeing)}')
       ..writeln()
       ..writeln('😊 Настроение: ${_formatMood(entry.mood)}')
       ..writeln('🎭 Главные эмоции: ${entry.mainEmotions}')
@@ -563,7 +564,7 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
         _Field('Энергия', e.energy),
         _Field(
           'Самочувствие',
-          e.wellBeing == 'OK' ? 'Всё хорошо' : (e.wellBeing ?? ''),
+          WellBeingUtils.format(e.wellBeing),
         ),
       ],
     ),

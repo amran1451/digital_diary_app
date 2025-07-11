@@ -8,6 +8,7 @@ import '../../services/local_db.dart';
 import '../../services/quick_note_service.dart';
 import '../../services/telegram_service.dart';
 import '../../services/pdf_service.dart';
+import '../../utils/wellbeing_utils.dart';
 import 'package:printing/printing.dart';
 import '../../theme/dark_diary_theme.dart';
 import '../../main.dart';
@@ -309,7 +310,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
         _Field('Энергия', e.energy),
         _Field(
           'Самочувствие',
-          e.wellBeing == 'OK' ? 'Всё хорошо' : (e.wellBeing ?? ''),
+          WellBeingUtils.format(e.wellBeing),
         ),
       ],
     ),
