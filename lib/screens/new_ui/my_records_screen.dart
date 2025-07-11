@@ -15,6 +15,7 @@ import 'entry_detail_screen_new.dart';
 import '../history_diary/export_screen.dart';
 import '../history_diary/import_screen.dart';
 import '../history_diary/analytics/analytics_menu_screen.dart';
+import '../../utils/rating_emoji.dart';
 
 enum MyRecordsMenu {
   export,
@@ -560,9 +561,7 @@ class _MyRecordsScreenState extends State<MyRecordsScreen> {
 }
 
 String _emojiFromRating(int rating) {
-  if (rating <= 3) return '😩';
-  if (rating <= 7) return '😐';
-  return '🤩';
+  return ratingEmoji[rating] ?? '🤔';
 }
 
 class _RecordCard extends StatelessWidget {

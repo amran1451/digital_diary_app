@@ -5,7 +5,8 @@ import '../../models/entry_data.dart';
 import '../../services/local_db.dart';
 import '../../theme/dark_diary_theme.dart';
 import '../../main.dart';
-import '../flow_diary/date_time_screen.dart';
+
+import '../../utils/rating_emoji.dart';
 
 class EntryDetailScreenNew extends StatefulWidget {
   static const routeName = '/entry_detail_new';
@@ -284,7 +285,10 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
             decoration: const InputDecoration(labelText: 'Место'),
           ),
           const SizedBox(height: 16),
-          Text('Оценка дня $_rating', style: theme.textTheme.bodyMedium),
+          Text(
+            '${ratingEmoji[_rating] ?? '🤔'} Оценка дня $_rating',
+            style: theme.textTheme.bodyMedium,
+          ),
           Slider(
             value: _rating.toDouble(),
             min: 0,
@@ -534,7 +538,11 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
       emoji: '📊',
       title: 'Оценка',
       fields: [
-        _Field('Оценка', '${e.rating} – ${e.ratingReason}'),
+        _Field(
+          'Оценка',
+          '${ratingEmoji[int.tryParse(e.rating) ?? -1] ?? '🤔'} '
+              '${e.rating} – ${e.ratingReason}',
+        ),
       ],
     ),
     _Section(
