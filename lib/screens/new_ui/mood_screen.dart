@@ -463,7 +463,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
                         showDialog(
                           context: context,
                           builder: (ctx) => const AlertDialog(
-                            content: Text('Не запаривайся: выбери 2-3 эмоции, больше не нужно'),
+                              content: Text('Выбери все подходящие эмоции'),
                           ),
                         );
                       },
@@ -524,21 +524,19 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
     selected: _selected.contains(emo),
     selectedColor: const Color(0xFF4B3B7F),
     checkmarkColor: const Color(0xFFE6E1E5),
-    onSelected: (v) async {
-    setState(() {
-    if (v) {
-    if (_selected.length < 3) {
-    _selected.add(emo);
-    _influenceCtrls.putIfAbsent(
-    emo, () => TextEditingController());
-    }
-    } else {
-    _selected.remove(emo);
-    _influenceCtrls.remove(emo)?.dispose();
-                                        }
-                  });
-                  await _save();
-                  },
+      onSelected: (v) async {
+        setState(() {
+          if (v) {
+            _selected.add(emo);
+            _influenceCtrls.putIfAbsent(
+                emo, () => TextEditingController());
+          } else {
+            _selected.remove(emo);
+            _influenceCtrls.remove(emo)?.dispose();
+          }
+        });
+        await _save();
+      },
                   ),
                                 ),
                           ],
