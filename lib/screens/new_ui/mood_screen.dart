@@ -21,6 +21,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
   String _emoji = '😐';
   int? _expanded;
   final Set<String> _selected = <String>{};
+  final Map<String, TextEditingController> _influenceCtrls = {};
   late TextEditingController _moodCtrl;
   Map<String, List<QuickNote>> _notes = {};
 
@@ -131,6 +132,21 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
           .split(RegExp(r'[;,\n]+'))
           .map((e) => e.trim())
           .where((e) => e.isNotEmpty));
+
+      final regex =
+      RegExp(r'(.*?)\s*[—-]\s*(\([^)]*\)|[^,]+)(?:,|\$)');
+      for (final match in regex.allMatches(entry.influence)) {
+        final emo = match.group(1)!.trim();
+        var text = match.group(2)!.trim();
+        if (text.startsWith('(') && text.endsWith(')')) {
+          text = text.substring(1, text.length - 1).trim();
+        }
+        _influenceCtrls[emo] = TextEditingController(text: text);
+      }
+      for (final emo in _selected) {
+        _influenceCtrls.putIfAbsent(emo, () => TextEditingController());
+      }
+
       _inited = true;
       DraftService.currentDraft = entry;
       DraftService.saveDraft();
@@ -144,8 +160,18 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
     final text = _moodCtrl.text.trim();
     entry.mood = text.isNotEmpty ? text : '$_rating';
     entry.mainEmotions = _selected.join(', ');
+    entry.influence = _buildInfluenceString();
     DraftService.currentDraft = entry;
     await DraftService.saveDraft();
+  }
+
+  String _buildInfluenceString() {
+    final parts = <String>[];
+    for (final emo in _selected) {
+      final text = _influenceCtrls[emo]?.text.trim() ?? '';
+      if (text.isNotEmpty) parts.add('$emo — $text');
+    }
+    return parts.join(', ');
   }
 
   void _toggleEmoji() {
@@ -174,7 +200,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
     if (selected != null) setState(() => _emoji = selected);
   }
 
-Future<void> _editDraftNote() async {
+  Future<void> _editDraftNote() async {
     final existing = _notes['mood']?.isNotEmpty == true ? _notes['mood']![0] : null;
     final ctrl = TextEditingController(text: existing?.text ?? '');
     final result = await showModalBottomSheet<String>(
@@ -221,9 +247,54 @@ Future<void> _editDraftNote() async {
     }
   }
 
+  Widget _influenceCard() {
+    final theme = Theme.of(context);
+    return Card(
+      color: theme.colorScheme.surfaceVariant,
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('\uD83D\uDCAD Что повлияло',
+                style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            Column(
+              children: [
+                for (final emo in _selected)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(emo)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 2,
+                          child: TextField(
+                            controller: _influenceCtrls[emo],
+                            decoration:
+                            const InputDecoration(hintText: 'Что повлияло'),
+                            onChanged: (_) => _save(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _moodCtrl.dispose();
+    for (final c in _influenceCtrls.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -375,9 +446,12 @@ Future<void> _editDraftNote() async {
                                       if (v) {
                                         if (_selected.length < 3) {
                                           _selected.add(emo);
+                                          _influenceCtrls.putIfAbsent(
+                                              emo, () => TextEditingController());
                                         }
                                       } else {
                                         _selected.remove(emo);
+                                        _influenceCtrls.remove(emo)?.dispose();
                                       }
                                     });
                                     await _save();
@@ -390,6 +464,10 @@ Future<void> _editDraftNote() async {
                     ),
                   );
                 }),
+                if (_selected.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  _influenceCard(),
+                ],
                 const SizedBox(height: 16),
               ],
             ),
