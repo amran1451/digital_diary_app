@@ -11,7 +11,7 @@ import 'package:geocoding/geocoding.dart';
 import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
 import '../../services/local_db.dart';
-import '../../services/place_history_service.dart';
+import '../../services/place_service.dart';
 import '../../theme/dark_diary_theme.dart';
 import '../../main.dart';
 import 'state_screen.dart';
@@ -51,7 +51,7 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
   };
 
   Future<void> _initEntry() async {
-    _history = await PlaceHistoryService.loadHistory();
+    _history = await PlaceService.getSuggestions('');
 
     final arg = ModalRoute.of(context)?.settings.arguments;
     if (arg is EntryData) {
@@ -132,7 +132,7 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
   }
 
   Future<void> _loadHistory() async {
-    _history = await PlaceHistoryService.loadHistory();
+    _history = await PlaceService.getSuggestions('');
     if (_history.length > 3) _history = _history.take(3).toList();
     setState(() {});
   }
@@ -307,10 +307,7 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                         entry!.place = v;
                         DraftService.currentDraft = entry!;
                         await DraftService.saveDraft();
-                        if (v.trim().isNotEmpty) {
-                          await PlaceHistoryService.addPlace(v.trim());
-                          await _loadHistory();
-                        }
+                        // no db writes while typing
                       },
                     );
                   },
@@ -320,8 +317,7 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                     entry!.place = v;
                     DraftService.currentDraft = entry!;
                     await DraftService.saveDraft();
-                    await PlaceHistoryService.addPlace(v);
-                    await _loadHistory();
+                    // will be stored on save
                   },
                 ),
                 const SizedBox(height: 24),

@@ -10,6 +10,7 @@ import '../../services/telegram_service.dart';
 import '../../services/pdf_service.dart';
 import '../../utils/wellbeing_utils.dart';
 import 'package:printing/printing.dart';
+import '../../services/place_service.dart';
 import '../../theme/dark_diary_theme.dart';
 import '../../main.dart';
 import '../flow_diary/date_time_screen.dart';
@@ -39,6 +40,9 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
 
   Future<void> _send(EntryData e, BuildContext ctx) async {
     await LocalDb.saveOrUpdate(e);
+    if (e.place.trim().isNotEmpty) {
+      await PlaceService.savePlace(e.place.trim());
+    }
     await TelegramService.sendEntry(e);
     _confettiCtrl.play();
     ScaffoldMessenger.of(ctx).showSnackBar(
@@ -57,6 +61,9 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
 
   Future<void> _save(EntryData e, BuildContext ctx) async {
     await LocalDb.saveOrUpdate(e);
+    if (e.place.trim().isNotEmpty) {
+      await PlaceService.savePlace(e.place.trim());
+    }
     ScaffoldMessenger.of(ctx)
         .showSnackBar(const SnackBar(content: Text('Изменения сохранены')));
     await DraftService.clearDraft();

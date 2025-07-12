@@ -9,7 +9,7 @@ class LocalDb {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       join(dbPath, 'diary.db'),
-      version: 8,
+      version: 9,
       onCreate: (db, v) async {
         await db.execute('''
           CREATE TABLE entries(
@@ -47,6 +47,12 @@ class LocalDb {
             needsSync INTEGER DEFAULT 1
           )
         ''');
+        await db.execute('''
+          CREATE TABLE places(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            place TEXT UNIQUE COLLATE NOCASE
+          )
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -73,6 +79,18 @@ class LocalDb {
         }
         if (oldVersion < 8) {
           await db.execute('UPDATE entries SET wellBeing = NULL WHERE wellBeing = ? OR wellBeing = ?', ['OK', 'Всё хорошо']);
+        }
+        if (oldVersion < 9) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS places(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              place TEXT UNIQUE COLLATE NOCASE
+            )
+          ''');
+          await db.execute('''
+            INSERT OR IGNORE INTO places(place)
+            SELECT DISTINCT place FROM entries WHERE TRIM(place) <> ''
+          ''');
         }
       },
     );

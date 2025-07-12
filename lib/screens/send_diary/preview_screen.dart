@@ -6,6 +6,7 @@ import '../../services/local_db.dart';
 import '../../services/telegram_service.dart';
 import '../../services/draft_service.dart';
 import '../../services/quick_note_service.dart';
+import '../../services/place_service.dart';
 import '../../main.dart';
 import '../../utils/wellbeing_utils.dart';
 import '../flow_diary/date_time_screen.dart';
@@ -41,6 +42,9 @@ class PreviewScreen extends StatelessWidget {
   Future<void> _send(EntryData e, BuildContext ctx) async {
     // 1) Сохранить локально
     await LocalDb.saveOrUpdate(e);
+    if (e.place.trim().isNotEmpty) {
+      await PlaceService.savePlace(e.place.trim());
+    }
 
     // 2) Отправить через сервис
     final ok = await TelegramService.sendEntry(e);
@@ -71,6 +75,9 @@ class PreviewScreen extends StatelessWidget {
 
   Future<void> _save(EntryData e, BuildContext ctx) async {
     await LocalDb.saveOrUpdate(e);
+    if (e.place.trim().isNotEmpty) {
+      await PlaceService.savePlace(e.place.trim());
+    }
     ScaffoldMessenger.of(ctx)
         .showSnackBar(const SnackBar(content: Text('Изменения сохранены')));
     await DraftService.clearDraft();

@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../../models/entry_data.dart';
 import '../../services/draft_service.dart';
 import '../../services/local_db.dart';
-import '../../services/place_history_service.dart';
+import '../../services/place_service.dart';
 import '../../main.dart';
 import 'state_screen.dart';
 import '../history_diary/entries_screen.dart';
@@ -57,7 +57,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
 
   Future<void> _initEntry() async {
     debugPrint('== Startup: _initEntry start');
-    _placeHistory = await PlaceHistoryService.loadHistory();
+    _placeHistory = await PlaceService.getSuggestions('');
     debugPrint('== Startup: place history: $_placeHistory');
 
     final arg = ModalRoute.of(context)?.settings.arguments;
@@ -259,8 +259,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                 entry!.place = selection;
                 DraftService.currentDraft = entry!;
                 await DraftService.saveDraft();
-                await PlaceHistoryService.addPlace(selection);
-                _placeHistory = await PlaceHistoryService.loadHistory();
+                // will be stored on save
               },
               fieldViewBuilder:
                   (context, controller, focusNode, onFieldSubmitted) {
@@ -278,10 +277,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                     entry!.place = v;
                     DraftService.currentDraft = entry!;
                     await DraftService.saveDraft();
-                    if (v.trim().isNotEmpty) {
-                      await PlaceHistoryService.addPlace(v.trim());
-                      _placeHistory = await PlaceHistoryService.loadHistory();
-                    }
+                    // no db writes while typing
                   },
                 );
               },
