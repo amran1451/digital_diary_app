@@ -213,6 +213,7 @@ class _FocusScreenNewState extends State<FocusScreenNew> {
                 const SizedBox(height: 16),
               ],
             ),
+    ),
           ),
         ),
         bottomNavigationBar: SafeArea(

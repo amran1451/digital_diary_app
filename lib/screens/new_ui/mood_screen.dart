@@ -559,6 +559,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
             ),
           ),
         ),
+        ),
         bottomNavigationBar: SafeArea(
           child: Container(
             padding: const EdgeInsets.all(16),

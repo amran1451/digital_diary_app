@@ -657,6 +657,7 @@ class _StateScreenNewState extends State<StateScreenNew> {
               ],
             ),
           ),
+    ),
         ),
         bottomNavigationBar: SafeArea(
           child: Container(

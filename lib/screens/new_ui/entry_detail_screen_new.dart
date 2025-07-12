@@ -326,6 +326,7 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
           }).toList(),
         ],
       ),
+        ),
     );
   }
 

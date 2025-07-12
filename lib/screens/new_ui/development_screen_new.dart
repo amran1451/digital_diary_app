@@ -195,6 +195,7 @@ class _DevelopmentScreenNewState extends State<DevelopmentScreenNew> {
                 const SizedBox(height: 16),
               ],
             ),
+    ),
           ),
         ),
         bottomNavigationBar: SafeArea(

@@ -212,6 +212,7 @@ class _AchievementsScreenNewState extends State<AchievementsScreenNew> {
             ),
           ),
         ),
+        ),
         bottomNavigationBar: SafeArea(
           child: Container(
             padding: const EdgeInsets.all(16),

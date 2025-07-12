@@ -386,25 +386,26 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
             ),
           ),
         ),
-    bottomNavigationBar: SafeArea(
-    child: Padding(
-    padding: const EdgeInsets.all(16),
-    child: FilledButton(
-    onPressed: () async {
-    if (entry == null) return;
-    DraftService.currentDraft = entry!;
-    await DraftService.saveDraft();
-    if (!mounted) return;
-    Navigator.pushNamed(
-    context,
-    StateScreenNew.routeName,
-    arguments: entry,
-    );
-    },
-    child: const Text('Далее: Состояние'),
-    ),
-    ),
-    ),
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: FilledButton(
+              onPressed: () async {
+                if (entry == null) return;
+                DraftService.currentDraft = entry!;
+                await DraftService.saveDraft();
+                if (!mounted) return;
+                Navigator.pushNamed(
+                  context,
+                  StateScreenNew.routeName,
+                  arguments: entry,
+                );
+              },
+              child: const Text('Далее: Состояние'),
+            ),
+          ),
+        ),
       ),
     );
   }
