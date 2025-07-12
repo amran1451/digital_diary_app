@@ -47,6 +47,8 @@ import 'screens/new_ui/entry_detail_screen_new.dart';
 import 'screens/history_diary/entry_detail_screen.dart';
 import 'screens/history_diary/export_screen.dart';
 import 'screens/history_diary/import_screen.dart';
+import 'screens/new_ui/export_screen_new.dart';
+import 'screens/new_ui/import_screen_new.dart';
 import 'screens/history_diary/import_preview_screen.dart';
 
 // send_diary
@@ -165,6 +167,8 @@ class _MyAppState extends State<MyApp> {
         EntryDetailScreen.routeName:   (_) => const EntryDetailScreen(),
         ExportScreen.routeName:        (_) => const ExportScreen(),
         ImportScreen.routeName:        (_) => const ImportScreen(),
+        ExportScreenNew.routeName:     (_) => const ExportScreenNew(),
+        ImportScreenNew.routeName:     (_) => const ImportScreenNew(),
         ImportPreviewScreen.routeName: (_) => const ImportPreviewScreen(),
         RatingAnalyticsScreen.routeName: (_) => const RatingAnalyticsScreen(),
         SleepTrackerScreen.routeName: (_) => const SleepTrackerScreen(),

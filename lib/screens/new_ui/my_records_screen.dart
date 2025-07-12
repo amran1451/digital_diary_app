@@ -12,8 +12,8 @@ import '../../services/local_db.dart';
 import '../../services/telegram_service.dart';
 import '../../theme/dark_diary_theme.dart';
 import 'entry_detail_screen_new.dart';
-import '../history_diary/export_screen.dart';
-import '../history_diary/import_screen.dart';
+import 'export_screen_new.dart';
+import 'import_screen_new.dart';
 import '../history_diary/analytics/analytics_menu_screen.dart';
 import '../../utils/rating_emoji.dart';
 import '../../widgets/keyboard_safe_content.dart';
@@ -330,10 +330,10 @@ class _MyRecordsScreenState extends State<MyRecordsScreen> {
               onSelected: (item) async {
                 switch (item) {
                   case MyRecordsMenu.export:
-                    Navigator.pushNamed(ctx, ExportScreen.routeName);
+                    Navigator.pushNamed(ctx, ExportScreenNew.routeName);
                     break;
                   case MyRecordsMenu.importEntries:
-                    await Navigator.pushNamed(ctx, ImportScreen.routeName);
+                    await Navigator.pushNamed(ctx, ImportScreenNew.routeName);
                     await _loadEntries();
                     break;
                   case MyRecordsMenu.analytics:
