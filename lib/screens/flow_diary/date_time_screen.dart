@@ -58,6 +58,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   Future<void> _initEntry() async {
     debugPrint('== Startup: _initEntry start');
     _placeHistory = await PlaceService.getSuggestions('');
+    if (!mounted) return;
     debugPrint('== Startup: place history: $_placeHistory');
 
     final arg = ModalRoute.of(context)?.settings.arguments;
@@ -69,10 +70,12 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
       placeCtrl.text = entry!.place;
       DraftService.currentDraft = entry!;
       await DraftService.saveDraft();
+      if (!mounted) return;
       setState(() {});
       return;
     }
     final draft = await DraftService.loadDraft();
+    if (!mounted) return;
     debugPrint('== Startup: loaded draft entry: ${draft?.toMap()}');
     if (draft != null) {
       debugPrint('  date: ${draft.date}');
@@ -83,17 +86,22 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     if (draft != null && await DraftService.hasActiveDraft()) {
       debugPrint('== Startup: about to showRestoreDialog');
       final resume = await showUnsavedDraftDialog(context) ?? false;
+      if (!mounted) return;
       if (resume) {
         entry = draft;
       } else {
         await DraftService.clearDraft();
+        if (!mounted) return;
         entry = await _createNewEntry();
+        if (!mounted) return;
       }
     } else {
       if (draft != null) {
         await DraftService.clearDraft();
+        if (!mounted) return;
       }
       entry = await _createNewEntry();
+      if (!mounted) return;
     }
 
     debugPrint('== Startup state entry: ${entry?.toMap()}');
@@ -106,6 +114,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
 
     DraftService.currentDraft = entry!;
     await DraftService.saveDraft();
+    if (!mounted) return;
 
     setState(() {});
   }
@@ -166,12 +175,14 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
       firstDate: DateTime.now().subtract(const Duration(days: 30)),
       lastDate: DateTime.now(),
     );
+    if (!mounted) return;
     if (picked != null) {
       String two(int v) => v.toString().padLeft(2, '0');
       entry!.date =
           '${two(picked.day)}-${two(picked.month)}-${picked.year}';
       DraftService.currentDraft = entry!;
       await DraftService.saveDraft();
+      if (!mounted) return;
       setState(() {});
     }
   }
