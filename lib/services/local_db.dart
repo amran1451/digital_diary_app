@@ -96,6 +96,9 @@ class LocalDb {
     );
   }
 
+  /// Exposes the database instance for other services.
+  static Future<Database> open() => _openDb();
+
   /// Вставка или обновление
   static Future<int> saveOrUpdate(EntryData e) async {
     final db = await _openDb();

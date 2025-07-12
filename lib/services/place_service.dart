@@ -1,12 +1,12 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'local_db.dart';
 
 class PlaceService {
   static List<String> _cache = [];
 
   static Future<Database> _openDb() async {
-    final dbPath = await getDatabasesPath();
-    return openDatabase(join(dbPath, 'diary.db'), version: 9);
+    // Ensure the database schema is created by delegating to LocalDb.
+    return LocalDb.open();
   }
 
   static Future<void> init() async {
