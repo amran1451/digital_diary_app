@@ -114,6 +114,61 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
     ],
   };
 
+  static const Map<String, String> _emotionHints = {
+    'Воодушевление': 'Ты видишь цель и веришь, что «мы сделаем это!»',
+    'Восторг': 'Сверхрадость: реальность превзошла ожидания',
+    'Интерес': 'Нос чует новизну, мозг кричит «покажи ещё!»',
+    'Радость': 'Простое «мне хорошо прямо сейчас»',
+    'Счастье': 'Долгосрочное «жизнь в плюс»',
+    'Лёгкость': 'Нет груза, всё по плечу',
+    'Теплота': 'Душевный контакт, уют',
+    'Любовь': 'Глубокая привязанность и забота',
+    'Обожание': 'Любовь на стероидах, чуть идеализированная',
+    'Печаль': 'Потеря или неудовлетворённая потребность',
+    'Одиночество': 'Нехватка близости',
+    'Уныние': 'Временный упадок сил и смысла',
+    'Потерянность': 'Неясно, куда идти дальше',
+    'Безысходность': 'Мир кажется запертой коробкой',
+    'Ностальгия': 'Тоска по хорошему, но ушедшему',
+    'Тоска': 'Неопределённая печаль + желание «чего-то»',
+    'Экзистенциальная тоска':
+    'Печаль о смысле жизни и своей конечности',
+    'Меланхолия': 'Длинная, мягкая грусть с оттенком искусства',
+    'Беспокойство': 'Что-то может пойти не так',
+    'Неуверенность': 'Недостаток веры в себя/ситуацию',
+    'Паника': 'Опасность кажется тотальной, времени ноль',
+    'Напряжение': 'Готовность к удару/рывку',
+    'Предвкушение негатива':
+    'Мысленно смотришь фильм ужасов про будущее',
+    'Тревога': 'Микс напряжения + беспокойства',
+    'Растерянность': 'Много инфы, мало ясности',
+    'Трепет': 'Сильное ожидание (плюс или минус)',
+    'Раздражение': 'Что-то мешает или повторяет ошибку',
+    'Обида': 'Переживание несправедливости к себе',
+    'Зависть': 'У другого есть желаемое, у меня — нет',
+    'Агрессия': 'Импульс атаковать, защититься или завладеть',
+    'Неприязнь': 'Стабильное «не моё», неприятие',
+    'Фрустрация': 'Цель заблокирована, усилия не дают результата',
+    'Сопротивление': 'Внутренний отказ принять изменения',
+    'Пустота': 'Эмоции обнулились или ушли в подполье',
+    'Замерзание': 'Стоп-кадр от шока/страха',
+    'Онемение': 'Система перегружена и выключила сенсоры',
+    'Тупик': 'Ни вперёд, ни назад',
+    'Хтонь': 'Экзистенциальная пустыня + тревожное бездно',
+    'Спокойствие': 'Ничего не шатает лодку',
+    'Устойчивость': 'Верю, что справлюсь с бурями',
+    'Принятие': 'Соглашаюсь с фактом без борьбы',
+    'Доверие': 'Верю, что меня не подставят',
+    'Резонанс': 'Внутреннее совпадение с внешним',
+    'Вина': 'Нарушил свои/чьи-то правила',
+    'Стыд': '«Я плохой/неправильный» на витрине',
+    'Смущение': 'Неловкий свет прожектора на мне',
+    'Неловкость': 'Соц-ситуация «как бы выйти красиво?»',
+    'Амбивалентность': 'Две противоположные эмоции одновременно',
+    'Уязвимость': 'Чувствительность + риск быть раненым',
+    'Катарсис': 'Эмоциональная разрядка и очищение',
+  };
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -289,6 +344,34 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
     );
   }
 
+  Future<void> _showEmotionHint(String emo) async {
+    final hint = _emotionHints[emo];
+    if (hint == null) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(emo, style: Theme.of(ctx).textTheme.titleLarge),
+            const SizedBox(height: 12),
+            Text(hint, style: Theme.of(ctx).textTheme.bodyMedium),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Понятно'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _moodCtrl.dispose();
@@ -433,31 +516,31 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
                           spacing: 8,
                           runSpacing: 8,
                           children: [
-                            for (final emo in emotions)
-                              Tooltip(
-                                message: emo,
-                                child: FilterChip(
-                                  label: Text(emo),
-                                  selected: _selected.contains(emo),
-                                  selectedColor: const Color(0xFF4B3B7F),
-                                  checkmarkColor: const Color(0xFFE6E1E5),
-                                  onSelected: (v) async {
-                                    setState(() {
-                                      if (v) {
-                                        if (_selected.length < 3) {
-                                          _selected.add(emo);
-                                          _influenceCtrls.putIfAbsent(
-                                              emo, () => TextEditingController());
+    for (final emo in emotions)
+    GestureDetector(
+    onLongPress: () => _showEmotionHint(emo),
+    child: FilterChip(
+    label: Text(emo),
+    selected: _selected.contains(emo),
+    selectedColor: const Color(0xFF4B3B7F),
+    checkmarkColor: const Color(0xFFE6E1E5),
+    onSelected: (v) async {
+    setState(() {
+    if (v) {
+    if (_selected.length < 3) {
+    _selected.add(emo);
+    _influenceCtrls.putIfAbsent(
+    emo, () => TextEditingController());
+    }
+    } else {
+    _selected.remove(emo);
+    _influenceCtrls.remove(emo)?.dispose();
                                         }
-                                      } else {
-                                        _selected.remove(emo);
-                                        _influenceCtrls.remove(emo)?.dispose();
-                                      }
-                                    });
-                                    await _save();
-                                  },
+                  });
+                  await _save();
+                  },
+                  ),
                                 ),
-                              ),
                           ],
                         ),
                       ],
