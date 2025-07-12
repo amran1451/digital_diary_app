@@ -93,6 +93,18 @@ class LocalDb {
           ''');
         }
       },
+      onOpen: (db) async {
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS places(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            place TEXT UNIQUE COLLATE NOCASE
+          )
+        ''');
+        await db.execute('''
+          INSERT OR IGNORE INTO places(place)
+          SELECT DISTINCT place FROM entries WHERE TRIM(place) <> ''
+        ''');
+      },
     );
   }
 
