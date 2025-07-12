@@ -5,6 +5,7 @@ import '../../services/quick_note_service.dart';
 import '../../theme/dark_diary_theme.dart';
 import 'achievements_screen_new.dart';
 import '../../widgets/diary_menu_button.dart';
+import '../../widgets/keyboard_safe_content.dart';
 
 class MoodScreenNew extends StatefulWidget {
   static const routeName = '/mood-new';
@@ -387,6 +388,7 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
     return Theme(
       data: theme,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: DarkDiaryTheme.background,
         appBar: AppBar(
           title: const Text('Настроение'),
@@ -402,9 +404,12 @@ class _MoodScreenNewState extends State<MoodScreenNew> {
         ),
         body: SafeArea(
           bottom: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
+    child: KeyboardSafeContent(
+    child: SingleChildScrollView(
+    keyboardDismissBehavior:
+    ScrollViewKeyboardDismissBehavior.onDrag,
+    padding: const EdgeInsets.all(16),
+    child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(child: Text('3/6', style: theme.textTheme.labelMedium)),

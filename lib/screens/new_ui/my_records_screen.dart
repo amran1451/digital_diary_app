@@ -16,6 +16,7 @@ import '../history_diary/export_screen.dart';
 import '../history_diary/import_screen.dart';
 import '../history_diary/analytics/analytics_menu_screen.dart';
 import '../../utils/rating_emoji.dart';
+import '../../widgets/keyboard_safe_content.dart';
 
 enum MyRecordsMenu {
   export,
@@ -320,6 +321,7 @@ class _MyRecordsScreenState extends State<MyRecordsScreen> {
     return Theme(
       data: theme,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: DarkDiaryTheme.background,
         appBar: AppBar(
           title: const Text('Мои записи'),
@@ -433,6 +435,8 @@ class _MyRecordsScreenState extends State<MyRecordsScreen> {
               ? const Center(child: Text('Записей нет'))
               : ListView.builder(
             controller: _scrollCtrl,
+            keyboardDismissBehavior:
+            ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.all(8),
             itemCount: _entries.length,
             itemBuilder: (ctx, i) {

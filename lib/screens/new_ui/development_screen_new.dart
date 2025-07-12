@@ -6,6 +6,7 @@ import '../../utils/draft_note_helper.dart';
 import '../../theme/dark_diary_theme.dart';
 import 'focus_screen_new.dart';
 import '../../widgets/diary_menu_button.dart';
+import '../../widgets/keyboard_safe_content.dart';
 
 class DevelopmentScreenNew extends StatefulWidget {
   static const routeName = '/development-new';
@@ -148,6 +149,7 @@ class _DevelopmentScreenNewState extends State<DevelopmentScreenNew> {
     return Theme(
       data: theme,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: DarkDiaryTheme.background,
         appBar: AppBar(
                   title: const Text('Личностный рост'),
@@ -155,9 +157,12 @@ class _DevelopmentScreenNewState extends State<DevelopmentScreenNew> {
                 ),
         body: SafeArea(
           bottom: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
+    child: KeyboardSafeContent(
+    child: SingleChildScrollView(
+    keyboardDismissBehavior:
+    ScrollViewKeyboardDismissBehavior.onDrag,
+    padding: const EdgeInsets.all(16),
+    child: Column(
               children: [
                 Center(child: Text('5/6', style: theme.textTheme.labelMedium)),
                 const SizedBox(height: 8),

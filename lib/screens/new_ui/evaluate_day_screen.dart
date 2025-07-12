@@ -18,6 +18,7 @@ import 'state_screen.dart';
 import '../history_diary/entries_screen.dart';
 import '../../widgets/diary_menu_button.dart';
 import '../../widgets/unsaved_draft_dialog.dart';
+import '../../widgets/keyboard_safe_content.dart';
 
 class EvaluateDayScreen extends StatefulWidget {
   static const routeName = '/evaluate-day';
@@ -231,6 +232,7 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
     return Theme(
       data: theme,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: DarkDiaryTheme.background,
         appBar: AppBar(
           title: const Text('Дневник'),
@@ -254,10 +256,13 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
         ),
         body: SafeArea(
           bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    child: KeyboardSafeContent(
+    child: SingleChildScrollView(
+    keyboardDismissBehavior:
+    ScrollViewKeyboardDismissBehavior.onDrag,
+    padding: const EdgeInsets.all(16),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(child: Text('1/6', style: theme.textTheme.labelMedium)),
                 const SizedBox(height: 8),
@@ -377,31 +382,29 @@ class _EvaluateDayScreenState extends State<EvaluateDayScreen> {
                     await DraftService.saveDraft();
                   },
                 ),
-                const Spacer(),
-                SafeArea(
-                  top: false,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: () async {
-                        if (entry == null) return;
-                        DraftService.currentDraft = entry!;
-                        await DraftService.saveDraft();
-                        if (!mounted) return;
-                        Navigator.pushNamed(
-                          context,
-                          StateScreenNew.routeName,
-                          arguments: entry,
-                        );
-                      },
-                      child: const Text('Далее: Состояние'),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
         ),
+    bottomNavigationBar: SafeArea(
+    child: Padding(
+    padding: const EdgeInsets.all(16),
+    child: FilledButton(
+    onPressed: () async {
+    if (entry == null) return;
+    DraftService.currentDraft = entry!;
+    await DraftService.saveDraft();
+    if (!mounted) return;
+    Navigator.pushNamed(
+    context,
+    StateScreenNew.routeName,
+    arguments: entry,
+    );
+    },
+    child: const Text('Далее: Состояние'),
+    ),
+    ),
+    ),
       ),
     );
   }

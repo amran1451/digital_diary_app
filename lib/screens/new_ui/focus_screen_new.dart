@@ -7,6 +7,7 @@ import '../../theme/dark_diary_theme.dart';
 import '../send_diary/preview_screen.dart';
 import '../../widgets/diary_menu_button.dart';
 import 'preview_screen_new.dart';
+import '../../widgets/keyboard_safe_content.dart';
 
 class FocusScreenNew extends StatefulWidget {
   static const routeName = '/focus-new';
@@ -156,6 +157,7 @@ class _FocusScreenNewState extends State<FocusScreenNew> {
     return Theme(
       data: theme,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: DarkDiaryTheme.background,
         appBar: AppBar(
                   title: const Text('Итоги'),
@@ -163,9 +165,12 @@ class _FocusScreenNewState extends State<FocusScreenNew> {
                 ),
         body: SafeArea(
           bottom: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
+    child: KeyboardSafeContent(
+    child: SingleChildScrollView(
+    keyboardDismissBehavior:
+    ScrollViewKeyboardDismissBehavior.onDrag,
+    padding: const EdgeInsets.all(16),
+    child: Column(
               children: [
                 Center(child: Text('6/6', style: theme.textTheme.labelMedium)),
                 const SizedBox(height: 8),

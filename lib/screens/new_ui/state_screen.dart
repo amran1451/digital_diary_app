@@ -7,6 +7,7 @@ import '../../utils/draft_note_helper.dart';
 import '../../theme/dark_diary_theme.dart';
 import 'mood_screen.dart';
 import '../../widgets/diary_menu_button.dart';
+import '../../widgets/keyboard_safe_content.dart';
 
 class StateScreenNew extends StatefulWidget {
   static const routeName = '/state-new';
@@ -207,8 +208,14 @@ class _StateScreenNewState extends State<StateScreenNew> {
     final durCtrl = TextEditingController(text: _activityDurationCtrls[act]?.text);
     final result = await showModalBottomSheet<String>(
       context: context,
+      isScrollControlled: true,
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 16,
+          bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -616,6 +623,7 @@ class _StateScreenNewState extends State<StateScreenNew> {
     return Theme(
       data: theme,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: DarkDiaryTheme.background,
         appBar: AppBar(
           title: const Text('Состояние'),
@@ -623,9 +631,12 @@ class _StateScreenNewState extends State<StateScreenNew> {
         ),
         body: SafeArea(
           bottom: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
+    child: KeyboardSafeContent(
+    child: SingleChildScrollView(
+    keyboardDismissBehavior:
+    ScrollViewKeyboardDismissBehavior.onDrag,
+    padding: const EdgeInsets.all(16),
+    child: Column(
               children: [
                 Center(child: Text('2/6', style: theme.textTheme.labelMedium)),
                 const SizedBox(height: 8),

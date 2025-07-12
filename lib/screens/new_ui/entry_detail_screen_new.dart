@@ -8,6 +8,7 @@ import '../../theme/dark_diary_theme.dart';
 
 import '../../utils/rating_emoji.dart';
 import '../../utils/wellbeing_utils.dart';
+import '../../widgets/keyboard_safe_content.dart';
 
 class EntryDetailScreenNew extends StatefulWidget {
   static const routeName = '/entry_detail_new';
@@ -269,7 +270,10 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
   Widget _buildEditForm(ThemeData theme) {
     return Form(
       key: _formKey,
-      child: ListView(
+        child: KeyboardSafeContent(
+        child: ListView(
+        keyboardDismissBehavior:
+        ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.all(16),
         children: [
           Row(
@@ -404,6 +408,7 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
           return true;
         },
         child: Scaffold(
+          resizeToAvoidBottomInset: true,
           backgroundColor: DarkDiaryTheme.background,
           appBar: AppBar(
             leadingWidth: 88,
@@ -453,6 +458,8 @@ class _EntryDetailScreenNewState extends State<EntryDetailScreenNew> {
         body: _editing
         ? _buildEditForm(theme)
         : ListView.builder(
+          keyboardDismissBehavior:
+          ScrollViewKeyboardDismissBehavior.onDrag,
           padding: const EdgeInsets.all(8),
           itemCount: sections.length + (entry.notificationsLog.isNotEmpty ? 1 : 0),
           itemBuilder: (ctx, i) {

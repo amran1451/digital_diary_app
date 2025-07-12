@@ -6,6 +6,7 @@ import '../../utils/draft_note_helper.dart';
 import '../../theme/dark_diary_theme.dart';
 import 'development_screen_new.dart';
 import '../../widgets/diary_menu_button.dart';
+import '../../widgets/keyboard_safe_content.dart';
 
 class AchievementsScreenNew extends StatefulWidget {
   static const routeName = '/achievements-new';
@@ -154,6 +155,7 @@ class _AchievementsScreenNewState extends State<AchievementsScreenNew> {
     return Theme(
       data: theme,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: DarkDiaryTheme.background,
         appBar: AppBar(
                   title: const Text('Достижения'),
@@ -161,13 +163,16 @@ class _AchievementsScreenNewState extends State<AchievementsScreenNew> {
                 ),
         body: SafeArea(
           bottom: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Center(child: Text('4/6', style: theme.textTheme.labelMedium)),
-                const SizedBox(height: 8),
-                _buildItem(
+          child: KeyboardSafeContent(
+            child: SingleChildScrollView(
+              keyboardDismissBehavior:
+              ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Center(child: Text('4/6', style: theme.textTheme.labelMedium)),
+                  const SizedBox(height: 8),
+                  _buildItem(
                   emoji: '✅',
                   title: 'Что сделал важного?',
                   hint: 'Один-два пункта',

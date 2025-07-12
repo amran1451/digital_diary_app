@@ -17,6 +17,7 @@ import '../history_diary/entries_screen.dart';
 import '../history_diary/entry_detail_screen.dart';
 import 'evaluate_day_screen.dart';
 import 'my_records_screen.dart';
+import '../../widgets/keyboard_safe_content.dart';
 
 class PreviewScreenNew extends StatefulWidget {
   static const routeName = '/preview-new';
@@ -93,6 +94,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
     return Theme(
       data: theme,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: DarkDiaryTheme.background,
         appBar: AppBar(
           toolbarHeight: 72,
@@ -187,6 +189,8 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
                   ),
                 Expanded(
                   child: ListView.builder(
+                    keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: const EdgeInsets.all(8),
                     itemCount: sections.length,
                     itemBuilder: (ctx, i) {
