@@ -8,7 +8,7 @@ import '../../services/csv_service.dart';
 import '../../utils/parse_utils.dart';
 import '../../utils/wellbeing_utils.dart';
 import '../../theme/dark_diary_theme.dart';
-import 'import_preview_screen.dart';
+import '../history_diary/import_preview_screen.dart';
 
 class ImportScreenNew extends StatefulWidget {
   static const routeName = '/import-new';
